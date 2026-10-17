@@ -1,0 +1,7 @@
+{
+  "implants": [
+    { "id": "neural_chip", "cost": 100, "effects": { "xp": 0.5 } },
+    { "id": "bone_frame", "cost": 500, "effects": { "decay": -0.3 } },
+    { "id": "credit_spoofer", "cost": 2000, "effects": { "income": 0.5 }, "persistent": true }
+  ]
+}

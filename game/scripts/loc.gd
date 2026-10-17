@@ -1,0 +1,80 @@
+extends Node
+
+## 言語ファイル（lang/*.json）を読み込み、TranslationServer に登録する。
+## 形式: {"locale": "ja", "name": "日本語", "strings": {"キー": "文字列"}}
+## MOD の lang/ に同じ locale のファイルを置くと文字列を追加・上書きでき、新しい locale なら言語が増える。
+
+signal language_changed
+
+const SETTINGS_PATH := "user://settings.json"
+const DEFAULT_LOCALE := "en"
+
+var _translations := {}  # locale -> Translation
+var _names := {}  # locale -> 言語の表示名
+
+
+func _ready() -> void:
+	_load_languages()
+	set_language(_saved_or_system_locale())
+
+
+## 使える言語の locale 一覧
+func languages() -> Array:
+	var list := _names.keys()
+	list.sort()
+	return list
+
+
+func language_name(locale: String) -> String:
+	return _names.get(locale, locale)
+
+
+func current() -> String:
+	return TranslationServer.get_locale()
+
+
+func set_language(locale: String) -> void:
+	if not _translations.has(locale):
+		locale = DEFAULT_LOCALE
+	TranslationServer.set_locale(locale)
+	_save_setting(locale)
+	language_changed.emit()
+
+
+## 書式つきの翻訳。t("ui.credits", {"n": "10"}) -> "クレジット: 10"
+func t(key: String, args := {}) -> String:
+	return tr(key).format(args)
+
+
+func _load_languages() -> void:
+	for path in ModPaths.json_files("lang"):
+		var data: Variant = ModPaths.load_json(path)
+		if not data is Dictionary or not data.has("locale"):
+			push_warning("Language file without locale: " + path)
+			continue
+		var locale: String = data["locale"]
+		if not _translations.has(locale):
+			var translation := Translation.new()
+			translation.locale = locale
+			_translations[locale] = translation
+			TranslationServer.add_translation(translation)
+		if data.has("name"):
+			_names[locale] = data["name"]
+		var strings: Dictionary = data.get("strings", {})
+		for key in strings:
+			_translations[locale].add_message(key, strings[key])
+
+
+func _saved_or_system_locale() -> String:
+	if FileAccess.file_exists(SETTINGS_PATH):
+		var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(SETTINGS_PATH))
+		if data is Dictionary and _translations.has(data.get("locale", "")):
+			return data["locale"]
+	var system := OS.get_locale_language()
+	return system if _translations.has(system) else DEFAULT_LOCALE
+
+
+func _save_setting(locale: String) -> void:
+	var file := FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
+	if file:
+		file.store_string(JSON.stringify({"locale": locale}))

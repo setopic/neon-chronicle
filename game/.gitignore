@@ -1,0 +1,4 @@
+# Godot の生成物
+.godot/
+build/
+*.zip

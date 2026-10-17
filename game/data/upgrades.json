@@ -1,0 +1,8 @@
+{
+  "upgrades": [
+    { "id": "echo", "cost": 1, "cost_growth": 2, "max_level": 10, "effects_per_level": { "xp": 0.25 } },
+    { "id": "contacts", "cost": 1, "cost_growth": 2, "max_level": 10, "effects_per_level": { "income": 0.25 } },
+    { "id": "frame", "cost": 2, "cost_growth": 2, "max_level": 5, "effects_per_level": { "decay": -0.1 } },
+    { "id": "talent", "cost": 3, "cost_growth": 3, "max_level": 5, "effects_per_level": { "start_level": 1 } }
+  ]
+}

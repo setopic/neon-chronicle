@@ -1,0 +1,31 @@
+{
+  "jobs": [
+    {
+      "id": "courier",
+      "income": 1.0,
+      "skill": "negotiation",
+      "skill_bonus": 0.15,
+      "danger": 1.0,
+      "xp": { "combat": 1.0, "negotiation": 0.6 },
+      "requires": {}
+    },
+    {
+      "id": "hacker",
+      "income": 5.0,
+      "skill": "hacking",
+      "skill_bonus": 0.15,
+      "danger": 1.2,
+      "xp": { "hacking": 1.0, "negotiation": 0.3 },
+      "requires": { "negotiation": 3 }
+    },
+    {
+      "id": "mercenary",
+      "income": 20.0,
+      "skill": "combat",
+      "skill_bonus": 0.15,
+      "danger": 2.0,
+      "xp": { "combat": 1.5 },
+      "requires": { "combat": 6 }
+    }
+  ]
+}

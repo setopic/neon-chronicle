@@ -1,0 +1,7 @@
+{
+  "skills": [
+    { "id": "hacking", "effects_per_level": {} },
+    { "id": "combat", "effects_per_level": { "decay": -0.01 } },
+    { "id": "negotiation", "effects_per_level": { "income": 0.03 } }
+  ]
+}

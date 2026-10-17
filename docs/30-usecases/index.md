@@ -16,7 +16,6 @@ tags: [index]
 ## ノード一覧
 
 <!-- graph:children:start -->
-- [UC-01 予約を確定する](./uc-01-sample-confirm-booking.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

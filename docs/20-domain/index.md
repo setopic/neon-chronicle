@@ -16,7 +16,6 @@ tags: [index]
 ## ノード一覧
 
 <!-- graph:children:start -->
-- [DOM-01 予約](./dom-01-sample-booking.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
@@ -27,16 +26,6 @@ python -m tools.graph new --type domain --id DOM-02 --title "..." --slug some-sl
 
 <!-- graph:terms:start -->
 
-## 用語の一覧（自動生成 / 手で編集しない）
-
-各ドメインノードの「用語」表を集めたものである。直すときは、元のノードの表を直す。
-同じ意味のことを書くときは、ここにある語を使う。
-
-### [DOM-01 予約](./dom-01-sample-booking.md)
-
-| 用語 | 意味 | 旧称 |
-| --- | --- | --- |
-| 資源 | 確保の対象となるもの。部屋・席・枠のどれでもよく、実体の種類を問わない |  |
-| 確定 | 重なりの排除が保証された状態。誰かが承認することではない | 本予約（改める前の呼び名） |
+_用語表を持つドメインノードは、まだ無い。_
 
 <!-- graph:terms:end -->

@@ -29,7 +29,6 @@ tags: [index]
 ## ノード一覧
 
 <!-- graph:children:start -->
-- [CON-01 予約確定エンドポイント](./con-01-sample-confirm-booking.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
