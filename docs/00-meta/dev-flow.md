@@ -134,6 +134,8 @@ GitHub Projectの欄は次の4つである。
 
 実績は、issueに取り組んだ期間とプロジェクトで絞って集計する。同時に進めるissueは1つにし、issueごとにセッションを分ける。手元のセッションの消費は、次のコマンドで集計する。Remote Controlで手元から動かしたセッションも、ここに入る。
 
+`--project`は、ターンの最初のプロンプトを受けたときの作業フォルダで絞り込む。そのため、手元のセッションは`C:\Users\setom\develop\neon-chronicle`で始める。`develop`で始めて途中で移ると、作業はすべて`develop`の消費として記録される。記録は`scan`を回したときに取り込まれるので、集計の前に回す。
+
 ```bash
 python -I ~/.claude/token-log/token_log.py scan
 python -I ~/.claude/token-log/token_log.py report --project neon-chronicle --since <開始日> --until <閉じた日の翌日>
