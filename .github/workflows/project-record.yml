@@ -1,0 +1,106 @@
+# GitHub Projectの着手日・終了日・実績を書き込む（META-05「見積もりと実績」）。
+#
+# 日付はClaudeを使わずに、GitHubの記録から決める。日付は日本時間で書く。
+#   終了日  issueを閉じた日
+#   着手日  そのissueを閉じるPR（本文に「Closes #番号」）が最初に作られた日。無ければ終了日と同じ日
+#
+# 実績だけは、作業したセッションの記録からしか出せない。そのため、issueを閉じるClaudeが
+# 「実績: 5,800」で始まるコメントを付け、ここでProjectに写す。
+# ClaudeのコメントはGitHubでは持ち主の名前で付くので、持ち主のコメントだけを拾う。
+#
+# add-to-project.ymlと同じ設定を使う。どちらかが無ければ何もしない。
+#   Variables: PROJECT_URL         https://github.com/users/<持ち主>/projects/<番号>
+#   Secrets:   ADD_TO_PROJECT_PAT  classicのPAT。projectスコープ（非公開なら repo も）
+#
+# GITHUB_TOKENではProjects v2に書けないので、PATが要る。
+name: project-record
+
+on:
+  issues:
+    types: [closed]
+  issue_comment:
+    types: [created]
+
+# PATだけで動く。GITHUB_TOKENには何も与えない。
+permissions: {}
+
+jobs:
+  record:
+    if: >-
+      vars.PROJECT_URL != '' &&
+      !github.event.issue.pull_request && (
+        (github.event_name == 'issues' && github.event.issue.state_reason == 'completed') ||
+        (github.event_name == 'issue_comment' &&
+         github.event.comment.author_association == 'OWNER' &&
+         startsWith(github.event.comment.body, '実績:'))
+      )
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+      PROJECT_URL: ${{ vars.PROJECT_URL }}
+      REPO: ${{ github.repository }}
+      ISSUE: ${{ github.event.issue.number }}
+      ISSUE_URL: ${{ github.event.issue.html_url }}
+      ISSUE_NODE: ${{ github.event.issue.node_id }}
+      CLOSED_AT: ${{ github.event.issue.closed_at }}
+      BODY: ${{ github.event.comment.body }}
+    steps:
+      - name: Projectに書く
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::PROJECT_URL はあるが ADD_TO_PROJECT_PAT が無いため、Project に書きません"
+            exit 0
+          fi
+
+          kind=$(sed -E 's#.*/(users|orgs)/([^/]+)/projects/([0-9]+).*#\1#' <<<"$PROJECT_URL")
+          owner=$(sed -E 's#.*/(users|orgs)/([^/]+)/projects/([0-9]+).*#\2#' <<<"$PROJECT_URL")
+          number=$(sed -E 's#.*/(users|orgs)/([^/]+)/projects/([0-9]+).*#\3#' <<<"$PROJECT_URL")
+          [ "$kind" = users ] && kind=user || kind=organization
+
+          # gh projectのコマンドは、projectスコープのほかにread:orgとread:discussionを求めて落ちる。
+          # GraphQLを直に呼べば、projectスコープだけで足りる。
+          project=$(gh api graphql -F login="$owner" -F n="$number" -f query="
+            query(\$login: String!, \$n: Int!) {
+              $kind(login: \$login) { projectV2(number: \$n) {
+                id
+                fields(first: 50) { nodes { ... on ProjectV2FieldCommon { id name } } }
+              } }
+            }" --jq ".data.$kind.projectV2")
+          project_id=$(jq -r .id <<<"$project")
+          field() { jq -er --arg n "$1" '.fields.nodes[] | select(.name == $n) | .id' <<<"$project"; }
+
+          # 載っていればその項目を返すので、Auto-addの前後どちらでも動く。
+          item=$(gh api graphql -F p="$project_id" -F c="$ISSUE_NODE" -f query='
+            mutation($p: ID!, $c: ID!) { addProjectV2ItemById(input: {projectId: $p, contentId: $c}) { item { id } } }
+          ' --jq .data.addProjectV2ItemById.item.id)
+
+          set_field() {  # 欄の名前、値の種類（date か number）、値
+            gh api graphql -F p="$project_id" -F i="$item" -F f="$(field "$1")" -F v="$3" -f query="
+              mutation(\$p: ID!, \$i: ID!, \$f: ID!, \$v: $([ "$2" = date ] && echo Date || echo Float)!) {
+                updateProjectV2ItemFieldValue(input: {projectId: \$p, itemId: \$i, fieldId: \$f, value: {$2: \$v}}) { clientMutationId }
+              }" >/dev/null
+          }
+          jst() { TZ=Asia/Tokyo date -d "$1" +%F; }
+
+          if [ "$GITHUB_EVENT_NAME" = issues ]; then
+            # 参照しただけのPRは、そのissueに着手していないことがある。閉じたPRだけを見る。
+            first_pr=$(gh api graphql -F owner="${REPO%/*}" -F name="${REPO#*/}" -F n="$ISSUE" -f query='
+              query($owner: String!, $name: String!, $n: Int!) {
+                repository(owner: $owner, name: $name) { issue(number: $n) {
+                  closedByPullRequestsReferences(first: 20, includeClosedPrs: true) { nodes { createdAt } }
+                } }
+              }' --jq '.data.repository.issue.closedByPullRequestsReferences.nodes[].createdAt' | sort | head -n1)
+            start=$(jst "${first_pr:-$CLOSED_AT}")
+            end=$(jst "$CLOSED_AT")
+            set_field 着手日 date "$start"
+            set_field 終了日 date "$end"
+            echo "着手日=$start 終了日=$end を $ISSUE_URL に書いた"
+          else
+            actual=$(tr -d '\r' <<<"$BODY" | sed -nE '1s/^実績:[[:space:]]*([0-9,]+)[[:space:]]*$/\1/p' | tr -d ',')
+            # 形が崩れたコメントは、空欄で上書きせずに落とす。落ちたことは実行の一覧に残る。
+            [ -n "$actual" ] || { echo "::error::1行目から実績が読めない"; exit 1; }
+            set_field 実績 number "$actual"
+            echo "実績=$actual を $ISSUE_URL に書いた"
+          fi
