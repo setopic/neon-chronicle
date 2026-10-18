@@ -132,12 +132,27 @@ GitHub Projectの欄は次の4つである。
 
 1週間で使える量は、仮に20万とする。2026-10-17にProプランの週の上限を16%使っていたとき、手元の記録では6.3万だった。ここから週の上限を約40万と見て、その半分をこのプロジェクトに当てた。クラウドのセッションの消費は手元の記録に入らないので、40万は少なめに出ている。
 
-実績は、issueに取り組んだ期間とプロジェクトで絞って集計する。同時に進めるissueは1つにし、issueごとにセッションを分ける。
+実績は、issueに取り組んだ期間とプロジェクトで絞って集計する。同時に進めるissueは1つにし、issueごとにセッションを分ける。手元のセッションの消費は、次のコマンドで集計する。Remote Controlで手元から動かしたセッションも、ここに入る。
 
 ```bash
 python -I ~/.claude/token-log/token_log.py scan
 python -I ~/.claude/token-log/token_log.py report --project neon-chronicle --since <開始日> --until <閉じた日の翌日>
 ```
+
+クラウドのセッションの消費は、手元の記録に入らない。そのため、issueを閉じるときに、そのissueを進めたクラウドのスレッドのClaudeが自分の分を出す。手元の`report`の値とこの値を足したものを、「実績」に書く。
+
+値は、セッションの記録の`result`（`list_events`で`kinds`に`result`を渡す）から取る。`result`は1ターンごとに残り、`modelUsage`にモデルごとのトークン数の累計を持つ。この累計は、セッションを動かすプロセスが起動してからの値である。`process_turn_index`が0に戻ったところでプロセスが起動し直しているので、その直前の`result`の`modelUsage`を足していく。最後のプロセスは、最後の`result`の値を使う。
+
+コスト指数は、`token_log.py`と同じ重みで出す。各欄に次の重みを掛けて足し、モデルの重み（OpusとFableが5、Sonnetが3、Haikuが1）を掛けて、1,000で割る。
+
+| `modelUsage`の欄 | 重み |
+| --- | --- |
+| `inputTokens` | 1 |
+| `cacheCreationInputTokens` | 2 |
+| `cacheReadInputTokens` | 0.1 |
+| `outputTokens` | 5 |
+
+`modelUsage`には、キャッシュの書き込みが5分のものか1時間のものかの区別が無い。これまでのクラウドのセッションの記録では5分のものが0だったので、1時間のもの（重み2）として数える。`token_log.py`の重みを変えたら、この表も合わせる。
 
 マイルストーンを閉じたら、見積もりと実績の比を出し、目安の表と「1週間で使える量」を直す。直した値と理由は、この節に書く。
 
