@@ -16,6 +16,9 @@ CIの app-check.yml から呼ぶ。Godotを使わずに分かる抜けだけを�
 11. 体の種類が1つ以上ある。第1周は data の最初の体で目覚める（DOM-11）
 12. ジンの依頼は、仕事かスキルのどちらか一方を持ち、data にある仕事やスキルを指す。
     各依頼に、ジンの台詞のキー（request.<id>.offer）がある（DOM-12）
+13. 人物のイベントの前の選択の条件と説明の書き分けは、同じ人物の前の段のイベントを指す。
+    説明を書き分けたイベントは、指したイベントの選択肢ごとに説明のキー（event.<id>.desc.<選択肢>）を持つ。
+    要る断片は data にある断片を指す（DOM-13）
 
 ゲームは足りないキーを英語で補うので（loc.gd）、抜けは画面にキーのまま出るまで気づけない。
 """
@@ -77,6 +80,8 @@ def main():
     endings = {e.get("id") for data in datas.values() for e in data.get("endings", [])}
     jobs = {e.get("id") for data in datas.values() for e in data.get("jobs", [])}
     skills = {e.get("id") for data in datas.values() for e in data.get("skills", [])}
+    fragments = {e.get("id") for data in datas.values() for e in data.get("fragments", [])}
+    events = {e.get("id"): e for data in datas.values() for e in data.get("events", [])}
     if not any(data.get("bodies") for data in datas.values()):
         errors.append("data に体の種類（bodies）が1つも無い")
 
@@ -93,7 +98,7 @@ def main():
                 errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
         for event in data.get("events", []):
             choices = event.get("choices", [])
-            if not any(not c.get("requires") for c in choices):
+            if not any(not c.get("requires") and not c.get("requires_choice") for c in choices):
                 errors.append(f"{path.relative_to(GAME)}: 選ぶ条件の無い選択肢が無い: event.{event.get('id')}")
             if any(c.get("durability", 0) < 0 for c in choices):
                 key = f"event.{event.get('id')}.fall"
@@ -107,6 +112,30 @@ def main():
                     key = f"event.{event.get('id')}.{choice.get('id')}.{suffix}"
                     if key not in base:
                         errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+
+        seen = []
+        for event in data.get("events", []):
+            where = f"{path.relative_to(GAME)}: event.{event.get('id')}"
+            character = event.get("character")
+            earlier = {e.get("id") for e in seen if character and e.get("character") == character}
+            seen.append(event)
+            if "fragment" in event and event["fragment"] not in fragments:
+                errors.append(f"{where}: 無い断片を指している: {event['fragment']}")
+            by = event.get("desc_by")
+            if by is not None:
+                if by not in earlier:
+                    errors.append(f"{where}: 同じ人物の前の段ではないイベントで説明を書き分けている: {by}")
+                for c in events.get(by, {}).get("choices", []):
+                    key = f"event.{event.get('id')}.desc.{c.get('id')}"
+                    if key not in base:
+                        errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+            for choice in event.get("choices", []):
+                after = choice.get("requires_choice")
+                if after is None:
+                    continue
+                parts = after.split(".")
+                if len(parts) != 2 or parts[0] not in earlier or not any(c.get("id") == parts[1] for c in events[parts[0]].get("choices", [])):
+                    errors.append(f"{where}.{choice.get('id')}: 同じ人物の前の段の選択肢を指していない: {after}")
 
         for req in data.get("requests", []):
             where = f"{path.relative_to(GAME)}: request.{req.get('id')}"

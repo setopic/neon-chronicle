@@ -53,6 +53,65 @@
       ]
     },
     {
+      "id": "rei_1",
+      "jobs": ["hacker"],
+      "character": "rei",
+      "choices": [
+        { "id": "listen", "xp": { "hacking": 6 } },
+        { "id": "refuse" }
+      ]
+    },
+    {
+      "id": "rei_2",
+      "jobs": ["hacker"],
+      "character": "rei",
+      "desc_by": "rei_1",
+      "choices": [
+        { "id": "help", "requires": { "hacking": 6 }, "credits": 40, "durability": -6, "xp": { "hacking": 12 } },
+        { "id": "decline" }
+      ]
+    },
+    {
+      "id": "rei_3",
+      "jobs": ["hacker"],
+      "character": "rei",
+      "desc_by": "rei_2",
+      "choices": [
+        { "id": "promise", "requires_choice": "rei_2.help", "xp": { "hacking": 15 } },
+        { "id": "alone", "xp": { "hacking": 5 } }
+      ]
+    },
+    {
+      "id": "jin_1",
+      "jobs": ["courier"],
+      "character": "jin",
+      "choices": [
+        { "id": "heed", "credits": -10 },
+        { "id": "ignore", "credits": 50, "durability": -10 }
+      ]
+    },
+    {
+      "id": "jin_2",
+      "jobs": ["mercenary"],
+      "character": "jin",
+      "desc_by": "jin_1",
+      "choices": [
+        { "id": "rescue", "durability": -12, "xp": { "combat": 12 } },
+        { "id": "leave" }
+      ]
+    },
+    {
+      "id": "jin_3",
+      "jobs": ["courier",  "mercenary"],
+      "character": "jin",
+      "fragment": "name",
+      "desc_by": "jin_2",
+      "choices": [
+        { "id": "tell", "xp": { "negotiation": 15 } },
+        { "id": "silent" }
+      ]
+    },
+    {
       "id": "core_server",
       "jobs": ["core_breach"],
       "choices": [

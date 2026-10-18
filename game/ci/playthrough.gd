@@ -5,6 +5,7 @@ extends SceneTree
 ## 条件がそろったら稼ぎの多い仕事に就く。永続強化とインプラントは買えるものから買う。
 ## 転生するときは、説明に書いてある効果を見て、経験がいちばん増える体を選ぶ。
 ## ジンの依頼は狙わない。果たした依頼の数だけを出す（ADR-0013）。
+## 人物のイベントも狙わない。エンディングまでに選んだ選択肢を出す（DOM-13）。
 ## 遊んだ時間（進めた秒数）を出し、制限時間までにたどり着かなければ終了コード1で終わる。
 ## セーブは別のファイルに書くので、手元のセーブは消えない。
 ##
@@ -111,6 +112,7 @@ func _finish(code: int) -> void:
 	print("played %d min, life %d, fragments %d / %d, endings %s, requests done %d" % [
 		int(_played / 60.0), _game.life_number, _game.fragments.size(),
 		_data.order["fragments"].size(), _game.endings_reached(), _requests_done])
+	print("  character events: %s" % _game.character_choices)
 	for entry in _game.chronicle:
 		print("  life %d (%s): %s" % [int(entry["life"]), entry.get("body", ""), _game.story_of(entry)])
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))

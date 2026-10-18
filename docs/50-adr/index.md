@@ -30,6 +30,7 @@ tags: [index]
 - [ADR-0011 倒れた理由の句をイベントごとに書く](./adr-0011-fall-phrase-per-event.md)
 - [ADR-0012 転生のときに4種類の体から1つを選ぶ](./adr-0012-choose-body-on-rebirth.md)
 - [ADR-0013 周の始まりにジンの依頼を1つ示し、果たせば記憶ポイントを上乗せする](./adr-0013-jin-requests.md)
+- [ADR-0014 人物のイベントを1周に1段ずつ進め、前の段の選択で文と選択肢を変える](./adr-0014-character-events-across-lives.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

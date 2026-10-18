@@ -379,7 +379,7 @@ func _build_event() -> Control:
 	var panel: Control = box.get_parent().get_parent()
 	panel.custom_minimum_size = Vector2(620, 0)
 	center.add_child(panel)
-	var text := _label(GameData.desc_of("events", Game.pending_event), Color.WHITE, 17)
+	var text := _label(Game.event_desc(Game.pending_event), Color.WHITE, 17)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(text)
 	for choice in Game.event_choices():
