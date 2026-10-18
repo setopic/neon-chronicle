@@ -167,6 +167,7 @@
     "ui.rebirth_title_ending": "The end of the story",
     "log.fragment": "A memory fragment returned: {fragment}",
     "log.ending": "You reached the end of the story. Memory points +{points}",
+    "log.away": "{age} passed while you were away.",
     "fragment.white_room.name": "The White Room",
     "fragment.white_room.desc": "A memory of waking in a white operating room. Faceless technicians were saying, \"Transferring the subject's consciousness.\" You still can't remember your own name.",
     "fragment.contract.name": "The Contract",

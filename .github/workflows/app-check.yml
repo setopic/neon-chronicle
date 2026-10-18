@@ -58,3 +58,8 @@ jobs:
       - name: 最初から最後まで遊んで、エンディングにたどり着くか確かめる
         working-directory: game
         run: timeout 300 ~/godot/godot --headless --path . --script res://ci/playthrough.gd
+
+      # セーブの時刻をずらしてロードし、閉じていた時間の分だけ進むかを見る（ADR-0007）。
+      - name: 閉じていた時間の分だけ進むか確かめる
+        working-directory: game
+        run: timeout 120 ~/godot/godot --headless --path . --script res://ci/away.gd

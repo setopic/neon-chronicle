@@ -27,7 +27,7 @@ related: []
 | `mod_paths.gd` | 本体とMODの読み込み先をまとめる | ファイルを読むこと |
 | `loc.gd`（`Loc`） | 言語ファイルを読み、言語を切り替える。言語と「イベントで止める」の設定を`user://settings.json`に保存する（[ADR-0004](../50-adr/adr-0004-event-rules.md)） | 数値を扱うこと |
 | `game_data.gd`（`GameData`） | `data`を読む。同じidは後から読んだものが上書きする | 進行の状態を持つこと |
-| `game_state.gd`（`Game`） | 進行・転生・セーブとロード（`user://save.json`）を受け持つ | 画面を描くこと |
+| `game_state.gd`（`Game`） | 進行・転生・セーブとロード（`user://save.json`）を受け持つ。セーブはセーブした時刻を持ち、開いたときに閉じていた時間を進める（[ADR-0007](../50-adr/adr-0007-away-progress.md)） | 画面を描くこと |
 | `main.gd`・`city.gd` | 画面と、上部の3Dの街を描く。右上の「ライセンス」のボタンで、素材のライセンスを表示する | 進行の計算をすること |
 | `game/credits.txt` | 使った外部の素材とそのライセンスの一覧を持つ（[ADR-0002](../50-adr/adr-0002-asset-licenses-in-game.md)） | Godotの第三者の部品を並べること。それは実行中にGodotから取る |
 
@@ -41,11 +41,11 @@ related: []
 
 フォントはNoto Sans JPの部分集合（`game/fonts/subset-chars.txt`）である。外部の素材を足したら、`game/credits.txt`に書き足し、ライセンスの全文を求めるものは書き出しの`include_filter`にも挙げる。この中に無い文字を表示文に使うと表示されないので、そのときは部分集合を作り直す。
 
-どの言語ファイルも`en.json`と同じキーを持ち、`data`の各項目には表示名と説明のキーがある。ゲームは足りないキーを英語で補うので、抜けても画面を見るまで気づけない。そのため、CIの`app-check.yml`がこのキーの対応を確かめる。あわせて、Godotをヘッドレスで起動し、エラーが出ないことも確かめる。さらに、`game/ci/playthrough.gd`が決まった手順で最初から最後まで自動で遊び、エンディングにたどり着くことを確かめる（[ADR-0006](../50-adr/adr-0006-fragments-and-endings.md)）。
+どの言語ファイルも`en.json`と同じキーを持ち、`data`の各項目には表示名と説明のキーがある。ゲームは足りないキーを英語で補うので、抜けても画面を見るまで気づけない。そのため、CIの`app-check.yml`がこのキーの対応を確かめる。あわせて、Godotをヘッドレスで起動し、エラーが出ないことも確かめる。さらに、`game/ci/playthrough.gd`が決まった手順で最初から最後まで自動で遊び、エンディングにたどり着くことを確かめる（[ADR-0006](../50-adr/adr-0006-fragments-and-endings.md)）。`game/ci/away.gd`は、閉じていた時間の分だけ進むことを確かめる（[ADR-0007](../50-adr/adr-0007-away-progress.md)）。
 
 ## 未決事項
 
-音楽と効果音、オフライン中の進行は、まだ入っていない。
+音楽と効果音は、まだ入っていない。
 
 ---
 
@@ -60,6 +60,7 @@ related: []
 - (decides) [ADR-0004 イベントの起き方と結果を決まった量で表す](../50-adr/adr-0004-event-rules.md)
 - (decides) [ADR-0005 クロニクルの物語文を仕事と選択と倒れた理由から組み立てる](../50-adr/adr-0005-chronicle-story.md)
 - (decides) [ADR-0006 記憶の断片を順に戻し、最後の仕事の選択でエンディングを分ける](../50-adr/adr-0006-fragments-and-endings.md)
+- (decides) [ADR-0007 閉じていた時間を、開いたときにまとめて進める](../50-adr/adr-0007-away-progress.md)
 - (depends_on) [UC-01 itch.ioでブラウザ版を公開する](../30-usecases/uc-01-itch-web-release.md)
 
 <!-- graph:auto:end -->

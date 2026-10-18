@@ -24,7 +24,7 @@
 
 ## 未確定なもの
 
-ストーリー、音楽と効果音、オフライン中の進行は、まだ決まっていない。残りの作業はGitHubのissueとProjectで管理する。
+音楽と効果音は、まだ決まっていない。残りの作業はGitHubのissueとProjectで管理する。
 
 ## 設計文書の図
 
@@ -74,6 +74,7 @@ graph LR
     ADR-0004["ADR-0004<br/>イベントの起き方と結果を決まった量で表す"]
     ADR-0005["ADR-0005<br/>クロニクルの物語文を仕事と選択と倒れた理由から組み立てる"]
     ADR-0006["ADR-0006<br/>記憶の断片を順に戻し、最後の仕事の選択でエンディングを分ける"]
+    ADR-0007["ADR-0007<br/>閉じていた時間を、開いたときにまとめて進める"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -91,6 +92,8 @@ graph LR
   ADR-0006 -.->|decides| DOM-08
   ADR-0006 -.->|decides| DOM-01
   ADR-0006 -.->|decides| ARCH-01
+  ADR-0007 -.->|decides| DOM-02
+  ADR-0007 -.->|decides| ARCH-01
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02

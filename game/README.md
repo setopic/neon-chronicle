@@ -45,6 +45,7 @@ rm -f neon-chronicle-web.zip
 ## 検査
 `python ci/check_data.py` で、言語ファイルのキーの抜けと JSON の書き損じを確かめます。CI（`.github/workflows/app-check.yml`）はこれに加えて、Godot をヘッドレスで起動してエラーが出ないかを見ます。
 `godot --headless --path . --script res://ci/playthrough.gd` は、決まった手順で最初から最後まで早送りで遊び、エンディングにたどり着くかを確かめます。遊んだ時間と各周の物語文を出します。セーブは別のファイルに書くので、手元のセーブは消えません。
+`godot --headless --path . --script res://ci/away.gd` は、セーブの時刻をずらしてロードし、閉じていた時間の分だけ進むかを確かめます。
 
 ## まだ入っていないもの
-音楽と効果音、オフライン中の進行。
+音楽と効果音。
