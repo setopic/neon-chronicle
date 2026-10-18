@@ -16,6 +16,7 @@ tags: [index]
 ## ノード一覧
 
 <!-- graph:children:start -->
+- [UC-01 itch.ioでブラウザ版を公開する](./uc-01-itch-web-release.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

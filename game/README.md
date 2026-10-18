@@ -28,8 +28,13 @@ Noto Sans JP（SIL Open Font License 1.1、`fonts/OFL-NotoSansJP.txt`）を太�
 第2水準の漢字など、この中にない文字を使うと表示されないので、そのときはサブセットを作り直します。
 
 ## 書き出し
-`godot --headless --path . --export-release "Web" build/web/index.html`
-`neon-chronicle-web.zip` は itch.io に HTML ゲームとしてそのままアップロードできます。
+```bash
+godot --headless --path . --export-release "Web" build/web/index.html
+rm -f neon-chronicle-web.zip
+(cd build/web && zip -r ../../neon-chronicle-web.zip .)
+```
+
+できた `neon-chronicle-web.zip` は itch.io に HTML ゲームとしてそのままアップロードできます。itch.io での公開の手順は `docs/30-usecases/uc-01-itch-web-release.md`（UC-01）にあります。
 
 ## 検査
 `python ci/check_data.py` で、言語ファイルのキーの抜けと JSON の書き損じを確かめます。CI（`.github/workflows/app-check.yml`）はこれに加えて、Godot をヘッドレスで起動してエラーが出ないかを見ます。
