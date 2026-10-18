@@ -38,7 +38,7 @@ implemented_by:
 記録に残った選択肢による経験の効果 = 0.02 × 記録に残った選択肢
 ```
 
-主な仕事が空の周は、仕事の句を「仕事に就かずに生き」にする。最後に選んだ選択肢が空の周は、その句を省く。
+主な仕事が空の周は、仕事の句を「仕事に就かずに生き」にする。最後に選んだ選択肢が空の周は、その句を省く。エンディングにたどり着いた周の句は、[DOM-08](./dom-08-memory-fragments-and-endings.md)が決めている。
 
 ## 不変条件
 
@@ -81,5 +81,6 @@ implemented_by:
 このノードを参照しているノード
 
 - (decides) [ADR-0005 クロニクルの物語文を仕事と選択と倒れた理由から組み立てる](../50-adr/adr-0005-chronicle-story.md)
+- (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 
 <!-- graph:auto:end -->

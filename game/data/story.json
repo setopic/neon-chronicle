@@ -1,0 +1,13 @@
+{
+  "fragments": [
+    { "id": "white_room", "requires": { "negotiation": 4 } },
+    { "id": "contract", "requires": { "hacking": 11 } },
+    { "id": "name", "requires": { "combat": 12 } },
+    { "id": "project", "requires": { "negotiation": 12 } },
+    { "id": "core", "requires": { "hacking": 17 } }
+  ],
+  "endings": [
+    { "id": "reclaim" },
+    { "id": "remain" }
+  ]
+}

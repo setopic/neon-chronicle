@@ -8,6 +8,8 @@ CIの app-check.yml から呼ぶ。Godotを使わずに分かる抜けだけを�
 5. イベントの各選択肢に、表示名と結果と物語の句のキー（event.<id>.<選択肢>.name / .result / .chronicle）がある
 6. どのイベントにも、選ぶ条件の無い選択肢が1つ以上ある（DOM-06）
 7. 各仕事に、物語の句のキー（job.<id>.chronicle）がある（DOM-07）
+8. エンディングの選択肢は、data にあるエンディングを指す。各エンディングに、物語の句のキー（ending.<id>.chronicle）がある（DOM-08）
+   エンディングの選択肢は周を終えるので、最後に選んだ選択肢にならず、選択肢の物語の句は要らない
 
 ゲームは足りないキーを英語で補うので（loc.gd）、抜けは画面にキーのまま出るまで気づけない。
 """
@@ -20,7 +22,10 @@ from pathlib import Path
 GAME = Path(__file__).resolve().parent.parent
 BASE_LOCALE = "en"
 # game_data.gd の KEY_PREFIX と同じ対応
-KEY_PREFIX = {"jobs": "job", "skills": "skill", "implants": "implant", "upgrades": "upgrade", "events": "event"}
+KEY_PREFIX = {
+    "jobs": "job", "skills": "skill", "implants": "implant", "upgrades": "upgrade", "events": "event",
+    "fragments": "fragment", "endings": "ending",
+}
 KEY_IN_SCRIPT = re.compile(r'\b(?:tr|t|_log)\("([a-z_]+\.[a-z0-9_.]+)"')
 
 
@@ -55,10 +60,14 @@ def main():
         for key in sorted(keys - base):
             errors.append(f"{locale}: {BASE_LOCALE} に無いキーがある: {key}")
 
+    datas = {}
     for path in sorted((GAME / "data").glob("*.json")):
         data = load(path, errors)
-        if not isinstance(data, dict):
-            continue
+        if isinstance(data, dict):
+            datas[path] = data
+    endings = {e.get("id") for data in datas.values() for e in data.get("endings", [])}
+
+    for path, data in datas.items():
         for kind, prefix in KEY_PREFIX.items():
             for entry in data.get(kind, []):
                 for suffix in ("name", "desc"):
@@ -74,10 +83,18 @@ def main():
             if not any(not c.get("requires") for c in choices):
                 errors.append(f"{path.relative_to(GAME)}: 選ぶ条件の無い選択肢が無い: event.{event.get('id')}")
             for choice in choices:
-                for suffix in ("name", "result", "chronicle"):
+                if "ending" in choice and choice["ending"] not in endings:
+                    errors.append(f"{path.relative_to(GAME)}: 無いエンディングを指している: event.{event.get('id')}.{choice.get('id')}")
+                suffixes = ("name", "result") if "ending" in choice else ("name", "result", "chronicle")
+                for suffix in suffixes:
                     key = f"event.{event.get('id')}.{choice.get('id')}.{suffix}"
                     if key not in base:
                         errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+
+        for ending in data.get("endings", []):
+            key = f"ending.{ending.get('id')}.chronicle"
+            if key not in base:
+                errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
 
     for path in sorted((GAME / "scripts").glob("*.gd")):
         for key in KEY_IN_SCRIPT.findall(path.read_text(encoding="utf-8")):

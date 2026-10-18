@@ -30,6 +30,7 @@ var _rebirth_points_label: Label
 var _log_label: RichTextLabel
 var _upgrade_buttons := {}
 var _choice_buttons := {}  # 選択肢のid -> ボタン
+var _story_closed_life := 0  # 戻った記憶の断片やエンディングの画面を閉じた周の番号。DOM-08
 
 
 func _ready() -> void:
@@ -87,7 +88,12 @@ func _build() -> void:
 	root.add_child(_build_log())
 
 	if not Game.alive:
-		_content.add_child(_build_rebirth())
+		var last: Dictionary = Game.chronicle.back() if not Game.chronicle.is_empty() else {}
+		var has_story: bool = last.get("ending", "") != "" or not Game.last_fragments.is_empty()
+		if has_story and _story_closed_life != Game.life_number:
+			_content.add_child(_build_story(last.get("ending", "")))
+		else:
+			_content.add_child(_build_rebirth())
 	elif Game.pending_event != "":
 		_content.add_child(_build_event())
 	_refresh()
@@ -137,6 +143,10 @@ func _build_header() -> Control:
 	reset.text = tr("ui.reset")
 	reset.pressed.connect(_confirm_reset)
 	tools.add_child(reset)
+	var memories := Button.new()
+	memories.text = tr("ui.fragments")
+	memories.pressed.connect(_show_fragments)
+	tools.add_child(memories)
 	var licenses := Button.new()
 	licenses.text = tr("ui.licenses")
 	licenses.pressed.connect(_show_licenses)
@@ -219,12 +229,12 @@ func _build_rebirth() -> Control:
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dim.add_child(center)
 
-	var box := _panel(tr("ui.rebirth_title"))
+	var last: Dictionary = Game.chronicle.back() if not Game.chronicle.is_empty() else {}
+	var box := _panel(tr("ui.rebirth_title_ending" if last.get("ending", "") != "" else "ui.rebirth_title"))
 	var panel: Control = box.get_parent().get_parent()
 	panel.custom_minimum_size = Vector2(620, 0)
 	center.add_child(panel)
 
-	var last: Dictionary = Game.chronicle.back() if not Game.chronicle.is_empty() else {}
 	var summary := _label(Game.format_entry({"key": "ui.rebirth_summary", "args": last}), Color.WHITE, 17)
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(summary)
@@ -233,6 +243,7 @@ func _build_rebirth() -> Control:
 		story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		box.add_child(story)
 	box.add_child(_label(Loc.t("ui.points_gained", {"n": Game.last_points_gained}), PINK, 20))
+	box.add_child(_label(_fragment_progress(), DIM, 14))
 
 	box.add_child(_section_title(tr("ui.upgrades")))
 	for id in GameData.order["upgrades"]:
@@ -270,6 +281,45 @@ func _build_rebirth() -> Control:
 	awaken.add_theme_color_override("font_color", CYAN)
 	awaken.pressed.connect(Game.rebirth)
 	box.add_child(awaken)
+	return dim
+
+
+## 周の終わりに戻った記憶の断片か、たどり着いたエンディングの文。閉じると転生の画面に移る。
+## 断片がすべて戻ってから就く仕事でしかエンディングにならないので、両方が同じ周に出ることは無い
+func _build_story(ending: String) -> Control:
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.9)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.add_child(center)
+
+	var box := _panel(GameData.name_of("endings", ending) if ending != "" else tr("ui.fragment_recalled"))
+	var panel: Control = box.get_parent().get_parent()
+	panel.custom_minimum_size = Vector2(700, 0)
+	center.add_child(panel)
+	if ending != "":
+		var text := _label(GameData.desc_of("endings", ending), Color.WHITE, 18)
+		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		box.add_child(text)
+		box.add_child(_label(Loc.t("ui.endings_reached", {
+			"n": Game.endings_reached().size(), "max": GameData.order["endings"].size(),
+		}), PINK, 15))
+	for id in Game.last_fragments:
+		box.add_child(_label(GameData.name_of("fragments", id), PINK, 20))
+		var text := _label(GameData.desc_of("fragments", id), Color.WHITE, 18)
+		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		box.add_child(text)
+	if ending == "":
+		box.add_child(_label(_fragment_progress(), DIM, 15))
+	var close := Button.new()
+	close.text = tr("ui.story_continue")
+	close.custom_minimum_size = Vector2(0, 44)
+	close.add_theme_color_override("font_color", CYAN)
+	close.pressed.connect(func():
+		_story_closed_life = Game.life_number
+		_build())
+	box.add_child(close)
 	return dim
 
 
@@ -317,7 +367,7 @@ func _refresh() -> void:
 			button.text = "%s    %s" % [name, Loc.t("ui.job_income", {"n": "%.1f" % Game.income_per_sec(id)})]
 			button.disabled = not Game.alive
 		else:
-			button.text = "%s    %s" % [name, _requirement_text(GameData.jobs[id].get("requires", {}))]
+			button.text = "%s    %s" % [name, _job_requirement_text(id)]
 			button.disabled = true
 		button.set_pressed_no_signal(id == Game.current_job)
 	for id in _skill_rows:
@@ -379,6 +429,29 @@ func _refresh_log() -> void:
 	_log_label.text = "\n".join(lines)
 
 
+func _job_requirement_text(job_id: String) -> String:
+	var job: Dictionary = GameData.jobs[job_id]
+	var text := _requirement_text(job.get("requires", {}))
+	if job.get("needs_all_fragments", false) and Game.next_fragment() != "":
+		text = "%s %s" % [Loc.t("ui.requires_fragments", {
+			"n": Game.fragments.size(), "max": GameData.order["fragments"].size(),
+		}), text]
+	return text
+
+
+## 戻った記憶の断片の数と、次の断片の条件
+func _fragment_progress() -> String:
+	var count := Loc.t("ui.fragment_count", {"n": Game.fragments.size(), "max": GameData.order["fragments"].size()})
+	var next := Game.next_fragment()
+	if next == "":
+		return "%s    %s" % [count, tr("ui.fragments_all")]
+	var requires: Dictionary = GameData.fragments[next].get("requires", {})
+	var parts := PackedStringArray()
+	for skill in requires:
+		parts.append(Loc.t("ui.skill_at", {"skill": GameData.name_of("skills", skill), "level": int(requires[skill])}))
+	return "%s    %s" % [count, Loc.t("ui.fragment_next", {"requires": " ".join(parts)})]
+
+
 func _requirement_text(requires: Dictionary) -> String:
 	var parts := PackedStringArray()
 	for skill in requires:
@@ -388,6 +461,8 @@ func _requirement_text(requires: Dictionary) -> String:
 
 ## 選んだときに増減する量。クレジットはいまの稼ぎから計算した額で見せる
 func _choice_effects(choice: Dictionary) -> String:
+	if choice.has("ending"):
+		return tr("ui.effect_ending")
 	var parts := PackedStringArray()
 	var credits := Game.choice_credits(choice)
 	if credits != 0.0:
@@ -411,6 +486,29 @@ func _confirm_reset() -> void:
 	dialog.ok_button_text = tr("ui.ok")
 	dialog.cancel_button_text = tr("ui.cancel")
 	dialog.confirmed.connect(Game.reset_game)
+	dialog.visibility_changed.connect(func(): if not dialog.visible: dialog.queue_free())
+	add_child(dialog)
+	dialog.popup_centered()
+
+
+## 戻った記憶の断片を、戻った順にすべて読む
+func _show_fragments() -> void:
+	var lines := PackedStringArray([_fragment_progress(), ""])
+	for id in Game.fragments:
+		if not GameData.fragments.has(id):
+			continue
+		lines.append(GameData.name_of("fragments", id))
+		lines.append(GameData.desc_of("fragments", id))
+		lines.append("")
+	var dialog := AcceptDialog.new()
+	dialog.title = tr("ui.fragments")
+	dialog.ok_button_text = tr("ui.close")
+	var text := RichTextLabel.new()
+	text.bbcode_enabled = false
+	text.custom_minimum_size = Vector2(700, 420)
+	text.add_theme_font_size_override("normal_font_size", 16)
+	text.text = "\n".join(lines)
+	dialog.add_child(text)
 	dialog.visibility_changed.connect(func(): if not dialog.visible: dialog.queue_free())
 	add_child(dialog)
 	dialog.popup_centered()

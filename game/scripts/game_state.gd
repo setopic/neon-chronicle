@@ -1,13 +1,13 @@
 extends Node
 
-## ゲームの進行状態。DOM-02〜DOM-07。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
+## ゲームの進行状態。DOM-02〜DOM-08。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
 
 signal life_ended
 signal life_started
 signal log_added
 signal event_changed
 
-const SAVE_PATH := "user://save.json"
+var save_path := "user://save.json"  # 通しの検査（ci/playthrough.gd）が別のファイルに差し替える
 const SAVE_VERSION := 1
 const SAVE_INTERVAL := 5.0
 const STEP := 0.25  # シミュレーションの刻み（秒）
@@ -19,7 +19,10 @@ const MAX_LOGS := 50
 const EVENT_INTERVAL := 90.0  # 危険度1の仕事で、イベントが起きる平均の間隔（秒）。DOM-06
 const DEED_XP := 0.02  # クロニクルに残った選択1種類あたりの経験の増え方。DOM-07
 ## ログやクロニクルの引数のうち、id から表示名に変える項目
-const NAME_ARGS := {"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades", "event": "events"}
+const NAME_ARGS := {
+	"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades", "event": "events",
+	"fragment": "fragments", "ending": "endings",
+}
 
 # --- 1人生の状態 ---
 var credits := 0.0
@@ -40,7 +43,9 @@ var life_number := 1
 var memory_points := 0
 var last_points_gained := 0
 var upgrades := {}
-var chronicle: Array = []  # 終わった周の記録 [{life, job, age, earned, points, deed, end}]
+var chronicle: Array = []  # 終わった周の記録 [{life, job, age, earned, points, deed, end, ending}]
+var fragments: Array = []  # 戻った記憶の断片のid。DOM-08
+var last_fragments: Array = []  # 直前の周の終わりに戻った記憶の断片のid
 var logs: Array = []  # [{key, args}]。言語を切り替えても訳し直せるようキーで持つ
 
 var _pending := 0.0
@@ -128,7 +133,10 @@ func income_per_sec(job_id: String) -> float:
 # --- 仕事とスキル ---
 
 func can_take_job(job_id: String) -> bool:
-	return meets(GameData.jobs.get(job_id, {}).get("requires", {}))
+	var job: Dictionary = GameData.jobs.get(job_id, {})
+	if job.get("needs_all_fragments", false) and next_fragment() != "":
+		return false
+	return meets(job.get("requires", {}))
 
 
 ## スキルのレベルが、就く条件や選ぶ条件（{スキルのid: レベル}）を満たしているか
@@ -224,6 +232,12 @@ func choose(choice_id: String) -> void:
 		return
 	var event_id := pending_event
 	pending_event = ""
+	_log("event.%s.%s.result" % [event_id, choice_id])
+	# エンディングの選択肢は、ほかの結果を持たず、その場で周を終える（DOM-08）
+	if choice.has("ending"):
+		event_changed.emit()
+		_end_life("", choice["ending"])
+		return
 	var deed := "%s.%s" % [event_id, choice_id]
 	var gain := choice_credits(choice)
 	credits = maxf(0.0, credits + gain)
@@ -232,7 +246,6 @@ func choose(choice_id: String) -> void:
 	var xp: Dictionary = choice.get("xp", {})
 	for skill in xp:
 		_add_xp(skill, maxf(0.0, xp[skill]))
-	_log("event.%s.%s.result" % [event_id, choice_id])
 	var before := durability
 	durability = clampf(durability + choice.get("durability", 0.0), 0.0, MAX_DURABILITY)
 	if before > LOW_DURABILITY and durability <= LOW_DURABILITY and durability > 0.0:
@@ -261,8 +274,8 @@ func points_for_life() -> int:
 	return maxi(1, int(sqrt(life_earned / 50.0)) + levels / 3)
 
 
-## 周を終わらせたイベントのid。体の劣化で終わったときは空
-func _end_life(fatal_event := "") -> void:
+## fatal_event は周を終わらせたイベントのid、ending はたどり着いたエンディングのid。どちらも無ければ空
+func _end_life(fatal_event := "", ending := "") -> void:
 	alive = false
 	pending_event = ""
 	last_points_gained = points_for_life()
@@ -270,9 +283,10 @@ func _end_life(fatal_event := "") -> void:
 	chronicle.append({
 		"life": life_number, "job": main_job(), "age": age,
 		"earned": life_earned, "points": last_points_gained,
-		"deed": last_deed, "end": fatal_event,
+		"deed": last_deed, "end": fatal_event, "ending": ending,
 	})
-	_log("log.death", {"points": last_points_gained})
+	_log("log.ending" if ending != "" else "log.death", {"points": last_points_gained})
+	_recall_fragments()
 	save_game()
 	life_ended.emit()
 
@@ -315,6 +329,9 @@ func story_of(entry: Dictionary) -> String:
 	var job_part := tr("job.%s.chronicle" % job) if job != "" else tr("chronicle.no_job")
 	var end: String = entry.get("end", "")
 	var end_part := Loc.t("chronicle.end_event", {"event": GameData.name_of("events", end)}) if end != "" else tr("chronicle.end_decay")
+	var ending: String = entry.get("ending", "")
+	if ending != "":
+		end_part = tr("ending.%s.chronicle" % ending)
 	var deed: String = entry.get("deed", "")
 	if deed == "":
 		return Loc.t("chronicle.story_short", {"job": job_part, "end": end_part})
@@ -337,6 +354,37 @@ func chronicle_deeds() -> int:
 
 func deed_bonus() -> float:
 	return DEED_XP * chronicle_deeds()
+
+
+# --- 記憶の断片とエンディング ---
+
+## 次に戻る記憶の断片のid。すべて戻っていれば空。断片は data に並んだ順に戻る
+func next_fragment() -> String:
+	for id in GameData.order["fragments"]:
+		if not fragments.has(id):
+			return id
+	return ""
+
+
+## 周の終わりのスキルのレベルで、次の断片の条件を満たしていれば戻す。続けて満たしていれば、いくつでも戻る
+func _recall_fragments() -> void:
+	last_fragments = []
+	var id := next_fragment()
+	while id != "" and meets(GameData.fragments[id].get("requires", {})):
+		fragments.append(id)
+		last_fragments.append(id)
+		_log("log.fragment", {"fragment": id})
+		id = next_fragment()
+
+
+## たどり着いたエンディングのid（クロニクルに残った順、重複なし）
+func endings_reached() -> Array:
+	var seen := []
+	for entry in chronicle:
+		var ending: String = entry.get("ending", "")
+		if ending != "" and not seen.has(ending):
+			seen.append(ending)
+	return seen
 
 
 # --- ログ ---
@@ -385,17 +433,17 @@ func save_game() -> void:
 		"implants": implants, "job_time": job_time, "alive": alive, "pending_event": pending_event,
 		"last_deed": last_deed, "life_number": life_number, "memory_points": memory_points,
 		"last_points_gained": last_points_gained, "upgrades": upgrades,
-		"chronicle": chronicle, "logs": logs,
+		"chronicle": chronicle, "fragments": fragments, "last_fragments": last_fragments, "logs": logs,
 	}
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(save_path, FileAccess.WRITE)
 	if file:
 		file.store_string(JSON.stringify(data))
 
 
 func load_game() -> bool:
-	if not FileAccess.file_exists(SAVE_PATH):
+	if not FileAccess.file_exists(save_path):
 		return false
-	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(SAVE_PATH))
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(save_path))
 	if not data is Dictionary:
 		return false
 	credits = data.get("credits", 0.0)
@@ -417,6 +465,8 @@ func load_game() -> bool:
 	last_points_gained = int(data.get("last_points_gained", 0))
 	upgrades = _int_values(data.get("upgrades", {}))
 	chronicle = data.get("chronicle", [])
+	fragments = data.get("fragments", [])
+	last_fragments = data.get("last_fragments", [])
 	logs = data.get("logs", [])
 	# JSON では整数も小数になるため、ログの Lv などを整数に戻す
 	for entry in logs:
@@ -432,6 +482,8 @@ func reset_game() -> void:
 	last_points_gained = 0
 	upgrades = {}
 	chronicle = []
+	fragments = []
+	last_fragments = []
 	logs = []
 	implants = []
 	_start_life()
