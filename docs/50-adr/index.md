@@ -31,6 +31,7 @@ tags: [index]
 - [ADR-0012 転生のときに4種類の体から1つを選ぶ](./adr-0012-choose-body-on-rebirth.md)
 - [ADR-0013 周の始まりにジンの依頼を1つ示し、果たせば記憶ポイントを上乗せする](./adr-0013-jin-requests.md)
 - [ADR-0014 人物のイベントを1周に1段ずつ進め、前の段の選択で文と選択肢を変える](./adr-0014-character-events-across-lives.md)
+- [ADR-0015 街と人物の資料を上のボタンから開き、記憶の断片が戻るまで追記を伏せる](./adr-0015-profiles-revealed-by-fragments.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

@@ -29,6 +29,7 @@ tags: [index]
 - [DOM-11 体の種類](./dom-11-body-types.md)
 - [DOM-12 ジンの依頼](./dom-12-jin-requests.md)
 - [DOM-13 人物のイベント](./dom-13-character-events.md)
+- [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
@@ -178,5 +179,12 @@ python -m tools.graph new --type domain --id DOM-02 --title "..." --slug some-sl
 | 話の進み具合 | 人物のイベントで選んだ選択肢を、イベントごとに持ったもの。転生しても失われない | |
 | 要る断片 | その段が起きるのに戻っている必要がある記憶の断片 | |
 | 前の選択の条件 | その選択肢が出るのに要る、同じ人物の前の段で選んだ選択肢 | |
+
+### [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
+
+| 用語 | 意味 | 旧称 |
+| --- | --- | --- |
+| 資料 | ネオン・シティ・主人公・登場人物の1つについての説明。上のボタン「街と人物」から開く画面で、いつでも読める | |
+| 追記 | 記憶の断片が戻るか、人物のイベントが起きると、資料の後ろに加わる文 | |
 
 <!-- graph:terms:end -->

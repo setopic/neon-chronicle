@@ -156,6 +156,10 @@ func _build_header() -> Control:
 	memories.text = tr("ui.fragments")
 	memories.pressed.connect(_show_fragments)
 	tools.add_child(memories)
+	var profiles := Button.new()
+	profiles.text = tr("ui.profiles")
+	profiles.pressed.connect(_show_profiles)
+	tools.add_child(profiles)
 	var licenses := Button.new()
 	licenses.text = tr("ui.licenses")
 	licenses.pressed.connect(_show_licenses)
@@ -564,30 +568,40 @@ func _show_fragments() -> void:
 		lines.append(GameData.name_of("fragments", id))
 		lines.append(GameData.desc_of("fragments", id))
 		lines.append("")
-	var dialog := AcceptDialog.new()
-	dialog.title = tr("ui.fragments")
-	dialog.ok_button_text = tr("ui.close")
-	var text := RichTextLabel.new()
-	text.bbcode_enabled = false
-	text.custom_minimum_size = Vector2(700, 420)
-	text.add_theme_font_size_override("normal_font_size", 16)
-	text.text = "\n".join(lines)
-	dialog.add_child(text)
-	dialog.visibility_changed.connect(func(): if not dialog.visible: dialog.queue_free())
-	add_child(dialog)
-	dialog.popup_centered()
+	_show_text(tr("ui.fragments"), "\n".join(lines), Vector2(700, 420), 16)
+
+
+## 街と人物の資料を読む。追記は、要る断片が戻るか出るイベントが起きるまで伏せる（DOM-14）
+func _show_profiles() -> void:
+	var lines := PackedStringArray()
+	for id in GameData.order["profiles"]:
+		var profile: Dictionary = GameData.profiles[id]
+		if not Game.revealed(profile):
+			continue
+		var paragraphs := PackedStringArray([GameData.desc_of("profiles", id)])
+		for note in profile.get("notes", []):
+			if note is Dictionary and Game.revealed(note):
+				paragraphs.append(tr("profile.%s.%s" % [id, note.get("id", "")]))
+		lines.append(GameData.name_of("profiles", id))
+		lines.append("\n".join(paragraphs))
+		lines.append("")
+	_show_text(tr("ui.profiles"), "\n".join(lines), Vector2(700, 420), 16)
 
 
 func _show_licenses() -> void:
+	_show_text(tr("ui.licenses"), license_text(), Vector2(900, 520), 14)
+
+
+func _show_text(title: String, body: String, min_size: Vector2, font_size: int) -> void:
 	var dialog := AcceptDialog.new()
-	dialog.title = tr("ui.licenses")
+	dialog.title = title
 	dialog.ok_button_text = tr("ui.close")
 	var text := RichTextLabel.new()
 	text.bbcode_enabled = false
 	text.selection_enabled = true
-	text.custom_minimum_size = Vector2(900, 520)
-	text.add_theme_font_size_override("normal_font_size", 14)
-	text.text = license_text()
+	text.custom_minimum_size = min_size
+	text.add_theme_font_size_override("normal_font_size", font_size)
+	text.text = body
 	dialog.add_child(text)
 	dialog.visibility_changed.connect(func(): if not dialog.visible: dialog.queue_free())
 	add_child(dialog)

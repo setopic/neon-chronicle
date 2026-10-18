@@ -19,6 +19,8 @@ CIの app-check.yml から呼ぶ。Godotを使わずに分かる抜けだけを�
 13. 人物のイベントの前の選択の条件と説明の書き分けは、同じ人物の前の段のイベントを指す。
     説明を書き分けたイベントは、指したイベントの選択肢ごとに説明のキー（event.<id>.desc.<選択肢>）を持つ。
     要る断片は data にある断片を指す（DOM-13）
+14. 街と人物の資料の出るイベントと、追記の要る断片・出るイベントは、data にあるものを指す。
+    追記は要る断片と出るイベントのどちらか一方を持ち、文のキー（profile.<id>.<追記>）がある（DOM-14）
 
 ゲームは足りないキーを英語で補うので（loc.gd）、抜けは画面にキーのまま出るまで気づけない。
 """
@@ -33,7 +35,7 @@ BASE_LOCALE = "en"
 # game_data.gd の KEY_PREFIX と同じ対応。ジンの依頼は表示名と説明を持たないので、12で別に見る
 KEY_PREFIX = {
     "jobs": "job", "skills": "skill", "implants": "implant", "upgrades": "upgrade", "events": "event",
-    "fragments": "fragment", "endings": "ending", "bodies": "body",
+    "fragments": "fragment", "endings": "ending", "bodies": "body", "profiles": "profile",
 }
 # game_state.gd の mio_line_key と同じ組
 MIO_REASONS = ("decay", "event")
@@ -148,6 +150,24 @@ def main():
             key = f"request.{req.get('id')}.offer"
             if key not in base:
                 errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+
+        for profile in data.get("profiles", []):
+            where = f"{path.relative_to(GAME)}: profile.{profile.get('id')}"
+            if "event" in profile and profile["event"] not in events:
+                errors.append(f"{where}: 無いイベントを指している: {profile['event']}")
+            for note in profile.get("notes", []):
+                note_where = f"{where}.{note.get('id')}"
+                if note.get("id") in ("name", "desc"):
+                    errors.append(f"{note_where}: 表示名と説明のキーと重なる")
+                if ("fragment" in note) == ("event" in note):
+                    errors.append(f"{note_where}: 要る断片と出るイベントのどちらか一方だけを持たない")
+                if "fragment" in note and note["fragment"] not in fragments:
+                    errors.append(f"{note_where}: 無い断片を指している: {note['fragment']}")
+                if "event" in note and note["event"] not in events:
+                    errors.append(f"{note_where}: 無いイベントを指している: {note['event']}")
+                key = f"profile.{profile.get('id')}.{note.get('id')}"
+                if key not in base:
+                    errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
 
         for ending in data.get("endings", []):
             key = f"ending.{ending.get('id')}.chronicle"

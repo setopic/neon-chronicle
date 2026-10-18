@@ -1,6 +1,6 @@
 extends Node
 
-## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-13。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
+## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-14。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
 
 signal life_ended
 signal life_started
@@ -525,6 +525,13 @@ func endings_reached() -> Array:
 		if ending != "" and not seen.has(ending):
 			seen.append(ending)
 	return seen
+
+
+## 資料や追記を出してよいか。要る断片が戻り、出るイベントで選択肢を選んでいれば出す。DOM-14
+func revealed(entry: Dictionary) -> bool:
+	if entry.has("fragment") and not fragments.has(entry["fragment"]):
+		return false
+	return not entry.has("event") or character_choices.has(entry["event"])
 
 
 # --- ログ ---
