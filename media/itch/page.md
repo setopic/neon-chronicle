@@ -8,7 +8,7 @@
 | --- | --- |
 | Title | `Neon Chronicle` |
 | Project URL | `neon-chronicle` |
-| Short description or tagline | `A cyberpunk idle game: work, wear out your body, and wake up in a new one. / サイバーパンクの放置転生ゲーム` |
+| Short description or tagline | `A cyberpunk idle game: work, wear out your body, and wake up in a new one.`（120バイトまで。日本語は1文字3バイトに数えられるので、英語だけにしている） |
 | Classification | Games |
 | Kind of project | HTML |
 | Release status | In development |
