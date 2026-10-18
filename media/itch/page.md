@@ -62,7 +62,7 @@ Pick a job in the back alleys of a neon city. Work earns credits and skill exper
 
 This is an early version. Events, story, music, and offline progress are not in yet.
 
-Made with Godot 4.7. Font: Noto Sans JP (SIL Open Font License 1.1).
+Made with Godot 4.7. Font: Noto Sans JP (SIL Open Font License 1.1). Full license texts are in the game (Licenses button, top right).
 
 ---
 
@@ -79,7 +79,7 @@ Made with Godot 4.7. Font: Noto Sans JP (SIL Open Font License 1.1).
 
 まだ初期の版です。イベント・ストーリー・音楽・オフライン中の進行は、まだ入っていません。
 
-Godot 4.7で作りました。フォントはNoto Sans JP（SIL Open Font License 1.1）です。
+Godot 4.7で作りました。フォントはNoto Sans JP（SIL Open Font License 1.1）です。ライセンスの全文は、ゲームの右上の「ライセンス」から見られます。
 ```
 
 日本語の説明文は遊ぶ人に向けた紹介なので、ゲームの外の文書と違い、です・ます体で書いている。

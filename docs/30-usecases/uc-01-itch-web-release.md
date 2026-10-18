@@ -5,7 +5,7 @@ title: itch.ioでブラウザ版を公開する
 status: draft
 tags: [release, web]
 depends_on: [ARCH-01]
-related: []
+related: [ADR-0002]
 ---
 
 # itch.ioでブラウザ版を公開する
@@ -115,5 +115,13 @@ related: []
 `depends_on`: この文書が成立するために前提となるノード
 
 - [ARCH-01 ゲームの全体構成](../10-architecture/arch-01-game-overview.md)
+
+`related`: 依存はしないが、一緒に読むべきノード
+
+- [ADR-0002 素材のライセンスの一覧をゲームの中に置く](../50-adr/adr-0002-asset-licenses-in-game.md)
+
+このノードを参照しているノード
+
+- (related) [ADR-0002 素材のライセンスの一覧をゲームの中に置く](../50-adr/adr-0002-asset-licenses-in-game.md)
 
 <!-- graph:auto:end -->

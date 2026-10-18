@@ -12,6 +12,9 @@ const DANGER := Color(1.0, 0.3, 0.3)
 const BG := Color(0.03, 0.02, 0.07)
 const PANEL_BG := Color(0.07, 0.05, 0.13, 0.94)
 const REFRESH_INTERVAL := 0.1
+# 使った素材の一覧とライセンスの全文。書き出しに含めるよう export_presets.cfg の include_filter に挙げてある。ADR-0002。
+const CREDITS_PATH := "res://credits.txt"
+const FONT_LICENSE_PATH := "res://fonts/OFL-NotoSansJP.txt"
 
 var _content: Control
 var _refresh_timer := 0.0
@@ -123,6 +126,10 @@ func _build_header() -> Control:
 	reset.text = tr("ui.reset")
 	reset.pressed.connect(_confirm_reset)
 	tools.add_child(reset)
+	var licenses := Button.new()
+	licenses.text = tr("ui.licenses")
+	licenses.pressed.connect(_show_licenses)
+	tools.add_child(licenses)
 	return header
 
 
@@ -323,6 +330,47 @@ func _confirm_reset() -> void:
 	dialog.visibility_changed.connect(func(): if not dialog.visible: dialog.queue_free())
 	add_child(dialog)
 	dialog.popup_centered()
+
+
+func _show_licenses() -> void:
+	var dialog := AcceptDialog.new()
+	dialog.title = tr("ui.licenses")
+	dialog.ok_button_text = tr("ui.close")
+	var text := RichTextLabel.new()
+	text.bbcode_enabled = false
+	text.selection_enabled = true
+	text.custom_minimum_size = Vector2(900, 520)
+	text.add_theme_font_size_override("normal_font_size", 14)
+	text.text = license_text()
+	dialog.add_child(text)
+	dialog.visibility_changed.connect(func(): if not dialog.visible: dialog.queue_free())
+	add_child(dialog)
+	dialog.popup_centered()
+
+
+## エンジンとその同梱物のライセンスは、手で写さずに Engine から取る。版を上げても食い違わない。
+static func license_text() -> String:
+	var parts := PackedStringArray()
+	parts.append(FileAccess.get_file_as_string(CREDITS_PATH))
+	parts.append("==== Noto Sans JP: SIL Open Font License 1.1 ====\n")
+	parts.append(FileAccess.get_file_as_string(FONT_LICENSE_PATH))
+	parts.append("==== Godot Engine: MIT License ====\n")
+	parts.append(Engine.get_license_text())
+	parts.append("==== Third-party components of Godot Engine ====\n")
+	for component in Engine.get_copyright_info():
+		if component["name"] == "Godot Engine":
+			continue
+		parts.append(component["name"])
+		for part in component["parts"]:
+			for line in part["copyright"]:
+				parts.append("  Copyright (c) " + line)
+			parts.append("  License: " + part["license"])
+		parts.append("")
+	var licenses := Engine.get_license_info()
+	for name in licenses:
+		parts.append("==== License: %s ====\n" % name)
+		parts.append(licenses[name])
+	return "\n".join(parts)
 
 
 # --- 部品 ---

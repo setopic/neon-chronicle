@@ -23,6 +23,9 @@ Godot 4.7.2 / GDScript。ブラウザ向けに Compatibility 描画とスレッ�
 - MOD は `user://mods/<MOD名>/data/` と `lang/` に JSON を置くと読み込まれます。同じ id の項目は値を上書き、新しい id は追加、同じ locale の言語ファイルは文の上書き・追加になります（PC版向け。ブラウザ版では MOD フォルダを使いません）。
 - 新しい仕事を足すときは、`data` に項目を、各言語ファイルに `job.<id>.name` と `job.<id>.desc` を足します。
 
+## ライセンス
+使った外部の素材とそのライセンスは `credits.txt` に並べています。ゲームの右上の「ライセンス」のボタンで、この一覧と、OFL・Godot（第三者の部品を含む）のライセンスの全文を表示します。外部の素材を足したら、`credits.txt` に書き足してください。全文を添える必要があるものは、`export_presets.cfg` の `include_filter` にも足します（ADR-0002）。
+
 ## フォント
 Noto Sans JP（SIL Open Font License 1.1、`fonts/OFL-NotoSansJP.txt`）を太さ500に固定し、ASCII・かな・JIS第1水準漢字などに絞って軽くしています（`fonts/subset-chars.txt`）。
 第2水準の漢字など、この中にない文字を使うと表示されないので、そのときはサブセットを作り直します。

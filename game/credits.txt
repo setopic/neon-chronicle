@@ -1,0 +1,13 @@
+Neon Chronicle uses the following assets.
+
+Font: Noto Sans JP (Medium, subset)
+  Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'
+  License: SIL Open Font License 1.1 (full text below)
+
+Engine: Godot Engine 4.7.2
+  Copyright (c) 2014-present Godot Engine contributors (see AUTHORS.md).
+  Copyright (c) 2007-2014 Juan Linietsky, Ariel Manzur.
+  License: MIT (full text below)
+  The engine includes third-party components. Their licenses follow the engine license.
+
+Everything else in the game (text, numbers, the 3D city) was made for Neon Chronicle.

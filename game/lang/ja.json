@@ -34,6 +34,8 @@
     "ui.chronicle": "クロニクル",
     "ui.chronicle_entry": "第{life}周：{job}として {age} 生きた（{earned} クレジット、記憶 +{points}）",
     "ui.awaken": "新しい体で目覚める",
+    "ui.licenses": "ライセンス",
+    "ui.close": "閉じる",
     "ui.no_job": "無職",
 
     "log.awaken": "第{life}周：新しい体で目覚めた。仕事を選ぼう。",
