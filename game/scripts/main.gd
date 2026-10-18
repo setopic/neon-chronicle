@@ -258,8 +258,7 @@ func _build_rebirth() -> Control:
 		box.add_child(story)
 		# エンディングのあとは物語が終わっているので、診療所の場面を出さない
 		if last.get("ending", "") == "":
-			var end: String = last.get("end", "")
-			var mio := _label(Loc.t(Game.mio_line_key(last), {"fall": Game.fall_phrase(end) if end != "" else ""}), Color.WHITE, 16)
+			var mio := _label(tr(Game.mio_line_key(last)), Color.WHITE, 16)
 			mio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			box.add_child(mio)
 	box.add_child(_label(Loc.t("ui.points_gained", {"n": Game.last_points_gained}), PINK, 20))

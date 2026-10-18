@@ -204,8 +204,8 @@
     "mio.decay.1": "Mio: \"Welcome back. You used that body to its limit. Your next one is ready.\"",
     "mio.decay.2": "Mio: \"Another body used up. Let's tune your next awakening.\"",
     "mio.decay.3": "Mio: \"Every time I bring you back, you're still you. Use this body to the end, too.\"",
-    "mio.event.1": "Mio: \"You {fall}? Bodies can be replaced. Memories don't all come back.\"",
-    "mio.event.2": "Mio: \"So you {fall}. Don't fall the same way in this body.\"",
-    "mio.event.3": "Mio: \"You {fall} again? And still, you always come back here.\""
+    "mio.event.1": "Mio: \"Bodies can be replaced. Memories don't all come back, though. Go easy.\"",
+    "mio.event.2": "Mio: \"Don't fall the same way in this body.\"",
+    "mio.event.3": "Mio: \"Reckless again. And still, you always come back here.\""
   }
 }

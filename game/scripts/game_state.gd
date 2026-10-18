@@ -356,7 +356,8 @@ func story_of(entry: Dictionary) -> String:
 	var job: String = entry.get("job", "")
 	var job_part := tr("job.%s.chronicle" % job) if job != "" else tr("chronicle.no_job")
 	var end: String = entry.get("end", "")
-	var end_part := fall_phrase(end) if end != "" else tr("chronicle.end_decay")
+	# イベントの名前を「〜で倒れた」に差し込むと不自然な文になるので、句をイベントごとに書く（ADR-0011）
+	var end_part := tr("event.%s.fall" % end) if end != "" else tr("chronicle.end_decay")
 	var ending: String = entry.get("ending", "")
 	if ending != "":
 		end_part = tr("ending.%s.chronicle" % ending)
@@ -367,12 +368,6 @@ func story_of(entry: Dictionary) -> String:
 
 
 ## クロニクルに残った選択肢の種類。いまのデータに無いもの（外したMODの選択肢）は数えない
-## イベントで倒れたときの句（「私兵の待ち伏せに遭って倒れた」）。イベントの名前を「〜で倒れた」に
-## 差し込むと不自然な文になるので、イベントごとに書く（ADR-0011）
-func fall_phrase(event_id: String) -> String:
-	return tr("event.%s.fall" % event_id)
-
-
 ## 転生の画面でミオが言う一言のキー。倒れた理由（体の限界かイベントか）と周の番号で変わる（DOM-10）。
 ## 周の番号は、初めて倒れた周・10周目まで・それより後の3段に分ける
 func mio_line_key(entry: Dictionary) -> String:
