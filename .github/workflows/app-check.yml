@@ -10,28 +10,44 @@ on:
   push:
   pull_request:
 
+env:
+  # ARCH-01 のGodotの版。上げるときは文書と一緒に直す。
+  GODOT_VERSION: "4.7.2"
+
 jobs:
   app:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
 
-      # ここから下はプロジェクトごとに書き換える。
-      # 実装が無いうちは何もしない。
+      # 言語ファイルのキーの抜けとJSONの書き損じを、Godotを使わずに見る。
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: data と lang のJSONを確かめる
+        run: python game/ci/check_data.py
 
-      # --- Python の例 ---
-      # - uses: actions/setup-python@v7
-      #   with:
-      #     python-version: "3.12"
-      # - run: pip install -r requirements.txt
-      # - run: python -m pytest
-
-      # --- TypeScript / Node の例 ---
-      # - uses: actions/setup-node@v4
-      #   with:
-      #     node-version: "22"
-      # - run: npm ci
-      # - run: npm test
-
-      - name: 実装の検査は未設定
-        run: echo "app-check.yml にプロジェクトの検査を書いてください"
+      # 書き出しはしない。書き出しテンプレートは約1GBあり、毎回落とすには重い。
+      # 起動して数秒動かせば、スクリプトの構文の誤りとJSONの読み込みの失敗はログに出る。
+      # Godotはそれらがあっても終了コード0で終わるので、ログの ERROR で判定する。
+      - uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}
+      - name: Godotを用意する
+        run: |
+          if [ ! -x ~/godot/godot ]; then
+            mkdir -p ~/godot
+            curl -fsSLo /tmp/godot.zip "https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+            unzip -q /tmp/godot.zip -d ~/godot
+            mv ~/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 ~/godot/godot
+          fi
+      - name: ヘッドレスで起動して、エラーが出ないか確かめる
+        working-directory: game
+        run: |
+          ~/godot/godot --headless --path . --import > /dev/null 2>&1
+          ~/godot/godot --headless --path . --quit-after 120 2>&1 | tee /tmp/godot.log
+          if grep -E "^(SCRIPT )?ERROR" /tmp/godot.log; then
+            echo "::error::Godotの起動中にエラーが出た"
+            exit 1
+          fi

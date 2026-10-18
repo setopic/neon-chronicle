@@ -31,5 +31,8 @@ Noto Sans JP（SIL Open Font License 1.1、`fonts/OFL-NotoSansJP.txt`）を太�
 `godot --headless --path . --export-release "Web" build/web/index.html`
 `neon-chronicle-web.zip` は itch.io に HTML ゲームとしてそのままアップロードできます。
 
+## 検査
+`python ci/check_data.py` で、言語ファイルのキーの抜けと JSON の書き損じを確かめます。CI（`.github/workflows/app-check.yml`）はこれに加えて、Godot をヘッドレスで起動してエラーが出ないかを見ます。
+
 ## まだ入っていないもの
 イベントと選択肢、クロニクルの物語文、ストーリー、音楽と効果音、オフライン中の進行。
