@@ -45,4 +45,4 @@ rm -f neon-chronicle-web.zip
 `python ci/check_data.py` で、言語ファイルのキーの抜けと JSON の書き損じを確かめます。CI（`.github/workflows/app-check.yml`）はこれに加えて、Godot をヘッドレスで起動してエラーが出ないかを見ます。
 
 ## まだ入っていないもの
-クロニクルの物語文、ストーリー、音楽と効果音、オフライン中の進行。
+ストーリー、音楽と効果音、オフライン中の進行。

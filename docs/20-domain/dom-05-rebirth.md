@@ -41,6 +41,8 @@ implemented_by:
 | 稼いだクレジット | 小数 | ○ | その周で稼いだクレジットの合計 |
 | 得た記憶ポイント | 整数 | ○ | その周の終わりに手に入った記憶ポイント |
 
+記録を物語文にするための属性は、[DOM-07](./dom-07-chronicle-story.md)が足している。
+
 次の値は属性ではなく導出値である。
 
 ```
@@ -91,5 +93,6 @@ implemented_by:
 このノードを参照しているノード
 
 - (decides) [ADR-0003 物語の文書を既定の種別で書く](../50-adr/adr-0003-story-docs-default-types.md)
+- (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 
 <!-- graph:auto:end -->

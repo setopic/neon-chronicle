@@ -5,8 +5,9 @@ CIの app-check.yml から呼ぶ。Godotを使わずに分かる抜けだけを�
 2. どの言語ファイルも、en.json と同じキーを持つ
 3. data の各項目に、表示名と説明のキー（<種類>.<id>.name / .desc）がある
 4. スクリプトに直接書いたキー（tr("ui.title") など）が en.json にある
-5. イベントの各選択肢に、表示名と結果のキー（event.<id>.<選択肢>.name / .result）がある
+5. イベントの各選択肢に、表示名と結果と物語の句のキー（event.<id>.<選択肢>.name / .result / .chronicle）がある
 6. どのイベントにも、選ぶ条件の無い選択肢が1つ以上ある（DOM-06）
+7. 各仕事に、物語の句のキー（job.<id>.chronicle）がある（DOM-07）
 
 ゲームは足りないキーを英語で補うので（loc.gd）、抜けは画面にキーのまま出るまで気づけない。
 """
@@ -64,12 +65,16 @@ def main():
                     key = f"{prefix}.{entry.get('id')}.{suffix}"
                     if key not in base:
                         errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+        for job in data.get("jobs", []):
+            key = f"job.{job.get('id')}.chronicle"
+            if key not in base:
+                errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
         for event in data.get("events", []):
             choices = event.get("choices", [])
             if not any(not c.get("requires") for c in choices):
                 errors.append(f"{path.relative_to(GAME)}: 選ぶ条件の無い選択肢が無い: event.{event.get('id')}")
             for choice in choices:
-                for suffix in ("name", "result"):
+                for suffix in ("name", "result", "chronicle"):
                     key = f"event.{event.get('id')}.{choice.get('id')}.{suffix}"
                     if key not in base:
                         errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
