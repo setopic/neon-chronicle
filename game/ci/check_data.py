@@ -14,6 +14,8 @@ CIの app-check.yml から呼ぶ。Godotを使わずに分かる抜けだけを�
    キーをスクリプトで組み立てているので、4では見つからない
 10. 耐久を減らす選択肢のあるイベントに、倒れたときの句のキー（event.<id>.fall）がある（ADR-0011）
 11. 体の種類が1つ以上ある。第1周は data の最初の体で目覚める（DOM-11）
+12. ジンの依頼は、仕事かスキルのどちらか一方を持ち、data にある仕事やスキルを指す。
+    各依頼に、ジンの台詞のキー（request.<id>.offer）がある（DOM-12）
 
 ゲームは足りないキーを英語で補うので（loc.gd）、抜けは画面にキーのまま出るまで気づけない。
 """
@@ -25,7 +27,7 @@ from pathlib import Path
 
 GAME = Path(__file__).resolve().parent.parent
 BASE_LOCALE = "en"
-# game_data.gd の KEY_PREFIX と同じ対応
+# game_data.gd の KEY_PREFIX と同じ対応。ジンの依頼は表示名と説明を持たないので、12で別に見る
 KEY_PREFIX = {
     "jobs": "job", "skills": "skill", "implants": "implant", "upgrades": "upgrade", "events": "event",
     "fragments": "fragment", "endings": "ending", "bodies": "body",
@@ -73,6 +75,8 @@ def main():
         if isinstance(data, dict):
             datas[path] = data
     endings = {e.get("id") for data in datas.values() for e in data.get("endings", [])}
+    jobs = {e.get("id") for data in datas.values() for e in data.get("jobs", [])}
+    skills = {e.get("id") for data in datas.values() for e in data.get("skills", [])}
     if not any(data.get("bodies") for data in datas.values()):
         errors.append("data に体の種類（bodies）が1つも無い")
 
@@ -103,6 +107,18 @@ def main():
                     key = f"event.{event.get('id')}.{choice.get('id')}.{suffix}"
                     if key not in base:
                         errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+
+        for req in data.get("requests", []):
+            where = f"{path.relative_to(GAME)}: request.{req.get('id')}"
+            if ("job" in req) == ("skill" in req):
+                errors.append(f"{where}: 仕事とスキルのどちらか一方だけを持たない")
+            if "job" in req and req["job"] not in jobs:
+                errors.append(f"{where}: 無い仕事を指している: {req['job']}")
+            if "skill" in req and req["skill"] not in skills:
+                errors.append(f"{where}: 無いスキルを指している: {req['skill']}")
+            key = f"request.{req.get('id')}.offer"
+            if key not in base:
+                errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
 
         for ending in data.get("endings", []):
             key = f"ending.{ending.get('id')}.chronicle"

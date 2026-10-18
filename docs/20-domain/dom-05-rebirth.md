@@ -50,6 +50,8 @@ implemented_by:
 永続強化の値段 = 最初の値段 × 値段の伸び ^ いまのレベル
 ```
 
+ジンの依頼を果たした周は、周の終わりに得る記憶ポイントに、依頼の上乗せが足される（[DOM-12](./dom-12-jin-requests.md)）。
+
 ## 不変条件
 
 - [ ] 周が終わるたびに、記憶ポイントは1以上増える
@@ -97,5 +99,6 @@ implemented_by:
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 - (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
 - (depends_on) [DOM-11 体の種類](./dom-11-body-types.md)
+- (depends_on) [DOM-12 ジンの依頼](./dom-12-jin-requests.md)
 
 <!-- graph:auto:end -->

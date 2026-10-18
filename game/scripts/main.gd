@@ -24,6 +24,7 @@ var _job_buttons := {}
 var _skill_rows := {}  # id -> {label, bar}
 var _durability_bar: ProgressBar
 var _body_label: Label
+var _request_label: Label
 var _implant_buttons := {}
 var _points_label: Label
 var _rebirth_points_label: Label
@@ -201,6 +202,10 @@ func _build_right() -> Control:
 	box.add_child(_durability_bar)
 	_body_label = _label("", DIM, 15)
 	box.add_child(_body_label)
+	# ジンの依頼は、その周の目標なので、周の状態を出す欄に置く（ADR-0013）
+	_request_label = _label("", PINK, 15)
+	_request_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(_request_label)
 
 	box.add_child(_section_title(tr("ui.implants")))
 	for id in GameData.order["implants"]:
@@ -262,7 +267,10 @@ func _build_rebirth() -> Control:
 			var mio := _label(tr(Game.mio_line_key(last)), Color.WHITE, 16)
 			mio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			box.add_child(mio)
-	box.add_child(_label(Loc.t("ui.points_gained", {"n": Game.last_points_gained}), PINK, 20))
+	var gained := Loc.t("ui.points_gained", {"n": Game.last_points_gained})
+	if Game.last_request_bonus > 0:
+		gained += Loc.t("ui.request_bonus", {"n": Game.last_request_bonus})
+	box.add_child(_label(gained, PINK, 20))
 	box.add_child(_label(_fragment_progress(), DIM, 14))
 
 	# 説明は見出しと同じ行に置き、画面の高さに収める
@@ -419,6 +427,8 @@ func _refresh() -> void:
 		Loc.t("ui.age", {"age": Game.format_time(Game.age)}),
 		Loc.t("ui.decay", {"n": "%.2f" % Game.current_decay()}),
 	]
+	_request_label.text = _request_text()
+	_request_label.visible = _request_label.text != ""
 	for id in _implant_buttons:
 		var button: Button = _implant_buttons[id]
 		var data: Dictionary = GameData.implants[id]
@@ -473,6 +483,24 @@ func _job_requirement_text(job_id: String) -> String:
 			"n": Game.fragments.size(), "max": GameData.order["fragments"].size(),
 		}), text]
 	return text
+
+
+## ジンの依頼の中身と進み具合。依頼の無い周は空
+func _request_text() -> String:
+	if Game.request == "":
+		return ""
+	var args := Game.request_args(Game.request)
+	var goal := Loc.t("request.job" if args.has("job") else "request.skill", {
+		"job": GameData.name_of("jobs", args.get("job", "")),
+		"skill": GameData.name_of("skills", args.get("skill", "")),
+		"min": args.get("min", 0), "level": args.get("level", 0),
+	})
+	var progress := tr("ui.request_done")
+	if not Game.request_done:
+		var p := Game.request_progress()
+		progress = "%s / %s" % ([Game.format_time(p[0]), Game.format_time(p[1])] if args.has("job") else [
+			Loc.t("ui.level", {"level": int(p[0])}), Loc.t("ui.level", {"level": int(p[1])})])
+	return Loc.t("ui.request", {"goal": goal, "progress": progress})
 
 
 ## 戻った記憶の断片の数と、次の断片の条件
