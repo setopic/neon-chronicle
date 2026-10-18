@@ -1,0 +1,85 @@
+# itch.ioのページに入れるもの
+
+[UC-01](../../docs/30-usecases/uc-01-itch-web-release.md)の手順で、itch.ioの編集画面に写す値と文面を置く。ページを直したら、このファイルも同じに直す。
+
+## 基本の欄
+
+| 欄（Edit game） | 値 |
+| --- | --- |
+| Title | `Neon Chronicle` |
+| Project URL | `neon-chronicle` |
+| Short description or tagline | `A cyberpunk idle game: work, wear out your body, and wake up in a new one. / サイバーパンクの放置転生ゲーム` |
+| Classification | Games |
+| Kind of project | HTML |
+| Release status | In development |
+| Pricing | 未定（下の「価格」） |
+| Uploads | `neon-chronicle-web.zip`に「This file will be played in the browser」を付ける |
+| Embed options | Embed in page、Manually set size `1280 × 720`、Fullscreen buttonを付ける、Mobile friendlyは付けない、Automatically start on page loadは付けない、SharedArrayBuffer supportは付けない |
+| Genre | Simulation |
+| Tags | `idle`, `incremental`, `cyberpunk`, `prestige`, `neon`, `sci-fi`, `singleplayer`, `short`, `godot`, `japanese` |
+| AI generation disclosure | 下の「AIの使用の申告」 |
+| Languages | English, Japanese |
+| Inputs | Mouse |
+| Community | Comments |
+| Visibility & access | 準備中はDraft。公開の日にPublic |
+| Cover image | `media/itch/cover.png`（630 × 500） |
+| Screenshots | `media/screenshots/`の画像（下の「画面写真」） |
+
+SharedArrayBuffer supportを付けないのは、スレッドを使わない書き出しにしているからである（[ARCH-01](../../docs/10-architecture/arch-01-game-overview.md)）。Mobile friendlyを付けないのは、スマートフォンで遊べるかを確かめていないからである。
+
+## 価格
+
+`No payments`（無料）か、`$0 or donate`（無料で遊べて、任意で投げ銭を受ける）のどちらかにする。決めたらここに書く。
+
+## AIの使用の申告
+
+itch.ioは、生成AIを使ったかどうかの申告を求めている。コードと文面はClaudeと一緒に書いている。画像・音声は生成AIで作っていない（カバー画像はゲームの画面から作った）。申告の欄の選び方は、作者が決める。
+
+## 画面写真
+
+| ファイル | 写っているもの |
+| --- | --- |
+| `screenshot-ja.png` | 第1周の始まり（日本語） |
+| `screenshot-en.png` | 同じ画面（英語） |
+| `screenshot-rebirth.png` | 体が限界を迎えて、永続強化を選ぶ画面 |
+| `screenshot-hacker.png` | ハッカーの仕事を始め、インプラントを付けたところ（英語） |
+
+## 説明文（Description）
+
+英語を先に、日本語を後に置く。itch.ioの一覧からは英語で読む人が多いからである。
+
+```text
+Neon Chronicle is a cyberpunk idle game about working, wearing out, and starting over.
+
+Pick a job in the back alleys of a neon city. Work earns credits and skill experience, but your body decays every second, and dangerous jobs wear it down faster. When its integrity hits zero, that life is over. The memory points you earned buy permanent upgrades, and you wake up in a new body to begin the next life.
+
+- Three jobs: courier, hacker, and mercenary
+- Skills, implants, and permanent upgrades that carry over between lives
+- A chronicle that records every life you have lived
+- One life takes about 4 to 7 minutes
+- English and Japanese (switch in the top right corner)
+- Progress is saved in your browser
+
+This is an early version. Events, story, music, and offline progress are not in yet.
+
+Made with Godot 4.7. Font: Noto Sans JP (SIL Open Font License 1.1).
+
+---
+
+ネオン・クロニクルは、働いて、体をすり減らし、新しい体でやり直すサイバーパンクの放置ゲームです。
+
+ネオンの街の路地裏で、仕事を選びます。働くとクレジットとスキルの経験がたまりますが、体は1秒ごとに劣化し、危険な仕事ほど速くすり減ります。耐久が0になると、その人生は終わりです。稼いだ記憶ポイントで永続強化を買い、新しい体で目覚めて次の周を始めます。
+
+- 仕事は3つ：運び屋・ハッカー・傭兵
+- スキル・インプラント・転生しても残る永続強化
+- これまでの人生を記録するクロニクル
+- 1周はおよそ4〜7分
+- 日本語と英語（右上で切り替え）
+- 進み具合はブラウザに保存されます
+
+まだ初期の版です。イベント・ストーリー・音楽・オフライン中の進行は、まだ入っていません。
+
+Godot 4.7で作りました。フォントはNoto Sans JP（SIL Open Font License 1.1）です。
+```
+
+日本語の説明文は遊ぶ人に向けた紹介なので、ゲームの外の文書と違い、です・ます体で書いている。
