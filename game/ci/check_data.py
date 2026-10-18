@@ -10,6 +10,9 @@ CIの app-check.yml から呼ぶ。Godotを使わずに分かる抜けだけを�
 7. 各仕事に、物語の句のキー（job.<id>.chronicle）がある（DOM-07）
 8. エンディングの選択肢は、data にあるエンディングを指す。各エンディングに、物語の句のキー（ending.<id>.chronicle）がある（DOM-08）
    エンディングの選択肢は周を終えるので、最後に選んだ選択肢にならず、選択肢の物語の句は要らない
+9. 転生の画面のミオの一言（mio.<倒れた理由>.<段>）が、倒れた理由と段の組すべてにある（DOM-10）。
+   キーをスクリプトで組み立てているので、4では見つからない
+10. 耐久を減らす選択肢のあるイベントに、倒れたときの句のキー（event.<id>.fall）がある（ADR-0011）
 
 ゲームは足りないキーを英語で補うので（loc.gd）、抜けは画面にキーのまま出るまで気づけない。
 """
@@ -26,6 +29,9 @@ KEY_PREFIX = {
     "jobs": "job", "skills": "skill", "implants": "implant", "upgrades": "upgrade", "events": "event",
     "fragments": "fragment", "endings": "ending",
 }
+# game_state.gd の mio_line_key と同じ組
+MIO_REASONS = ("decay", "event")
+MIO_STAGES = (1, 2, 3)
 KEY_IN_SCRIPT = re.compile(r'\b(?:tr|t|_log)\("([a-z_]+\.[a-z0-9_.]+)"')
 
 
@@ -82,6 +88,10 @@ def main():
             choices = event.get("choices", [])
             if not any(not c.get("requires") for c in choices):
                 errors.append(f"{path.relative_to(GAME)}: 選ぶ条件の無い選択肢が無い: event.{event.get('id')}")
+            if any(c.get("durability", 0) < 0 for c in choices):
+                key = f"event.{event.get('id')}.fall"
+                if key not in base:
+                    errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
             for choice in choices:
                 if "ending" in choice and choice["ending"] not in endings:
                     errors.append(f"{path.relative_to(GAME)}: 無いエンディングを指している: event.{event.get('id')}.{choice.get('id')}")
@@ -100,6 +110,11 @@ def main():
         for key in KEY_IN_SCRIPT.findall(path.read_text(encoding="utf-8")):
             if key not in base:
                 errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+
+    for reason in MIO_REASONS:
+        for stage in MIO_STAGES:
+            if f"mio.{reason}.{stage}" not in base:
+                errors.append(f"{BASE_LOCALE} にキーが無い: mio.{reason}.{stage}")
 
     for error in errors:
         print(error)
