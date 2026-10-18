@@ -14,10 +14,12 @@ Godot 4.7.2 / GDScript。ブラウザ向けに Compatibility 描画とスレッ�
 | `data/*.json` | 仕事・スキル・インプラント・永続強化・イベント・記憶の断片とエンディング（`story.json`）の数値。表示文はここに書かない |
 | `lang/*.json` | 言語ファイル（`ja.json`, `en.json`）。`<種類>.<id>.name` / `.desc` などのキーで文を持つ |
 | `scripts/mod_paths.gd` | 本体と MOD の読み込み先をまとめる |
-| `scripts/loc.gd` | 言語ファイルの読み込みと言語の切り替え。設定（言語、イベントで止めるか）の保存 |
+| `scripts/loc.gd` | 言語ファイルの読み込みと言語の切り替え。設定（言語、イベントで止めるか、音楽と効果音を鳴らすか）の保存 |
 | `scripts/game_data.gd` | data の読み込み（同じ id は後から読んだものが上書き） |
 | `scripts/game_state.gd` | 進行・転生・セーブとロード（`user://save.json`） |
 | `scripts/main.gd` / `city.gd` | 画面と上部の3Dの街 |
+| `scripts/sound.gd` | 音楽と効果音を鳴らす |
+| `audio/` | 音楽と効果音の WAV と、それを合成する `make_sounds.py` |
 
 ## 言語と MOD
 - 最初の起動ではブラウザ（OS）の言語が日本語なら日本語、それ以外は英語。右上で切り替えると次回も覚えています。
@@ -47,5 +49,5 @@ rm -f neon-chronicle-web.zip
 `godot --headless --path . --script res://ci/playthrough.gd` は、決まった手順で最初から最後まで早送りで遊び、エンディングにたどり着くかを確かめます。遊んだ時間と各周の物語文を出します。セーブは別のファイルに書くので、手元のセーブは消えません。
 `godot --headless --path . --script res://ci/away.gd` は、セーブの時刻をずらしてロードし、閉じていた時間の分だけ進むかを確かめます。
 
-## まだ入っていないもの
-音楽と効果音。
+## 音
+音楽と効果音は外部の素材ではなく、`python audio/make_sounds.py` で合成した WAV です。音を変えるときはこのスクリプトを直して回し直します。曲は繰り返して流すので、`audio/music.wav.import` の `edit/loop_mode=2` を外さないでください。右上の「音楽」と「効果音」で別々に消せます。ブラウザでは、最初にクリックかキー入力をしたときから聞こえます（ADR-0008）。

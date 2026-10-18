@@ -76,6 +76,8 @@
     "upgrade.talent.desc": "All skills start at Lv +1",
 
     "ui.pause_on_event": "Pause on events",
+    "ui.music": "Music",
+    "ui.sfx": "Sound effects",
     "ui.effect_credits": "Credits {n}",
     "ui.effect_durability": "Durability {n}",
     "ui.effect_xp": "{skill} XP {n}",

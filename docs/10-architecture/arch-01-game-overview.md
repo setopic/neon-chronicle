@@ -16,7 +16,7 @@ related: []
 
 ## 構成
 
-実装は`game/`にあるGodot 4.7.2のプロジェクトで、言語はGDScriptである。自動読み込み（autoload）は`Loc`・`GameData`・`Game`の3つである。
+実装は`game/`にあるGodot 4.7.2のプロジェクトで、言語はGDScriptである。自動読み込み（autoload）は`Loc`・`GameData`・`Game`・`Sound`の4つである。
 
 この表は、`game/project.godot`の自動読み込みと`game/scripts/`のファイルを写したものである。機械は突き合わせないので、スクリプトを足したら手で確かめる。
 
@@ -25,8 +25,10 @@ related: []
 | `game/data/*.json` | 仕事・スキル・インプラント・永続強化・イベント・記憶の断片・エンディングの数値を持つ | 表示文を持つこと |
 | `game/lang/*.json` | 言語ごとの表示文を、`<種類>.<id>.name`のようなキーで持つ | 数値を持つこと |
 | `mod_paths.gd` | 本体とMODの読み込み先をまとめる | ファイルを読むこと |
-| `loc.gd`（`Loc`） | 言語ファイルを読み、言語を切り替える。言語と「イベントで止める」の設定を`user://settings.json`に保存する（[ADR-0004](../50-adr/adr-0004-event-rules.md)） | 数値を扱うこと |
+| `loc.gd`（`Loc`） | 言語ファイルを読み、言語を切り替える。言語と「イベントで止める」「音楽」「効果音」の設定を`user://settings.json`に保存する（[ADR-0004](../50-adr/adr-0004-event-rules.md)、[ADR-0008](../50-adr/adr-0008-audio.md)） | 数値を扱うこと |
 | `game_data.gd`（`GameData`） | `data`を読む。同じidは後から読んだものが上書きする | 進行の状態を持つこと |
+| `sound.gd`（`Sound`） | 音楽と効果音を鳴らす。「音楽」と「効果音」の設定で消したものは鳴らさない（[ADR-0008](../50-adr/adr-0008-audio.md)） | 進行を変えること |
+| `game/audio/` | 音楽と効果音のWAVと、それを合成する`make_sounds.py`を持つ（[ADR-0008](../50-adr/adr-0008-audio.md)） | 外部の素材を持つこと |
 | `game_state.gd`（`Game`） | 進行・転生・セーブとロード（`user://save.json`）を受け持つ。セーブはセーブした時刻を持ち、開いたときに閉じていた時間を進める（[ADR-0007](../50-adr/adr-0007-away-progress.md)） | 画面を描くこと |
 | `main.gd`・`city.gd` | 画面と、上部の3Dの街を描く。右上の「ライセンス」のボタンで、素材のライセンスを表示する | 進行の計算をすること |
 | `game/credits.txt` | 使った外部の素材とそのライセンスの一覧を持つ（[ADR-0002](../50-adr/adr-0002-asset-licenses-in-game.md)） | Godotの第三者の部品を並べること。それは実行中にGodotから取る |
@@ -45,7 +47,7 @@ related: []
 
 ## 未決事項
 
-音楽と効果音は、まだ入っていない。
+なし
 
 ---
 
@@ -61,6 +63,7 @@ related: []
 - (decides) [ADR-0005 クロニクルの物語文を仕事と選択と倒れた理由から組み立てる](../50-adr/adr-0005-chronicle-story.md)
 - (decides) [ADR-0006 記憶の断片を順に戻し、最後の仕事の選択でエンディングを分ける](../50-adr/adr-0006-fragments-and-endings.md)
 - (decides) [ADR-0007 閉じていた時間を、開いたときにまとめて進める](../50-adr/adr-0007-away-progress.md)
+- (decides) [ADR-0008 音楽と効果音をスクリプトで作り、最初の操作から鳴らす](../50-adr/adr-0008-audio.md)
 - (depends_on) [UC-01 itch.ioでブラウザ版を公開する](../30-usecases/uc-01-itch-web-release.md)
 
 <!-- graph:auto:end -->

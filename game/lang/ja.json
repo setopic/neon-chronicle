@@ -76,6 +76,8 @@
     "upgrade.talent.desc": "全スキルが Lv +1 から始まる",
 
     "ui.pause_on_event": "イベントで止める",
+    "ui.music": "音楽",
+    "ui.sfx": "効果音",
     "ui.effect_credits": "クレジット {n}",
     "ui.effect_durability": "耐久 {n}",
     "ui.effect_xp": "{skill} 経験 {n}",

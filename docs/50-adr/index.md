@@ -24,6 +24,7 @@ tags: [index]
 - [ADR-0005 クロニクルの物語文を仕事と選択と倒れた理由から組み立てる](./adr-0005-chronicle-story.md)
 - [ADR-0006 記憶の断片を順に戻し、最後の仕事の選択でエンディングを分ける](./adr-0006-fragments-and-endings.md)
 - [ADR-0007 閉じていた時間を、開いたときにまとめて進める](./adr-0007-away-progress.md)
+- [ADR-0008 音楽と効果音をスクリプトで作り、最初の操作から鳴らす](./adr-0008-audio.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
