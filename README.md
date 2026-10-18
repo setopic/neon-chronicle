@@ -66,6 +66,7 @@ graph LR
     DOM-09["DOM-09<br/>意識の写しと目覚め"]
     DOM-10["DOM-10<br/>登場人物"]
     DOM-11["DOM-11<br/>体の種類"]
+    DOM-12["DOM-12<br/>ジンの依頼"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -83,6 +84,7 @@ graph LR
     ADR-0010["ADR-0010<br/>ミオの一言を転生の画面に出し、人物を目覚めと断片の文に入れる"]
     ADR-0011["ADR-0011<br/>倒れた理由の句をイベントごとに書く"]
     ADR-0012["ADR-0012<br/>転生のときに4種類の体から1つを選ぶ"]
+    ADR-0013["ADR-0013<br/>周の始まりにジンの依頼を1つ示し、果たせば記憶ポイントを上乗せする"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -110,6 +112,7 @@ graph LR
   ADR-0011 ==>|supersedes| ADR-0005
   ADR-0011 -.->|decides| DOM-07
   ADR-0012 -.->|decides| DOM-11
+  ADR-0013 -.->|decides| DOM-12
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -144,6 +147,10 @@ graph LR
   DOM-11 -->|depends_on| DOM-03
   DOM-11 -->|depends_on| DOM-05
   DOM-11 -->|depends_on| DOM-10
+  DOM-12 -->|depends_on| DOM-03
+  DOM-12 -->|depends_on| DOM-05
+  DOM-12 -->|depends_on| DOM-09
+  DOM-12 -->|depends_on| DOM-10
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04

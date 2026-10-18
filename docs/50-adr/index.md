@@ -29,6 +29,7 @@ tags: [index]
 - [ADR-0010 ミオの一言を転生の画面に出し、人物を目覚めと断片の文に入れる](./adr-0010-characters-in-screen-text.md)
 - [ADR-0011 倒れた理由の句をイベントごとに書く](./adr-0011-fall-phrase-per-event.md)
 - [ADR-0012 転生のときに4種類の体から1つを選ぶ](./adr-0012-choose-body-on-rebirth.md)
+- [ADR-0013 周の始まりにジンの依頼を1つ示し、果たせば記憶ポイントを上乗せする](./adr-0013-jin-requests.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
