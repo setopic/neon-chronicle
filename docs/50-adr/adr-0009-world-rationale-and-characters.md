@@ -2,7 +2,7 @@
 id: ADR-0009
 type: adr
 title: 生き直しを闇医者が乗っ取った企業の計画として説明し、4人の人物を置く
-status: review
+status: stable
 tags: [world, story]
 decides:
   - DOM-09
@@ -15,7 +15,7 @@ related: []
 # 生き直しを闇医者が乗っ取った企業の計画として説明し、4人の人物を置く
 
 - 日付: 2026-10-18
-- 状態: review
+- 状態: stable
 
 ## 背景
 
