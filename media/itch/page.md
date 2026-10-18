@@ -12,7 +12,7 @@
 | Classification | Games |
 | Kind of project | HTML |
 | Release status | In development |
-| Pricing | 未定（下の「価格」） |
+| Pricing | `$0 or donate`（下の「価格」） |
 | Uploads | `neon-chronicle-web.zip`に「This file will be played in the browser」を付ける |
 | Embed options | Embed in page、Manually set size `1280 × 720`、Fullscreen buttonを付ける、Mobile friendlyは付けない、Automatically start on page loadは付けない、SharedArrayBuffer supportは付けない |
 | Genre | Simulation |
@@ -29,7 +29,7 @@ SharedArrayBuffer supportを付けないのは、スレッドを使わない書�
 
 ## 価格
 
-`No payments`（無料）か、`$0 or donate`（無料で遊べて、任意で投げ銭を受ける）のどちらかにする。決めたらここに書く。
+`$0 or donate`にする。無料で遊べて、気に入った人だけが任意で払える。投げ銭を受けるには、itch.ioの「Payout settings」で受け取りの方法（PayPalなど）と税の情報を入れておく。
 
 ## AIの使用の申告
 
