@@ -30,7 +30,7 @@ jobs:
       # 書き出しはしない。書き出しテンプレートは約1GBあり、毎回落とすには重い。
       # 起動して数秒動かせば、スクリプトの構文の誤りとJSONの読み込みの失敗はログに出る。
       # Godotはそれらがあっても終了コード0で終わるので、ログの ERROR で判定する。
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ~/godot
           key: godot-${{ env.GODOT_VERSION }}
