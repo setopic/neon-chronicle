@@ -79,6 +79,7 @@ graph LR
     ADR-0007["ADR-0007<br/>閉じていた時間を、開いたときにまとめて進める"]
     ADR-0008["ADR-0008<br/>音楽と効果音をスクリプトで作り、最初の操作から鳴らす"]
     ADR-0009["ADR-0009<br/>生き直しを闇医者が乗っ取った企業の計画として説明し、4人の人物を置く"]
+    ADR-0010["ADR-0010<br/>ミオの一言を転生の画面に出し、人物を目覚めと断片の文に入れる"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -102,6 +103,7 @@ graph LR
   ADR-0009 -.->|decides| DOM-09
   ADR-0009 -.->|decides| DOM-10
   ADR-0009 -.->|decides| DOM-01
+  ADR-0010 -.->|decides| DOM-10
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02

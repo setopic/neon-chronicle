@@ -1,6 +1,6 @@
 extends Node
 
-## ゲームの進行状態。DOM-02〜DOM-08。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
+## ゲームの進行状態。DOM-02〜DOM-08、DOM-10。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
 
 signal life_ended
 signal life_started
@@ -344,7 +344,7 @@ func _start_life() -> void:
 	for skill in GameData.skills:
 		skill_level[skill] = start_level
 		skill_xp[skill] = 0.0
-	_log("log.awaken", {"life": life_number})
+	_log("log.awaken_first" if life_number == 1 else "log.awaken", {"life": life_number})
 	life_started.emit()
 
 
@@ -367,6 +367,15 @@ func story_of(entry: Dictionary) -> String:
 
 
 ## クロニクルに残った選択肢の種類。いまのデータに無いもの（外したMODの選択肢）は数えない
+## 転生の画面でミオが言う一言のキー。倒れた理由（体の限界かイベントか）と周の番号で変わる（DOM-10）。
+## 周の番号は、初めて倒れた周・10周目まで・それより後の3段に分ける
+func mio_line_key(entry: Dictionary) -> String:
+	var reason := "event" if entry.get("end", "") != "" else "decay"
+	var life := int(entry.get("life", 1))
+	var stage := 1 if life <= 1 else (2 if life < 10 else 3)
+	return "mio.%s.%d" % [reason, stage]
+
+
 func chronicle_deeds() -> int:
 	var seen := {}
 	for entry in chronicle:

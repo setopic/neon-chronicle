@@ -233,9 +233,15 @@ func _build_rebirth() -> Control:
 	var dim := ColorRect.new()
 	dim.color = Color(0, 0, 0, 0.75)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	# 画面が低いと「新しい体で目覚める」が下にはみ出すので、パネルごと縦にスクロールできるようにする
+	var outer := ScrollContainer.new()
+	outer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	outer.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	dim.add_child(outer)
 	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dim.add_child(center)
+	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	outer.add_child(center)
 
 	var last: Dictionary = Game.chronicle.back() if not Game.chronicle.is_empty() else {}
 	var box := _panel(tr("ui.rebirth_title_ending" if last.get("ending", "") != "" else "ui.rebirth_title"))
@@ -250,10 +256,23 @@ func _build_rebirth() -> Control:
 		var story := _label(Game.story_of(last), CYAN, 17)
 		story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		box.add_child(story)
+		# エンディングのあとは物語が終わっているので、診療所の場面を出さない
+		if last.get("ending", "") == "":
+			var end: String = last.get("end", "")
+			var mio := _label(Loc.t(Game.mio_line_key(last), {"event": GameData.name_of("events", end) if end != "" else ""}), Color.WHITE, 16)
+			mio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			box.add_child(mio)
 	box.add_child(_label(Loc.t("ui.points_gained", {"n": Game.last_points_gained}), PINK, 20))
 	box.add_child(_label(_fragment_progress(), DIM, 14))
 
-	box.add_child(_section_title(tr("ui.upgrades")))
+	# 説明は見出しと同じ行に置き、画面の高さに収める
+	var heading := HBoxContainer.new()
+	heading.add_theme_constant_override("separation", 14)
+	box.add_child(heading)
+	heading.add_child(_section_title(tr("ui.upgrades")))
+	var note := _label(tr("ui.upgrades_note"), DIM, 14)
+	note.size_flags_vertical = Control.SIZE_SHRINK_END
+	heading.add_child(note)
 	for id in GameData.order["upgrades"]:
 		var button := Button.new()
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -270,7 +289,7 @@ func _build_rebirth() -> Control:
 	}), PINK, 14))
 	# 物語文は1件で2〜3行になるので、全件をスクロールで見せ、最新の記録を下に出しておく
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 140)
+	scroll.custom_minimum_size = Vector2(0, 90)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	box.add_child(scroll)
 	var list := VBoxContainer.new()
