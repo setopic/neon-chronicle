@@ -59,9 +59,12 @@ graph LR
   end
   subgraph adr["決定記録"]
     ADR-0001["ADR-0001<br/>設計文書をグラフとして管理する"]
+    ADR-0002["ADR-0002<br/>素材のライセンスの一覧をゲームの中に置く"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
+  ADR-0002 -.->|related| UC-01
+  ADR-0002 -.->|decides| ARCH-01
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04
@@ -77,6 +80,7 @@ graph LR
   META-06 -.->|related| META-04
   META-07 -.->|related| META-01
   UC-01 -->|depends_on| ARCH-01
+  UC-01 -.->|related| ADR-0002
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;

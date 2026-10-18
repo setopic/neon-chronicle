@@ -34,6 +34,8 @@
     "ui.chronicle": "Chronicle",
     "ui.chronicle_entry": "Life {life}: lived {age} as a {job} ({earned} credits, memory +{points})",
     "ui.awaken": "Wake up in a new body",
+    "ui.licenses": "Licenses",
+    "ui.close": "Close",
     "ui.no_job": "drifter",
 
     "log.awaken": "Life {life}: you wake up in a new body. Pick a job.",

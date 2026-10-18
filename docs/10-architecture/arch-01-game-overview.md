@@ -28,7 +28,8 @@ related: []
 | `loc.gd`（`Loc`） | 言語ファイルを読み、言語の切り替えと保存をする | 数値を扱うこと |
 | `game_data.gd`（`GameData`） | `data`を読む。同じidは後から読んだものが上書きする | 進行の状態を持つこと |
 | `game_state.gd`（`Game`） | 進行・転生・セーブとロード（`user://save.json`）を受け持つ | 画面を描くこと |
-| `main.gd`・`city.gd` | 画面と、上部の3Dの街を描く | 進行の計算をすること |
+| `main.gd`・`city.gd` | 画面と、上部の3Dの街を描く。右上の「ライセンス」のボタンで、素材のライセンスを表示する | 進行の計算をすること |
+| `game/credits.txt` | 使った外部の素材とそのライセンスの一覧を持つ（[ADR-0002](../50-adr/adr-0002-asset-licenses-in-game.md)） | Godotの第三者の部品を並べること。それは実行中にGodotから取る |
 
 ## 境界
 
@@ -38,7 +39,7 @@ related: []
 
 ブラウザ版は、Compatibility描画と、スレッドを使わないWeb書き出しで動かす。ブラウザ版ではMODのフォルダを読まない。
 
-フォントはNoto Sans JPの部分集合（`game/fonts/subset-chars.txt`）である。この中に無い文字を表示文に使うと表示されないので、そのときは部分集合を作り直す。
+フォントはNoto Sans JPの部分集合（`game/fonts/subset-chars.txt`）である。外部の素材を足したら、`game/credits.txt`に書き足し、ライセンスの全文を求めるものは書き出しの`include_filter`にも挙げる。この中に無い文字を表示文に使うと表示されないので、そのときは部分集合を作り直す。
 
 どの言語ファイルも`en.json`と同じキーを持ち、`data`の各項目には表示名と説明のキーがある。ゲームは足りないキーを英語で補うので、抜けても画面を見るまで気づけない。そのため、CIの`app-check.yml`がこのキーの対応を確かめる。あわせて、Godotをヘッドレスで起動し、エラーが出ないことも確かめる。
 
@@ -55,6 +56,7 @@ related: []
 このノードを参照しているノード
 
 - (decides) [ADR-0001 設計文書をグラフとして管理する](../50-adr/adr-0001-graph-driven-docs.md)
+- (decides) [ADR-0002 素材のライセンスの一覧をゲームの中に置く](../50-adr/adr-0002-asset-licenses-in-game.md)
 - (depends_on) [UC-01 itch.ioでブラウザ版を公開する](../30-usecases/uc-01-itch-web-release.md)
 
 <!-- graph:auto:end -->
