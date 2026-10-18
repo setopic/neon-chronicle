@@ -41,7 +41,7 @@ itch.ioは、生成AIを使ったかどうかの申告を求めている。コ�
 
 | ファイル | 写っているもの |
 | --- | --- |
-| `screenshot-ja.png` | 第1周の途中。ハッカーに就けるようになったところ（日本語） |
+| `screenshot-ja.png` | 第1周の途中。傭兵に就けるようになったところ（日本語） |
 | `screenshot-event-ja.png` | 仕事中に起きたイベントと、その選択肢（日本語） |
 | `screenshot-memory.png` | 周の終わりに、記憶の断片が戻った画面（日本語） |
 | `screenshot-en.png` | 第1周の途中（英語） |
