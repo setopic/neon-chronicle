@@ -19,6 +19,7 @@ tags: [index]
 <!-- graph:children:start -->
 - [ADR-0001 設計文書をグラフとして管理する](./adr-0001-graph-driven-docs.md)
 - [ADR-0002 素材のライセンスの一覧をゲームの中に置く](./adr-0002-asset-licenses-in-game.md)
+- [ADR-0003 物語の文書を既定の種別で書く](./adr-0003-story-docs-default-types.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

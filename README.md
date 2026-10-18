@@ -54,17 +54,37 @@ graph LR
   subgraph architecture["アーキテクチャ"]
     ARCH-01["ARCH-01<br/>ゲームの全体構成"]
   end
+  subgraph domain["ドメイン"]
+    DOM-01["DOM-01<br/>世界観"]
+    DOM-02["DOM-02<br/>周と体"]
+    DOM-03["DOM-03<br/>仕事とスキル"]
+    DOM-04["DOM-04<br/>インプラント"]
+    DOM-05["DOM-05<br/>転生と永続強化"]
+  end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
   end
   subgraph adr["決定記録"]
     ADR-0001["ADR-0001<br/>設計文書をグラフとして管理する"]
     ADR-0002["ADR-0002<br/>素材のライセンスの一覧をゲームの中に置く"]
+    ADR-0003["ADR-0003<br/>物語の文書を既定の種別で書く"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
   ADR-0002 -.->|related| UC-01
   ADR-0002 -.->|decides| ARCH-01
+  ADR-0003 -.->|decides| DOM-01
+  ADR-0003 -.->|decides| DOM-02
+  ADR-0003 -.->|decides| DOM-03
+  ADR-0003 -.->|decides| DOM-04
+  ADR-0003 -.->|decides| DOM-05
+  DOM-02 -->|depends_on| DOM-01
+  DOM-03 -->|depends_on| DOM-02
+  DOM-04 -->|depends_on| DOM-02
+  DOM-04 -->|depends_on| DOM-03
+  DOM-05 -->|depends_on| DOM-02
+  DOM-05 -->|depends_on| DOM-03
+  DOM-05 -->|depends_on| DOM-04
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04
