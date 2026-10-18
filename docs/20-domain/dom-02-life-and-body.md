@@ -75,5 +75,6 @@ implemented_by:
 - (depends_on) [DOM-06 イベントと選択肢](./dom-06-events.md)
 - (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
+- (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
 
 <!-- graph:auto:end -->

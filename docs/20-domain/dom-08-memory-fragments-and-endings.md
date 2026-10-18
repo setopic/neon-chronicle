@@ -95,5 +95,7 @@ implemented_by:
 このノードを参照しているノード
 
 - (decides) [ADR-0006 記憶の断片を順に戻し、最後の仕事の選択でエンディングを分ける](../50-adr/adr-0006-fragments-and-endings.md)
+- (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
+- (depends_on) [DOM-10 登場人物](./dom-10-characters.md)
 
 <!-- graph:auto:end -->

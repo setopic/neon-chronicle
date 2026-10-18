@@ -95,5 +95,6 @@ implemented_by:
 - (decides) [ADR-0003 物語の文書を既定の種別で書く](../50-adr/adr-0003-story-docs-default-types.md)
 - (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
+- (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
 
 <!-- graph:auto:end -->

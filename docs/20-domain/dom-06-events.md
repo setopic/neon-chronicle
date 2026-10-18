@@ -98,5 +98,6 @@ implemented_by:
 - (decides) [ADR-0004 イベントの起き方と結果を決まった量で表す](../50-adr/adr-0004-event-rules.md)
 - (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
+- (depends_on) [DOM-10 登場人物](./dom-10-characters.md)
 
 <!-- graph:auto:end -->

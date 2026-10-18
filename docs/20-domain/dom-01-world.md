@@ -31,6 +31,8 @@ related: []
 
 企業が主人公の意識をデータにした経緯は、生き直すたびに少しずつ分かっていく。その分かり方は、DOM-08の記憶の断片が決めている。
 
+主人公が新しい体で目覚める仕組みは[DOM-09](./dom-09-consciousness-copy.md)が、名前のある人物は[DOM-10](./dom-10-characters.md)が決めている。
+
 ## 用語
 
 | 用語 | 意味 | 旧称 |
@@ -49,8 +51,11 @@ related: []
 
 - (decides) [ADR-0003 物語の文書を既定の種別で書く](../50-adr/adr-0003-story-docs-default-types.md)
 - (decides) [ADR-0006 記憶の断片を順に戻し、最後の仕事の選択でエンディングを分ける](../50-adr/adr-0006-fragments-and-endings.md)
+- (decides) [ADR-0009 生き直しを闇医者が乗っ取った企業の計画として説明し、4人の人物を置く](../50-adr/adr-0009-world-rationale-and-characters.md)
 - (depends_on) [DOM-02 周と体](./dom-02-life-and-body.md)
 - (depends_on) [DOM-06 イベントと選択肢](./dom-06-events.md)
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
+- (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
+- (depends_on) [DOM-10 登場人物](./dom-10-characters.md)
 
 <!-- graph:auto:end -->

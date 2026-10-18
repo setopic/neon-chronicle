@@ -63,6 +63,8 @@ graph LR
     DOM-06["DOM-06<br/>イベントと選択肢"]
     DOM-07["DOM-07<br/>クロニクルの物語"]
     DOM-08["DOM-08<br/>記憶の断片とエンディング"]
+    DOM-09["DOM-09<br/>意識の写しと目覚め"]
+    DOM-10["DOM-10<br/>登場人物"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -76,6 +78,7 @@ graph LR
     ADR-0006["ADR-0006<br/>記憶の断片を順に戻し、最後の仕事の選択でエンディングを分ける"]
     ADR-0007["ADR-0007<br/>閉じていた時間を、開いたときにまとめて進める"]
     ADR-0008["ADR-0008<br/>音楽と効果音をスクリプトで作り、最初の操作から鳴らす"]
+    ADR-0009["ADR-0009<br/>生き直しを闇医者が乗っ取った企業の計画として説明し、4人の人物を置く"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -96,6 +99,9 @@ graph LR
   ADR-0007 -.->|decides| DOM-02
   ADR-0007 -.->|decides| ARCH-01
   ADR-0008 -.->|decides| ARCH-01
+  ADR-0009 -.->|decides| DOM-09
+  ADR-0009 -.->|decides| DOM-10
+  ADR-0009 -.->|decides| DOM-01
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -116,6 +122,16 @@ graph LR
   DOM-08 -->|depends_on| DOM-05
   DOM-08 -->|depends_on| DOM-06
   DOM-08 -->|depends_on| DOM-07
+  DOM-09 -->|depends_on| DOM-01
+  DOM-09 -->|depends_on| DOM-02
+  DOM-09 -->|depends_on| DOM-03
+  DOM-09 -->|depends_on| DOM-04
+  DOM-09 -->|depends_on| DOM-05
+  DOM-09 -->|depends_on| DOM-08
+  DOM-10 -->|depends_on| DOM-01
+  DOM-10 -->|depends_on| DOM-06
+  DOM-10 -->|depends_on| DOM-08
+  DOM-10 -->|depends_on| DOM-09
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04
