@@ -25,6 +25,7 @@ tags: [index]
 - [ADR-0006 記憶の断片を順に戻し、最後の仕事の選択でエンディングを分ける](./adr-0006-fragments-and-endings.md)
 - [ADR-0007 閉じていた時間を、開いたときにまとめて進める](./adr-0007-away-progress.md)
 - [ADR-0008 音楽と効果音をスクリプトで作り、最初の操作から鳴らす](./adr-0008-audio.md)
+- [ADR-0009 生き直しを闇医者が乗っ取った企業の計画として説明し、4人の人物を置く](./adr-0009-world-rationale-and-characters.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

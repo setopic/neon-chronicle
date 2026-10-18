@@ -66,5 +66,6 @@ implemented_by:
 
 - (decides) [ADR-0003 物語の文書を既定の種別で書く](../50-adr/adr-0003-story-docs-default-types.md)
 - (depends_on) [DOM-05 転生と永続強化](./dom-05-rebirth.md)
+- (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
 
 <!-- graph:auto:end -->
