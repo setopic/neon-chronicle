@@ -4,7 +4,7 @@ type: domain
 title: 街と人物の資料
 status: stable
 tags: [world, story]
-depends_on: [DOM-01, DOM-08, DOM-09, DOM-10, DOM-13]
+depends_on: [DOM-01, DOM-08, DOM-09, DOM-10, DOM-13, DOM-15]
 related: []
 implemented_by:
   - game/scripts/game_state.gd
@@ -15,7 +15,7 @@ implemented_by:
 
 ## 定義
 
-資料は、[ネオン・シティ](./dom-01-world.md)・[主人公](./dom-01-world.md)・[登場人物](./dom-10-characters.md)の1つについて、プレイヤーがいつでも読める説明である。最初は、遊んでいればすでに分かることだけを載せる。[記憶の断片](./dom-08-memory-fragments-and-endings.md)が戻ったり、[人物のイベント](./dom-13-character-events.md)が起きたりすると、その資料に追記が加わる。
+資料は、[ネオン・シティ](./dom-01-world.md)・[企業](./dom-01-world.md)・[街の場所](./dom-15-city-places-and-powers.md)・[主人公](./dom-01-world.md)・[登場人物](./dom-10-characters.md)の1つについて、プレイヤーがいつでも読める説明である。最初は、遊んでいればすでに分かることだけを載せる。[記憶の断片](./dom-08-memory-fragments-and-endings.md)が戻ったり、[人物のイベント](./dom-13-character-events.md)が起きたりすると、その資料に追記が加わる。
 
 ## 属性
 
@@ -42,6 +42,10 @@ implemented_by:
 | 資料 | 出るイベント | 追記の要る断片・出るイベント |
 | --- | --- | --- |
 | ネオン・シティ | | 「計画書」「中枢サーバー」 |
+| 企業 | | |
+| 企業区画 | | |
+| 下層街 | | |
+| 闇市場 | | |
 | 自分（主人公） | | 「契約書」「名前」「計画書」「中枢サーバー」 |
 | ミオ | | 「白い部屋」「計画書」 |
 | ジン | | 「名前」 |
@@ -64,7 +68,7 @@ implemented_by:
 
 | 用語 | 意味 | 旧称 |
 | --- | --- | --- |
-| 資料 | ネオン・シティ・主人公・登場人物の1つについての説明。上のボタン「街と人物」から開く画面で、いつでも読める | |
+| 資料 | ネオン・シティ・企業・街の場所・主人公・登場人物の1つについての説明。上のボタン「街と人物」から開く画面で、いつでも読める | |
 | 追記 | 記憶の断片が戻るか、人物のイベントが起きると、資料の後ろに加わる文 | |
 
 ---
@@ -80,9 +84,11 @@ implemented_by:
 - [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
 - [DOM-10 登場人物](./dom-10-characters.md)
 - [DOM-13 人物のイベント](./dom-13-character-events.md)
+- [DOM-15 街の場所と勢力](./dom-15-city-places-and-powers.md)
 
 このノードを参照しているノード
 
 - (decides) [ADR-0015 街と人物の資料を上のボタンから開き、記憶の断片が戻るまで追記を伏せる](../50-adr/adr-0015-profiles-revealed-by-fragments.md)
+- (decides) [ADR-0018 街を複数の企業が分け合い、場所と住人をイベントと資料に出す](../50-adr/adr-0018-companies-places-and-residents.md)
 
 <!-- graph:auto:end -->
