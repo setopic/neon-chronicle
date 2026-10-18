@@ -16,7 +16,7 @@
     "ui.requires": "必要：{skill} Lv {level}",
     "ui.durability": "耐久 {now} / {max}",
     "ui.age": "経過 {age}",
-    "ui.decay": "劣化 {n} / 秒",
+    "ui.decay": "劣化の速度 {n} / 秒",
     "ui.implant_owned": "装着済み",
     "ui.cost_credits": "{n} クレジット",
     "ui.cost_points": "{n} pt",
@@ -64,7 +64,7 @@
     "implant.neural_chip.name": "神経加速チップ",
     "implant.neural_chip.desc": "スキルの経験 +50%",
     "implant.bone_frame.name": "強化骨格",
-    "implant.bone_frame.desc": "体の劣化 -30%",
+    "implant.bone_frame.desc": "劣化の速度 -30%",
     "implant.credit_spoofer.name": "信用スコア偽装",
     "implant.credit_spoofer.desc": "稼ぎ +50%。体ではなくネット上の身元に組み込むので、転生しても残る。",
 
@@ -73,7 +73,7 @@
     "upgrade.contacts.name": "闇市場のコネ",
     "upgrade.contacts.desc": "稼ぎ +25%",
     "upgrade.frame.name": "頑丈な義体",
-    "upgrade.frame.desc": "体の劣化 -10%",
+    "upgrade.frame.desc": "劣化の速度 -10%",
     "upgrade.talent.name": "才能の継承",
     "upgrade.talent.desc": "全スキルが Lv +1 から始まる",
 
@@ -211,11 +211,11 @@
     "body.standard.name": "汎用の体",
     "body.standard.desc": "効果なし",
     "body.labor.name": "作業用の体",
-    "body.labor.desc": "劣化 -25%、経験 -10%",
+    "body.labor.desc": "劣化の速度 -25%、経験 -10%",
     "body.combat.name": "戦闘用の体",
-    "body.combat.desc": "劣化 +25%、稼ぎ +80%",
+    "body.combat.desc": "劣化の速度 +25%、稼ぎ +80%",
     "body.prototype.name": "試作の体",
-    "body.prototype.desc": "劣化 +25%、経験 +60%",
+    "body.prototype.desc": "劣化の速度 +25%、経験 +60%",
     "ui.body_choice": "ミオが用意した体から、次の体を選ぶ。"
   }
 }
