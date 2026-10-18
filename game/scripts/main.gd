@@ -79,10 +79,16 @@ func _build() -> void:
 	margin.add_child(root)
 
 	root.add_child(_build_header())
+	# 仕事やインプラントが増えても画面の高さを超えないよう、中段だけをスクロールさせ、ログの高さを守る
+	var middle_scroll := ScrollContainer.new()
+	middle_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	middle_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	root.add_child(middle_scroll)
 	var middle := HBoxContainer.new()
+	middle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	middle.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	middle.add_theme_constant_override("separation", 10)
-	root.add_child(middle)
+	middle_scroll.add_child(middle)
 	middle.add_child(_build_left())
 	middle.add_child(_build_right())
 	root.add_child(_build_log())
@@ -102,7 +108,7 @@ func _build() -> void:
 
 func _build_header() -> Control:
 	var header := Control.new()
-	header.custom_minimum_size = Vector2(0, 200)
+	header.custom_minimum_size = Vector2(0, 140)
 	var city := City.new()
 	city.set_anchors_preset(Control.PRESET_FULL_RECT)
 	header.add_child(city)
@@ -214,7 +220,7 @@ func _build_log() -> Control:
 	var box := _panel(tr("ui.log"))
 	var panel: Control = box.get_parent().get_parent()
 	panel.size_flags_horizontal = Control.SIZE_FILL
-	panel.custom_minimum_size = Vector2(0, 150)
+	panel.custom_minimum_size = Vector2(0, 180)
 	_log_label = RichTextLabel.new()
 	_log_label.scroll_following = true
 	_log_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
