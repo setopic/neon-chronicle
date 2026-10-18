@@ -51,6 +51,14 @@
         { "id": "retreat", "durability": -5 },
         { "id": "charge", "requires": { "combat": 8 }, "credits": 80, "durability": -10, "xp": { "combat": 10 } }
       ]
+    },
+    {
+      "id": "core_server",
+      "jobs": ["core_breach"],
+      "choices": [
+        { "id": "reclaim", "ending": "reclaim" },
+        { "id": "remain", "ending": "remain" }
+      ]
     }
   ]
 }

@@ -26,6 +26,16 @@
       "danger": 2.0,
       "xp": { "combat": 1.5 },
       "requires": { "combat": 6 }
+    },
+    {
+      "id": "core_breach",
+      "income": 50.0,
+      "skill": "hacking",
+      "skill_bonus": 0.15,
+      "danger": 3.0,
+      "xp": { "hacking": 1.0 },
+      "requires": { "hacking": 15 },
+      "needs_all_fragments": true
     }
   ]
 }

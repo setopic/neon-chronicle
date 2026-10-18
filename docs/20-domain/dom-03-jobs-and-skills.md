@@ -41,6 +41,8 @@ implemented_by:
 | id | 文字列 | ○ | スキルを区別する名前 |
 | 1レベルあたりの効果 | 効果の種類ごとの小数 | ○ | レベルを掛けて足す。無いスキルもある |
 
+記憶の断片がすべて戻るまで就けない仕事を表す属性は、[DOM-08](./dom-08-memory-fragments-and-endings.md)が足している。
+
 周ごとの状態として、持っているクレジット、その周で稼いだクレジット、就いている仕事、スキルごとのレベルと経験、仕事ごとの就いた時間を持つ。
 
 次の値は属性ではなく導出値である。
@@ -101,5 +103,6 @@ implemented_by:
 - (depends_on) [DOM-05 転生と永続強化](./dom-05-rebirth.md)
 - (depends_on) [DOM-06 イベントと選択肢](./dom-06-events.md)
 - (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
+- (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 
 <!-- graph:auto:end -->

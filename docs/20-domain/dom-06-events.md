@@ -37,6 +37,8 @@ implemented_by:
 | 耐久の増減 | 小数 | | 負なら減らす |
 | 得る経験 | スキルごとの小数 | | 0以上 |
 
+エンディングにたどり着く選択肢の属性は、[DOM-08](./dom-08-memory-fragments-and-endings.md)が足している。
+
 周ごとの状態として、選ぶのを待っているイベントを持つ。待っているイベントが無いこともある。
 
 次の値は属性ではなく導出値である。
@@ -95,5 +97,6 @@ implemented_by:
 
 - (decides) [ADR-0004 イベントの起き方と結果を決まった量で表す](../50-adr/adr-0004-event-rules.md)
 - (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
+- (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 
 <!-- graph:auto:end -->

@@ -69,5 +69,6 @@ implemented_by:
 - (depends_on) [DOM-05 転生と永続強化](./dom-05-rebirth.md)
 - (depends_on) [DOM-06 イベントと選択肢](./dom-06-events.md)
 - (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
+- (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 
 <!-- graph:auto:end -->

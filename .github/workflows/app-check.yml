@@ -51,3 +51,10 @@ jobs:
             echo "::error::Godotの起動中にエラーが出た"
             exit 1
           fi
+
+      # 決まった手順で最初から最後まで自動で遊び、エンディングにたどり着くかを見る（DOM-08）。
+      # 時間は早送りで進めるので、数秒で終わる。たどり着かなければ終了コード1になる。
+      # スクリプトの誤りで止まらずに回り続けたときのために、timeout で打ち切る。
+      - name: 最初から最後まで遊んで、エンディングにたどり着くか確かめる
+        working-directory: game
+        run: timeout 300 ~/godot/godot --headless --path . --script res://ci/playthrough.gd

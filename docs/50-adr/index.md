@@ -22,6 +22,7 @@ tags: [index]
 - [ADR-0003 物語の文書を既定の種別で書く](./adr-0003-story-docs-default-types.md)
 - [ADR-0004 イベントの起き方と結果を決まった量で表す](./adr-0004-event-rules.md)
 - [ADR-0005 クロニクルの物語文を仕事と選択と倒れた理由から組み立てる](./adr-0005-chronicle-story.md)
+- [ADR-0006 記憶の断片を順に戻し、最後の仕事の選択でエンディングを分ける](./adr-0006-fragments-and-endings.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
