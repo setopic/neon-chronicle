@@ -3,6 +3,7 @@ extends SceneTree
 ## 最初から最後まで自動で遊び、エンディングにたどり着くかを確かめる。DOM-08。
 ## プレイヤーが画面で見られる情報だけで動く。次の記憶の断片の条件にあるスキルを上げ、
 ## 条件がそろったら稼ぎの多い仕事に就く。永続強化とインプラントは買えるものから買う。
+## 転生するときは、説明に書いてある効果を見て、経験がいちばん増える体を選ぶ。
 ## 遊んだ時間（進めた秒数）を出し、制限時間までにたどり着かなければ終了コード1で終わる。
 ## セーブは別のファイルに書くので、手元のセーブは消えない。
 ##
@@ -35,7 +36,7 @@ func _process(_delta: float) -> bool:
 func _step() -> void:
 	if not _game.alive:
 		_buy_upgrades()
-		_game.rebirth()
+		_game.rebirth(_pick_body())
 		return
 	if _game.pending_event != "":
 		_game.choose(_pick_choice())
@@ -81,6 +82,17 @@ func _pick_choice() -> String:
 	return pick
 
 
+func _pick_body() -> String:
+	var best := ""
+	var best_xp := -INF
+	for id in _data.order["bodies"]:
+		var xp: float = _data.bodies[id].get("effects", {}).get("xp", 0.0)
+		if xp > best_xp:
+			best = id
+			best_xp = xp
+	return best
+
+
 func _buy_upgrades() -> void:
 	var bought := true
 	while bought:
@@ -96,6 +108,6 @@ func _finish(code: int) -> void:
 		int(_played / 60.0), _game.life_number, _game.fragments.size(),
 		_data.order["fragments"].size(), _game.endings_reached()])
 	for entry in _game.chronicle:
-		print("  life %d: %s" % [int(entry["life"]), _game.story_of(entry)])
+		print("  life %d (%s): %s" % [int(entry["life"]), entry.get("body", ""), _game.story_of(entry)])
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
 	quit(code)

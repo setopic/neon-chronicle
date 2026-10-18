@@ -16,7 +16,7 @@
     "ui.requires": "必要：{skill} Lv {level}",
     "ui.durability": "耐久 {now} / {max}",
     "ui.age": "経過 {age}",
-    "ui.decay": "劣化 {n} / 秒",
+    "ui.decay": "体の劣化速度 {n} / 秒",
     "ui.implant_owned": "装着済み",
     "ui.cost_credits": "{n} クレジット",
     "ui.cost_points": "{n} pt",
@@ -33,12 +33,12 @@
     "ui.upgrades": "永続強化",
     "ui.upgrades_note": "同期で残った記憶を使って、次の目覚めを調整する。",
     "ui.chronicle": "クロニクル",
-    "ui.awaken": "新しい体で目覚める",
+    "ui.awaken": "{body}で目覚める",
     "ui.licenses": "ライセンス",
     "ui.close": "閉じる",
     "ui.no_job": "無職",
 
-    "log.awaken": "第{life}周：裏通りの診療所で、新しい体で目覚めた。仕事を選ぼう。",
+    "log.awaken": "第{life}周：裏通りの診療所で、新しい{body}で目覚めた。仕事を選ぼう。",
     "log.awaken_first": "第{life}周：裏通りの診療所で目覚めた。闇医者のミオが「仕事ならジンが回してくれる」と言った。仕事を選ぼう。",
     "log.job": "仲介屋のジンから、{job}の仕事を受けた。",
     "log.skill_up": "{skill}が Lv {level} になった。",
@@ -64,7 +64,7 @@
     "implant.neural_chip.name": "神経加速チップ",
     "implant.neural_chip.desc": "スキルの経験 +50%",
     "implant.bone_frame.name": "強化骨格",
-    "implant.bone_frame.desc": "体の劣化 -30%",
+    "implant.bone_frame.desc": "体の劣化速度 -30%",
     "implant.credit_spoofer.name": "信用スコア偽装",
     "implant.credit_spoofer.desc": "稼ぎ +50%。体ではなくネット上の身元に組み込むので、転生しても残る。",
 
@@ -73,7 +73,7 @@
     "upgrade.contacts.name": "闇市場のコネ",
     "upgrade.contacts.desc": "稼ぎ +25%",
     "upgrade.frame.name": "頑丈な義体",
-    "upgrade.frame.desc": "体の劣化 -10%",
+    "upgrade.frame.desc": "体の劣化速度 -10%",
     "upgrade.talent.name": "才能の継承",
     "upgrade.talent.desc": "全スキルが Lv +1 から始まる",
 
@@ -136,7 +136,7 @@
     "event.ambush.charge.result": "私兵を蹴散らし、運んでいた装備まで奪った。",
 
     "ui.chronicle_story": "第{life}周：{story}",
-    "ui.chronicle_stats": "経過 {age}、{earned} クレジット、記憶 +{points}",
+    "ui.chronicle_stats": "{body}、経過 {age}、{earned} クレジット、記憶 +{points}",
     "ui.chronicle_bonus": "クロニクルに残った選択 {n} 種類：経験 +{pct}%",
     "chronicle.story": "{job}、{deed}、{end}。",
     "chronicle.story_short": "{job}、{end}。",
@@ -206,6 +206,16 @@
     "mio.decay.3": "ミオ「何度迎えても、あなたはあなたね。次の体も、最後まで使ってあげて」",
     "mio.event.1": "ミオ「体は替えがきく。でも記憶は、全部は戻らないから。無茶はほどほどにね」",
     "mio.event.2": "ミオ「次の体では、同じ倒れ方をしないで」",
-    "mio.event.3": "ミオ「また無茶をしたのね。それでも、あなたは毎回ここへ戻ってくる」"
+    "mio.event.3": "ミオ「また無茶をしたのね。それでも、あなたは毎回ここへ戻ってくる」",
+
+    "body.standard.name": "汎用の体",
+    "body.standard.desc": "効果なし",
+    "body.labor.name": "作業用の体",
+    "body.labor.desc": "体の劣化速度 -25%、経験 -10%",
+    "body.combat.name": "戦闘用の体",
+    "body.combat.desc": "体の劣化速度 +25%、稼ぎ +80%",
+    "body.prototype.name": "試作の体",
+    "body.prototype.desc": "体の劣化速度 +25%、経験 +60%",
+    "ui.body_choice": "ミオが用意した体から、次の体を選ぶ。"
   }
 }

@@ -1,0 +1,8 @@
+{
+  "bodies": [
+    { "id": "standard", "decay": 0.4, "effects": {} },
+    { "id": "labor", "decay": 0.3, "effects": { "xp": -0.1 } },
+    { "id": "combat", "decay": 0.5, "effects": { "income": 0.8 } },
+    { "id": "prototype", "decay": 0.5, "effects": { "xp": 0.6 } }
+  ]
+}

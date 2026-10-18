@@ -1,6 +1,6 @@
 extends Node
 
-## ゲームの進行状態。DOM-02〜DOM-08、DOM-10。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
+## ゲームの進行状態。DOM-02〜DOM-08、DOM-10、DOM-11。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
 
 signal life_ended
 signal life_started
@@ -15,7 +15,7 @@ const MAX_CATCHUP := 60.0  # ふつうのフレームで進める最大秒数
 const MAX_AWAY := 8.0 * 3600.0  # 閉じていた時間を進める上限（秒）。ADR-0007
 const AWAY_GAP := 1.0  # 前のフレームからこれより空いたら、閉じていた（タブが裏にあった）とみなす
 const AWAY_LOG := 60.0  # これ以上の時間を進めたら、ログに残す
-const BASE_DECAY := 0.4  # 体の劣化（耐久/秒）。何もしなくても約250秒で寿命
+const BASE_DECAY := 0.4  # 体の種類が基本の劣化を持たないときの基本の劣化（耐久/秒）。何もしなくても約250秒で寿命
 const MAX_DURABILITY := 100.0
 const LOW_DURABILITY := 25.0
 const MAX_LOGS := 50
@@ -24,7 +24,7 @@ const DEED_XP := 0.02  # クロニクルに残った選択1種類あたりの経
 ## ログやクロニクルの引数のうち、id から表示名に変える項目
 const NAME_ARGS := {
 	"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades", "event": "events",
-	"fragment": "fragments", "ending": "endings",
+	"fragment": "fragments", "ending": "endings", "body": "bodies",
 }
 
 # --- 1人生の状態 ---
@@ -38,6 +38,7 @@ var skill_level := {}
 var implants: Array = []
 var job_time := {}
 var alive := true
+var body := ""  # その周の体の種類のid。DOM-11
 var pending_event := ""  # 待っているイベントのid。無いときは空
 var last_deed := ""  # 最後に選んだ選択肢（"<イベント>.<選択肢>"）。周を終わらせた選択は入れない
 
@@ -46,7 +47,7 @@ var life_number := 1
 var memory_points := 0
 var last_points_gained := 0
 var upgrades := {}
-var chronicle: Array = []  # 終わった周の記録 [{life, job, age, earned, points, deed, end, ending}]
+var chronicle: Array = []  # 終わった周の記録 [{life, body, job, age, earned, points, deed, end, ending}]
 var fragments: Array = []  # 戻った記憶の断片のid。DOM-08
 var last_fragments: Array = []  # 直前の周の終わりに戻った記憶の断片のid
 var logs: Array = []  # [{key, args}]。言語を切り替えても訳し直せるようキーで持つ
@@ -126,9 +127,9 @@ func _tick(dt: float) -> void:
 
 # --- 効果の計算 ---
 
-## インプラント・永続強化・スキルの効果を合計する（"income", "xp", "decay", "start_level"）
+## 体の種類・インプラント・永続強化・スキルの効果を合計する（"income", "xp", "decay", "start_level"）
 func effect(key: String) -> float:
-	var total := 0.0
+	var total: float = GameData.bodies.get(body, {}).get("effects", {}).get(key, 0.0)
 	for id in implants:
 		total += GameData.implants.get(id, {}).get("effects", {}).get(key, 0.0)
 	for id in upgrades:
@@ -142,8 +143,9 @@ func xp_mult() -> float:
 	return 1.0 + effect("xp") + deed_bonus()
 
 
+## 基本の劣化は体の種類が持つ。効果の合計とは別に掛けるので、劣化の効果が下限に届いていても体の差が残る（ADR-0012）
 func decay_per_sec(danger: float) -> float:
-	return BASE_DECAY * danger * maxf(0.2, 1.0 + effect("decay"))
+	return GameData.bodies.get(body, {}).get("decay", BASE_DECAY) * danger * maxf(0.2, 1.0 + effect("decay"))
 
 
 func current_decay() -> float:
@@ -309,7 +311,7 @@ func _end_life(fatal_event := "", ending := "") -> void:
 	last_points_gained = points_for_life()
 	memory_points += last_points_gained
 	chronicle.append({
-		"life": life_number, "job": main_job(), "age": age,
+		"life": life_number, "body": body, "job": main_job(), "age": age,
 		"earned": life_earned, "points": last_points_gained,
 		"deed": last_deed, "end": fatal_event, "ending": ending,
 	})
@@ -319,15 +321,21 @@ func _end_life(fatal_event := "", ending := "") -> void:
 	life_ended.emit()
 
 
-func rebirth() -> void:
-	if alive:
+## body_id は次の周の体の種類。転生の画面で選ぶ（DOM-11）
+func rebirth(body_id: String) -> void:
+	if alive or not GameData.bodies.has(body_id):
 		return
 	life_number += 1
-	_start_life()
+	_start_life(body_id)
 	save_game()
 
 
-func _start_life() -> void:
+## 体の種類を指定しないのは第1周だけで、data の最初の体で目覚める
+func first_body() -> String:
+	return GameData.order["bodies"][0] if not GameData.order["bodies"].is_empty() else ""
+
+
+func _start_life(body_id := "") -> void:
 	implants = implants.filter(func(id): return GameData.implants.get(id, {}).get("persistent", false))
 	credits = 0.0
 	life_earned = 0.0
@@ -340,11 +348,12 @@ func _start_life() -> void:
 	skill_level = {}
 	skill_xp = {}
 	alive = true
+	body = body_id if body_id != "" else first_body()
 	var start_level := int(effect("start_level"))
 	for skill in GameData.skills:
 		skill_level[skill] = start_level
 		skill_xp[skill] = 0.0
-	_log("log.awaken_first" if life_number == 1 else "log.awaken", {"life": life_number})
+	_log("log.awaken_first" if life_number == 1 else "log.awaken", {"life": life_number, "body": body})
 	life_started.emit()
 
 
@@ -470,7 +479,7 @@ func save_game() -> void:
 		"version": SAVE_VERSION, "saved_at": Time.get_unix_time_from_system(),
 		"credits": credits, "life_earned": life_earned, "durability": durability, "age": age,
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
-		"implants": implants, "job_time": job_time, "alive": alive, "pending_event": pending_event,
+		"implants": implants, "job_time": job_time, "alive": alive, "body": body, "pending_event": pending_event,
 		"last_deed": last_deed, "life_number": life_number, "memory_points": memory_points,
 		"last_points_gained": last_points_gained, "upgrades": upgrades,
 		"chronicle": chronicle, "fragments": fragments, "last_fragments": last_fragments, "logs": logs,
@@ -496,6 +505,8 @@ func load_game() -> bool:
 	implants = data.get("implants", [])
 	job_time = data.get("job_time", {})
 	alive = data.get("alive", true)
+	# #36 より前の体は、どれも効果の無い最初の体だった
+	body = data.get("body", first_body())
 	pending_event = data.get("pending_event", "")
 	if not GameData.events.has(pending_event):
 		pending_event = ""
@@ -505,6 +516,9 @@ func load_game() -> bool:
 	last_points_gained = int(data.get("last_points_gained", 0))
 	upgrades = _int_values(data.get("upgrades", {}))
 	chronicle = data.get("chronicle", [])
+	for entry in chronicle:
+		if not entry.has("body"):
+			entry["body"] = first_body()
 	fragments = data.get("fragments", [])
 	last_fragments = data.get("last_fragments", [])
 	logs = data.get("logs", [])

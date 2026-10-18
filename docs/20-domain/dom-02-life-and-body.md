@@ -27,7 +27,7 @@ implemented_by:
 | 経過時間 | 秒 | ○ | 周の始まりから進んだ時間。周の始まりは0 |
 | 生きているか | 真偽 | ○ | 耐久が0になったら偽になる |
 
-劣化は属性ではなく導出値である。基本の劣化は毎秒0.4で、ほかに何も無ければ、体は250秒で使えなくなる。基本の劣化をどれだけ増減させるかは、[DOM-03](./dom-03-jobs-and-skills.md)が決めている。
+劣化は属性ではなく導出値である。基本の劣化は体の種類ごとに決まっていて（[DOM-11](./dom-11-body-types.md)）、汎用の体では毎秒0.4である。ほかに何も無ければ、汎用の体は250秒で使えなくなる。基本の劣化をどれだけ増減させるかは、[DOM-03](./dom-03-jobs-and-skills.md)が決めている。
 
 ## 不変条件
 
@@ -76,5 +76,6 @@ implemented_by:
 - (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 - (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
+- (depends_on) [DOM-11 体の種類](./dom-11-body-types.md)
 
 <!-- graph:auto:end -->

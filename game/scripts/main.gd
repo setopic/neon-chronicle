@@ -246,7 +246,8 @@ func _build_rebirth() -> Control:
 	var last: Dictionary = Game.chronicle.back() if not Game.chronicle.is_empty() else {}
 	var box := _panel(tr("ui.rebirth_title_ending" if last.get("ending", "") != "" else "ui.rebirth_title"))
 	var panel: Control = box.get_parent().get_parent()
-	panel.custom_minimum_size = Vector2(620, 0)
+	# 体の種類のボタンを横に4つ並べるため、ほかのパネルより広くする
+	panel.custom_minimum_size = Vector2(880, 0)
 	center.add_child(panel)
 
 	var summary := _label(Game.format_entry({"key": "ui.rebirth_summary", "args": last}), Color.WHITE, 17)
@@ -301,12 +302,20 @@ func _build_rebirth() -> Control:
 		list.add_child(_label(Game.format_entry({"key": "ui.chronicle_stats", "args": entry}), DIM, 12))
 	list.resized.connect(func(): scroll.scroll_vertical = int(list.size.y))
 
-	var awaken := Button.new()
-	awaken.text = tr("ui.awaken")
-	awaken.custom_minimum_size = Vector2(0, 44)
-	awaken.add_theme_color_override("font_color", CYAN)
-	awaken.pressed.connect(Game.rebirth)
-	box.add_child(awaken)
+	# 体の種類ごとに目覚めるボタンを置く。選ぶことと目覚めることを1回の操作にして、画面の高さを増やさない（ADR-0012）
+	box.add_child(_label(tr("ui.body_choice"), DIM, 14))
+	var bodies := GridContainer.new()
+	bodies.columns = 4
+	bodies.add_theme_constant_override("h_separation", 8)
+	bodies.add_theme_constant_override("v_separation", 8)
+	box.add_child(bodies)
+	for id in GameData.order["bodies"]:
+		var awaken := Button.new()
+		awaken.text = "%s\n%s" % [Loc.t("ui.awaken", {"body": GameData.name_of("bodies", id)}), GameData.desc_of("bodies", id)]
+		awaken.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		awaken.add_theme_color_override("font_color", CYAN)
+		awaken.pressed.connect(Game.rebirth.bind(id))
+		bodies.add_child(awaken)
 	return dim
 
 
@@ -404,7 +413,8 @@ func _refresh() -> void:
 		bar.value = Game.skill_xp.get(id, 0.0)
 	_durability_bar.value = Game.durability
 	_durability_bar.modulate = DANGER if Game.durability < Game.LOW_DURABILITY else Color.WHITE
-	_body_label.text = "%s    %s    %s" % [
+	_body_label.text = "%s    %s    %s    %s" % [
+		GameData.name_of("bodies", Game.body),
 		Loc.t("ui.durability", {"now": int(ceil(Game.durability)), "max": int(Game.MAX_DURABILITY)}),
 		Loc.t("ui.age", {"age": Game.format_time(Game.age)}),
 		Loc.t("ui.decay", {"n": "%.2f" % Game.current_decay()}),

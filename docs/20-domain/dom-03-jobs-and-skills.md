@@ -18,7 +18,7 @@ implemented_by:
 
 仕事は、周の間に就いて、時間とともにクレジットと経験を得る活動である。スキルは、仕事で経験を積むと上がる腕前で、仕事の稼ぎを増やし、新しい仕事に就けるようにする。
 
-効果は、稼ぎ・経験・劣化を割合で増減させる値と、開始レベルを足す値である。効果を持つものは、スキルのほかにもある（[DOM-04](./dom-04-implants.md)・[DOM-05](./dom-05-rebirth.md)・[DOM-07](./dom-07-chronicle-story.md)）。どれが持つ効果も、種類ごとに足し合わせて使う。
+効果は、稼ぎ・経験・劣化を割合で増減させる値と、開始レベルを足す値である。効果を持つものは、スキルのほかにもある（[DOM-04](./dom-04-implants.md)・[DOM-05](./dom-05-rebirth.md)・[DOM-07](./dom-07-chronicle-story.md)・[DOM-11](./dom-11-body-types.md)）。どれが持つ効果も、種類ごとに足し合わせて使う。
 
 ## 属性
 
@@ -40,6 +40,8 @@ implemented_by:
 | --- | --- | --- | --- |
 | id | 文字列 | ○ | スキルを区別する名前 |
 | 1レベルあたりの効果 | 効果の種類ごとの小数 | ○ | レベルを掛けて足す。無いスキルもある |
+
+劣化の式の基本の劣化は、体の種類が持っている（[DOM-11](./dom-11-body-types.md)）。
 
 記憶の断片がすべて戻るまで就けない仕事を表す属性は、[DOM-08](./dom-08-memory-fragments-and-endings.md)が足している。
 
@@ -105,5 +107,6 @@ implemented_by:
 - (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 - (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
+- (depends_on) [DOM-11 体の種類](./dom-11-body-types.md)
 
 <!-- graph:auto:end -->
