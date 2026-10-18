@@ -132,9 +132,13 @@ func _build_header() -> Control:
 	_stats_label = _label("", CYAN, 20)
 	titles.add_child(_stats_label)
 
-	var tools := HBoxContainer.new()
+	# ボタンは設定と読み物の2段に分ける。1段に並べると、英語では1280の幅に収まらない（ADR-0017）
+	var tools := VBoxContainer.new()
 	tools.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	row.add_child(tools)
+	var settings := HBoxContainer.new()
+	settings.alignment = BoxContainer.ALIGNMENT_END
+	tools.add_child(settings)
 	var language := OptionButton.new()
 	for locale in Loc.languages():
 		language.add_item(Loc.language_name(locale))
@@ -142,31 +146,21 @@ func _build_header() -> Control:
 		if locale == Loc.current():
 			language.select(language.item_count - 1)
 	language.item_selected.connect(func(i): Loc.set_language(language.get_item_metadata(i)))
-	tools.add_child(language)
-	var pause := Button.new()
-	pause.toggle_mode = true
-	pause.text = tr("ui.pause_on_event")
-	pause.button_pressed = Loc.setting("pause_on_event", false)
-	pause.toggled.connect(func(on): Loc.set_setting("pause_on_event", on))
-	tools.add_child(pause)
-	tools.add_child(_toggle(tr("ui.music"), Sound.music_on(), Sound.set_music))
-	tools.add_child(_toggle(tr("ui.sfx"), Sound.sfx_on(), Sound.set_sfx))
-	var reset := Button.new()
-	reset.text = tr("ui.reset")
-	reset.pressed.connect(_confirm_reset)
-	tools.add_child(reset)
-	var memories := Button.new()
-	memories.text = tr("ui.fragments")
-	memories.pressed.connect(_show_fragments)
-	tools.add_child(memories)
-	var profiles := Button.new()
-	profiles.text = tr("ui.profiles")
-	profiles.pressed.connect(_show_profiles)
-	tools.add_child(profiles)
-	var licenses := Button.new()
-	licenses.text = tr("ui.licenses")
-	licenses.pressed.connect(_show_licenses)
-	tools.add_child(licenses)
+	settings.add_child(language)
+	settings.add_child(_toggle(tr("ui.pause_on_event"), Loc.setting("pause_on_event", false),
+		func(on): Loc.set_setting("pause_on_event", on)))
+	settings.add_child(_toggle(tr("ui.music"), Sound.music_on(), Sound.set_music))
+	settings.add_child(_toggle(tr("ui.sfx"), Sound.sfx_on(), Sound.set_sfx))
+	var menu := HBoxContainer.new()
+	menu.alignment = BoxContainer.ALIGNMENT_END
+	tools.add_child(menu)
+	menu.add_child(_button(tr("ui.fragments"), _show_fragments))
+	menu.add_child(_button(tr("ui.profiles"), _show_profiles))
+	menu.add_child(_button(tr("ui.licenses"), _show_licenses))
+	# 押すとやり直しになるので、ほかのボタンから離して右端に置く
+	var reset := _button(tr("ui.reset"), _confirm_reset)
+	reset.add_theme_color_override("font_color", DANGER)
+	menu.add_child(reset)
 	return header
 
 
@@ -497,12 +491,12 @@ func _refresh_log() -> void:
 
 func _job_requirement_text(job_id: String) -> String:
 	var job: Dictionary = GameData.jobs[job_id]
-	var text := _requirement_text(job.get("requires", {}))
+	var items := PackedStringArray()
 	if job.get("needs_all_fragments", false) and Game.next_fragment() != "":
-		text = "%s %s" % [Loc.t("ui.requires_fragments", {
+		items.append(Loc.t("ui.requires_fragments", {
 			"n": Game.fragments.size(), "max": GameData.order["fragments"].size(),
-		}), text]
-	return text
+		}))
+	return _requirement_text(job.get("requires", {}), items)
 
 
 ## ジンの依頼の中身と進み具合。依頼の無い周は空
@@ -536,11 +530,11 @@ func _fragment_progress() -> String:
 	return "%s    %s" % [count, Loc.t("ui.fragment_next", {"requires": " ".join(parts)})]
 
 
-func _requirement_text(requires: Dictionary) -> String:
-	var parts := PackedStringArray()
+## 「必要」を1つだけ付けて、条件を「、」でつなぐ。items は先に並べる条件
+func _requirement_text(requires: Dictionary, items := PackedStringArray()) -> String:
 	for skill in requires:
-		parts.append(Loc.t("ui.requires", {"skill": GameData.name_of("skills", skill), "level": int(requires[skill])}))
-	return " ".join(parts)
+		items.append(Loc.t("ui.skill_at", {"skill": GameData.name_of("skills", skill), "level": int(requires[skill])}))
+	return Loc.t("ui.requires", {"items": tr("ui.list_sep").join(items)}) if not items.is_empty() else ""
 
 
 ## 選んだときに増減する量。クレジットはいまの稼ぎから計算した額で見せる
@@ -579,6 +573,7 @@ func _signed(n: float) -> String:
 
 func _confirm_reset() -> void:
 	var dialog := ConfirmationDialog.new()
+	dialog.title = tr("ui.reset")
 	dialog.dialog_text = tr("ui.reset_confirm")
 	dialog.ok_button_text = tr("ui.ok")
 	dialog.cancel_button_text = tr("ui.cancel")
@@ -664,7 +659,13 @@ static func license_text() -> String:
 
 # --- 部品 ---
 
-## 見出しつきのパネルを作り、中身を入れる VBox を返す（パネル本体は VBox の親の親）
+func _button(text: String, pressed: Callable) -> Button:
+	var button := Button.new()
+	button.text = text
+	button.pressed.connect(pressed)
+	return button
+
+
 func _toggle(text: String, on: bool, changed: Callable) -> Button:
 	var button := Button.new()
 	button.toggle_mode = true
@@ -674,6 +675,7 @@ func _toggle(text: String, on: bool, changed: Callable) -> Button:
 	return button
 
 
+## 見出しつきのパネルを作り、中身を入れる VBox を返す（パネル本体は VBox の親の親）
 func _panel(title: String) -> VBoxContainer:
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -731,6 +733,14 @@ func _make_theme() -> Theme:
 		t.set_stylebox("hover_pressed", type, pressed)
 		t.set_stylebox("disabled", type, disabled)
 	t.set_color("font_disabled_color", "Button", Color(0.5, 0.5, 0.6))
+	# キーボードで選んでいるボタンの枠。標準の白い枠は、ほかの色から浮く
+	var focus := StyleBoxFlat.new()
+	focus.draw_center = false
+	focus.border_color = CYAN
+	focus.set_border_width_all(1)
+	focus.set_corner_radius_all(4)
+	t.set_stylebox("focus", "Button", focus)
+	t.set_stylebox("focus", "OptionButton", focus)
 
 	var bar_bg := StyleBoxFlat.new()
 	bar_bg.bg_color = Color(0.1, 0.08, 0.16)
@@ -740,4 +750,32 @@ func _make_theme() -> Theme:
 	bar_fill.set_corner_radius_all(3)
 	t.set_stylebox("background", "ProgressBar", bar_bg)
 	t.set_stylebox("fill", "ProgressBar", bar_fill)
+
+	# 記憶・街と人物・ライセンス・最初からの画面も、灰色の標準の見た目ではなくパネルと同じ色にする（ADR-0017）
+	var frame := StyleBoxFlat.new()
+	frame.bg_color = Color(0.05, 0.03, 0.1)
+	frame.border_color = CYAN
+	frame.set_border_width_all(1)
+	frame.set_corner_radius_all(6)
+	frame.expand_margin_left = 8
+	frame.expand_margin_right = 8
+	frame.expand_margin_bottom = 8
+	frame.expand_margin_top = 40
+	t.set_stylebox("embedded_border", "Window", frame)
+	var unfocused := frame.duplicate()
+	unfocused.border_color = Color(CYAN, 0.35)
+	t.set_stylebox("embedded_unfocused_border", "Window", unfocused)
+	t.set_constant("title_height", "Window", 40)
+	t.set_font_size("title_font_size", "Window", 18)
+	t.set_color("title_color", "Window", CYAN)
+	var dialog := StyleBoxFlat.new()
+	dialog.bg_color = Color(0.05, 0.03, 0.1)
+	dialog.set_content_margin_all(10)
+	t.set_stylebox("panel", "AcceptDialog", dialog)
+	var popup := StyleBoxFlat.new()
+	popup.bg_color = Color(0.07, 0.05, 0.13)
+	popup.border_color = Color(PINK, 0.5)
+	popup.set_border_width_all(1)
+	popup.set_content_margin_all(6)
+	t.set_stylebox("panel", "PopupMenu", popup)
 	return t
