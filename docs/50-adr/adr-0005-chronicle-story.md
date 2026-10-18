@@ -2,7 +2,7 @@
 id: ADR-0005
 type: adr
 title: クロニクルの物語文を仕事と選択と倒れた理由から組み立てる
-status: stable
+status: deprecated
 tags: [loop, story]
 decides:
   - DOM-07
@@ -14,7 +14,7 @@ related: []
 # クロニクルの物語文を仕事と選択と倒れた理由から組み立てる
 
 - 日付: 2026-10-18
-- 状態: stable
+- 状態: deprecated（[ADR-0011](./adr-0011-fall-phrase-per-event.md)が置き換えた）
 
 ## 背景
 
@@ -71,5 +71,9 @@ idで残すのは、ログと同じく、言語を切り替えたときに過去
 
 - [ARCH-01 ゲームの全体構成](../10-architecture/arch-01-game-overview.md)
 - [DOM-07 クロニクルの物語](../20-domain/dom-07-chronicle-story.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0011 倒れた理由の句をイベントごとに書く](./adr-0011-fall-phrase-per-event.md)
 
 <!-- graph:auto:end -->

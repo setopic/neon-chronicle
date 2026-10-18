@@ -27,6 +27,7 @@ tags: [index]
 - [ADR-0008 音楽と効果音をスクリプトで作り、最初の操作から鳴らす](./adr-0008-audio.md)
 - [ADR-0009 生き直しを闇医者が乗っ取った企業の計画として説明し、4人の人物を置く](./adr-0009-world-rationale-and-characters.md)
 - [ADR-0010 ミオの一言を転生の画面に出し、人物を目覚めと断片の文に入れる](./adr-0010-characters-in-screen-text.md)
+- [ADR-0011 倒れた理由の句をイベントごとに書く](./adr-0011-fall-phrase-per-event.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
