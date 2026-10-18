@@ -33,12 +33,12 @@
     "ui.upgrades": "Permanent upgrades",
     "ui.upgrades_note": "Memories that survived the sync tune your next awakening.",
     "ui.chronicle": "Chronicle",
-    "ui.awaken": "Wake up in a new body",
+    "ui.awaken": "Wake up in the {body}",
     "ui.licenses": "Licenses",
     "ui.close": "Close",
     "ui.no_job": "drifter",
 
-    "log.awaken": "Life {life}: you wake up in a new body at the back-alley clinic. Pick a job.",
+    "log.awaken": "Life {life}: you wake up in a new {body} at the back-alley clinic. Pick a job.",
     "log.awaken_first": "Life {life}: you wake up at the back-alley clinic. Mio, the street doctor, says, \"If you need work, Jin will set you up.\" Pick a job.",
     "log.job": "Jin, the fixer, set you up with work as a {job}.",
     "log.skill_up": "{skill} reached Lv {level}.",
@@ -136,7 +136,7 @@
     "event.ambush.charge.result": "You broke through and took their gear as well.",
 
     "ui.chronicle_story": "Life {life}: {story}",
-    "ui.chronicle_stats": "{age}, {earned} credits, memory +{points}",
+    "ui.chronicle_stats": "{body}, {age}, {earned} credits, memory +{points}",
     "ui.chronicle_bonus": "Choices in the chronicle: {n} (XP +{pct}%)",
     "chronicle.story": "{job}, {deed}, and {end}.",
     "chronicle.story_short": "{job} and {end}.",
@@ -206,6 +206,16 @@
     "mio.decay.3": "Mio: \"Every time I bring you back, you're still you. Use this body to the end, too.\"",
     "mio.event.1": "Mio: \"Bodies can be replaced. Memories don't all come back, though. Go easy.\"",
     "mio.event.2": "Mio: \"Don't fall the same way in this body.\"",
-    "mio.event.3": "Mio: \"Reckless again. And still, you always come back here.\""
+    "mio.event.3": "Mio: \"Reckless again. And still, you always come back here.\"",
+
+    "body.standard.name": "Standard body",
+    "body.standard.desc": "No effect",
+    "body.labor.name": "Labor body",
+    "body.labor.desc": "Decay -25%, XP -10%",
+    "body.combat.name": "Combat body",
+    "body.combat.desc": "Decay +25%, income +80%",
+    "body.prototype.name": "Prototype body",
+    "body.prototype.desc": "Decay +25%, XP +60%",
+    "ui.body_choice": "Pick your next body from the ones Mio has ready."
   }
 }

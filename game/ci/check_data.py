@@ -13,6 +13,7 @@ CIの app-check.yml から呼ぶ。Godotを使わずに分かる抜けだけを�
 9. 転生の画面のミオの一言（mio.<倒れた理由>.<段>）が、倒れた理由と段の組すべてにある（DOM-10）。
    キーをスクリプトで組み立てているので、4では見つからない
 10. 耐久を減らす選択肢のあるイベントに、倒れたときの句のキー（event.<id>.fall）がある（ADR-0011）
+11. 体の種類が1つ以上ある。第1周は data の最初の体で目覚める（DOM-11）
 
 ゲームは足りないキーを英語で補うので（loc.gd）、抜けは画面にキーのまま出るまで気づけない。
 """
@@ -27,7 +28,7 @@ BASE_LOCALE = "en"
 # game_data.gd の KEY_PREFIX と同じ対応
 KEY_PREFIX = {
     "jobs": "job", "skills": "skill", "implants": "implant", "upgrades": "upgrade", "events": "event",
-    "fragments": "fragment", "endings": "ending",
+    "fragments": "fragment", "endings": "ending", "bodies": "body",
 }
 # game_state.gd の mio_line_key と同じ組
 MIO_REASONS = ("decay", "event")
@@ -72,6 +73,8 @@ def main():
         if isinstance(data, dict):
             datas[path] = data
     endings = {e.get("id") for data in datas.values() for e in data.get("endings", [])}
+    if not any(data.get("bodies") for data in datas.values()):
+        errors.append("data に体の種類（bodies）が1つも無い")
 
     for path, data in datas.items():
         for kind, prefix in KEY_PREFIX.items():

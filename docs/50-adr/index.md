@@ -28,6 +28,7 @@ tags: [index]
 - [ADR-0009 生き直しを闇医者が乗っ取った企業の計画として説明し、4人の人物を置く](./adr-0009-world-rationale-and-characters.md)
 - [ADR-0010 ミオの一言を転生の画面に出し、人物を目覚めと断片の文に入れる](./adr-0010-characters-in-screen-text.md)
 - [ADR-0011 倒れた理由の句をイベントごとに書く](./adr-0011-fall-phrase-per-event.md)
+- [ADR-0012 転生のときに4種類の体から1つを選ぶ](./adr-0012-choose-body-on-rebirth.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
