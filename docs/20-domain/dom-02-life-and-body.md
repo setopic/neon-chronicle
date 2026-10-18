@@ -67,5 +67,6 @@ implemented_by:
 - (depends_on) [DOM-03 仕事とスキル](./dom-03-jobs-and-skills.md)
 - (depends_on) [DOM-04 インプラント](./dom-04-implants.md)
 - (depends_on) [DOM-05 転生と永続強化](./dom-05-rebirth.md)
+- (depends_on) [DOM-06 イベントと選択肢](./dom-06-events.md)
 
 <!-- graph:auto:end -->

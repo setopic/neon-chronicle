@@ -49,5 +49,6 @@ related: []
 
 - (decides) [ADR-0003 物語の文書を既定の種別で書く](../50-adr/adr-0003-story-docs-default-types.md)
 - (depends_on) [DOM-02 周と体](./dom-02-life-and-body.md)
+- (depends_on) [DOM-06 イベントと選択肢](./dom-06-events.md)
 
 <!-- graph:auto:end -->

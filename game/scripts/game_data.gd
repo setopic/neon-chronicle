@@ -1,17 +1,20 @@
 extends Node
 
-## data/*.json から仕事・スキル・インプラント・永続強化を読み込む。
+## data/*.json から仕事・スキル・インプラント・永続強化・イベントを読み込む。DOM-03〜DOM-06。
 ## 各ファイルは {"jobs": [...], "skills": [...], ...} の形。同じ id の項目は後から読んだもの（MOD）で上書きする。
 ## 表示名と説明は言語ファイルのキー "<種類>.<id>.name" / "<種類>.<id>.desc" から引く。
 
-const KEY_PREFIX := {"jobs": "job", "skills": "skill", "implants": "implant", "upgrades": "upgrade"}
+const KEY_PREFIX := {
+	"jobs": "job", "skills": "skill", "implants": "implant", "upgrades": "upgrade", "events": "event",
+}
 
 var jobs := {}
 var skills := {}
 var implants := {}
 var upgrades := {}
+var events := {}
 ## 種類ごとの表示順（最初に読んだ順）
-var order := {"jobs": [], "skills": [], "implants": [], "upgrades": []}
+var order := {"jobs": [], "skills": [], "implants": [], "upgrades": [], "events": []}
 
 
 func _ready() -> void:
