@@ -54,6 +54,9 @@ jobs:
           fi
 
           owner=$(sed -E 's#.*/(users|orgs)/([^/]+)/projects/([0-9]+).*#\2#' <<<"$PROJECT_URL")
+          # 個人のProjectで持ち主の名前を渡すと、projectスコープだけのPATでは
+          # ghが持ち主の種類を調べられず「unknown owner type」で落ちる。PATの持ち主として渡す。
+          case "$PROJECT_URL" in */users/*) owner=@me ;; esac
           number=$(sed -E 's#.*/(users|orgs)/([^/]+)/projects/([0-9]+).*#\3#' <<<"$PROJECT_URL")
 
           # 載っていればその項目を返すので、Auto-addの前後どちらでも動く。
