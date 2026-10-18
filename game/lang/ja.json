@@ -2,6 +2,7 @@
   "locale": "ja",
   "name": "日本語",
   "strings": {
+    "ui.title": "ネオン・クロニクル",
     "ui.life": "第{n}周",
     "ui.credits": "クレジット {n}",
     "ui.income": "+{n} / 秒",
