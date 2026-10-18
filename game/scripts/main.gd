@@ -12,6 +12,8 @@ const DANGER := Color(1.0, 0.3, 0.3)
 const BG := Color(0.03, 0.02, 0.07)
 const PANEL_BG := Color(0.07, 0.05, 0.13, 0.94)
 const REFRESH_INTERVAL := 0.1
+# 割合で増減させる効果の種類と、その文のキー。並びが画面に出る順になる（DOM-03）
+const FX_KEYS := {"income": "ui.fx_income", "xp": "ui.fx_xp", "decay": "ui.fx_decay"}
 # 使った素材の一覧とライセンスの全文。書き出しに含めるよう export_presets.cfg の include_filter に挙げてある。ADR-0002。
 const CREDITS_PATH := "res://credits.txt"
 const FONT_LICENSE_PATH := "res://fonts/OFL-NotoSansJP.txt"
@@ -24,9 +26,10 @@ var _job_buttons := {}
 var _skill_rows := {}  # id -> {label, bar}
 var _durability_bar: ProgressBar
 var _body_label: Label
+var _body_effects_label: Label
+var _effect_total_label: Label
 var _request_label: Label
 var _implant_buttons := {}
-var _points_label: Label
 var _rebirth_points_label: Label
 var _log_label: RichTextLabel
 var _upgrade_buttons := {}
@@ -206,6 +209,14 @@ func _build_right() -> Control:
 	box.add_child(_durability_bar)
 	_body_label = _label("", DIM, 15)
 	box.add_child(_body_label)
+	# 体の種類の効果は転生の画面でしか見えなかったので、周の間も出す。合計は出どころを分けずに1行にする（ADR-0016）
+	_body_effects_label = _label(Loc.t("ui.body_effects", {
+		"body": GameData.name_of("bodies", Game.body), "effects": GameData.desc_of("bodies", Game.body)}), DIM, 14)
+	_body_effects_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(_body_effects_label)
+	_effect_total_label = _label("", DIM, 14)
+	_effect_total_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(_effect_total_label)
 	# ジンの依頼は、その周の目標なので、周の状態を出す欄に置く（ADR-0013）
 	_request_label = _label("", PINK, 15)
 	_request_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -220,8 +231,6 @@ func _build_right() -> Control:
 		box.add_child(button)
 		_implant_buttons[id] = button
 
-	_points_label = _label("", PINK, 16)
-	box.add_child(_points_label)
 	return box.get_parent().get_parent()
 
 
@@ -402,10 +411,12 @@ func _refresh() -> void:
 	if _stats_label == null:
 		return
 	var income := Game.income_per_sec(Game.current_job)
-	_stats_label.text = "%s    %s    %s" % [
+	_stats_label.text = "%s    %s    %s    %s" % [
 		Loc.t("ui.life", {"n": Game.life_number}),
 		Loc.t("ui.credits", {"n": Game.format_number(Game.credits)}),
 		Loc.t("ui.income", {"n": "%.1f" % income}),
+		# 体の欄に効果の行を足した分、記憶ポイントは周の状態と並べて上に出す（ADR-0016）
+		Loc.t("ui.memory_points", {"n": Game.memory_points}),
 	]
 	for id in _job_buttons:
 		var button: Button = _job_buttons[id]
@@ -425,18 +436,24 @@ func _refresh() -> void:
 		bar.value = Game.skill_xp.get(id, 0.0)
 	_durability_bar.value = Game.durability
 	_durability_bar.modulate = DANGER if Game.durability < Game.LOW_DURABILITY else Color.WHITE
-	_body_label.text = "%s    %s    %s    %s" % [
-		GameData.name_of("bodies", Game.body),
+	_body_label.text = "%s    %s    %s" % [
 		Loc.t("ui.durability", {"now": int(ceil(Game.durability)), "max": int(Game.MAX_DURABILITY)}),
 		Loc.t("ui.age", {"age": Game.format_time(Game.age)}),
 		Loc.t("ui.decay", {"n": "%.2f" % Game.current_decay()}),
 	]
+	_effect_total_label.text = Loc.t("ui.effect_total", {"effects": _effects_text({
+		"income": Game.effect("income"),
+		"xp": Game.xp_mult() - 1.0,
+		# 劣化の効果には下限があるので、実際に掛かっている割合を出す（DOM-03）
+		"decay": maxf(0.2, 1.0 + Game.effect("decay")) - 1.0,
+	}, true)})
 	_request_label.text = _request_text()
 	_request_label.visible = _request_label.text != ""
 	for id in _implant_buttons:
 		var button: Button = _implant_buttons[id]
 		var data: Dictionary = GameData.implants[id]
-		var parts := [GameData.name_of("implants", id)]
+		# ツールチップは指で触ると見られないので、効果をボタンの文に出す（ADR-0016）
+		var parts := [GameData.name_of("implants", id), _effects_text(data.get("effects", {}))]
 		if Game.implants.has(id):
 			parts.append(tr("ui.implant_owned"))
 			button.disabled = true
@@ -465,9 +482,8 @@ func _refresh() -> void:
 			parts.append(_requirement_text(choice.get("requires", {})))
 			button.disabled = true
 		button.text = "    ".join(parts)
-	_points_label.text = Loc.t("ui.memory_points", {"n": Game.memory_points})
 	if is_instance_valid(_rebirth_points_label):
-		_rebirth_points_label.text = _points_label.text
+		_rebirth_points_label.text = Loc.t("ui.memory_points", {"n": Game.memory_points})
 
 
 func _refresh_log() -> void:
@@ -542,6 +558,19 @@ func _choice_effects(choice: Dictionary) -> String:
 	for skill in xp:
 		parts.append(Loc.t("ui.effect_xp", {"skill": GameData.name_of("skills", skill), "n": _signed(xp[skill])}))
 	return " ".join(parts) if not parts.is_empty() else tr("ui.effect_none")
+
+
+## 効果を「稼ぎ +50%、経験 +10%」の形にする。説明の文ではなくdataから作るので、MODで足したインプラントにも出る
+func _effects_text(effects: Dictionary, keep_zero := false) -> String:
+	var parts := []
+	for key in FX_KEYS:
+		var n: float = effects.get(key, 0.0)
+		if keep_zero or not is_zero_approx(n):
+			parts.append(Loc.t(FX_KEYS[key], {"n": _signed(round(n * 100.0))}))
+	var start_level: float = effects.get("start_level", 0.0)
+	if not is_zero_approx(start_level):
+		parts.append(Loc.t("ui.fx_start_level", {"n": _signed(start_level)}))
+	return tr("ui.list_sep").join(parts) if not parts.is_empty() else tr("ui.fx_none")
 
 
 func _signed(n: float) -> String:

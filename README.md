@@ -89,6 +89,7 @@ graph LR
     ADR-0013["ADR-0013<br/>周の始まりにジンの依頼を1つ示し、果たせば記憶ポイントを上乗せする"]
     ADR-0014["ADR-0014<br/>人物のイベントを1周に1段ずつ進め、前の段の選択で文と選択肢を変える"]
     ADR-0015["ADR-0015<br/>街と人物の資料を上のボタンから開き、記憶の断片が戻るまで追記を伏せる"]
+    ADR-0016["ADR-0016<br/>インプラントと体の種類の効果を画面の文に出す"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -120,6 +121,8 @@ graph LR
   ADR-0014 -.->|decides| DOM-13
   ADR-0014 -.->|decides| DOM-10
   ADR-0015 -.->|decides| DOM-14
+  ADR-0016 -.->|decides| DOM-04
+  ADR-0016 -.->|decides| DOM-11
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
