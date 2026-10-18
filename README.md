@@ -54,6 +54,9 @@ graph LR
   subgraph architecture["アーキテクチャ"]
     ARCH-01["ARCH-01<br/>ゲームの全体構成"]
   end
+  subgraph usecase["ユースケース"]
+    UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
+  end
   subgraph adr["決定記録"]
     ADR-0001["ADR-0001<br/>設計文書をグラフとして管理する"]
   end
@@ -73,8 +76,10 @@ graph LR
   META-05 -.->|related| META-04
   META-06 -.->|related| META-04
   META-07 -.->|related| META-01
+  UC-01 -->|depends_on| ARCH-01
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
+  class UC-01 draft;
 ```
 
 <!-- graph:diagram:end -->
