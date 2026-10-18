@@ -141,7 +141,7 @@ python -I ~/.claude/token-log/token_log.py report --project neon-chronicle --sin
 
 クラウドのセッションの消費は、手元の記録に入らない。そのため、issueを閉じるときに、そのissueを進めたクラウドのスレッドのClaudeが自分の分を出す。手元の`report`の値とこの値を足したものを、「実績」に書く。
 
-値は、セッションの記録の`result`（`list_events`で`kinds`に`result`を渡す）から取る。`result`は1ターンごとに残り、`modelUsage`にモデルごとのトークン数の累計を持つ。この累計は、セッションを動かすプロセスが起動してからの値である。`process_turn_index`が0に戻ったところでプロセスが起動し直しているので、その直前の`result`の`modelUsage`を足していく。最後のプロセスは、最後の`result`の値を使う。
+値は、セッションの記録の`result`（`list_events`で`kinds`に`result`を渡す）から取る。`result`は1ターンごとに残り、`modelUsage`にモデルごとのトークン数の累計を持つ。この累計は、セッションを動かすプロセスが起動し直しても引き継がれるので、ふつうは最後の`result`の値をそのまま使う。#3のスレッドでは、`process_turn_index`が0に戻った直後の累計が、直前の累計にそのターンの使用量を足した値と一致した。そのため、`process_turn_index`が0に戻ったところで足し合わせると、二重に数えることになる。累計が前の`result`より減っているところがあれば、そこで数え直しが起きているので、減る直前の値を足す。
 
 コスト指数は、`token_log.py`と同じ重みで出す。各欄に次の重みを掛けて足し、モデルの重み（OpusとFableが5、Sonnetが3、Haikuが1）を掛けて、1,000で割る。
 
