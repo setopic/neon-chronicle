@@ -289,7 +289,7 @@ func _build_rebirth() -> Control:
 	}), PINK, 14))
 	# 物語文は1件で2〜3行になるので、全件をスクロールで見せ、最新の記録を下に出しておく
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 90)
+	scroll.custom_minimum_size = Vector2(0, 70)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	box.add_child(scroll)
 	var list := VBoxContainer.new()
