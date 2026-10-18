@@ -228,6 +228,10 @@ func _build_rebirth() -> Control:
 	var summary := _label(Game.format_entry({"key": "ui.rebirth_summary", "args": last}), Color.WHITE, 17)
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(summary)
+	if not last.is_empty():
+		var story := _label(Game.story_of(last), CYAN, 17)
+		story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		box.add_child(story)
 	box.add_child(_label(Loc.t("ui.points_gained", {"n": Game.last_points_gained}), PINK, 20))
 
 	box.add_child(_section_title(tr("ui.upgrades")))
@@ -242,10 +246,23 @@ func _build_rebirth() -> Control:
 	box.add_child(_rebirth_points_label)
 
 	box.add_child(_section_title(tr("ui.chronicle")))
-	for entry in Game.chronicle.slice(-5):
-		var line := _label(Game.format_entry({"key": "ui.chronicle_entry", "args": entry}), DIM, 14)
-		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		box.add_child(line)
+	box.add_child(_label(Loc.t("ui.chronicle_bonus", {
+		"n": Game.chronicle_deeds(), "pct": int(round(Game.deed_bonus() * 100.0)),
+	}), PINK, 14))
+	# 物語文は1件で2〜3行になるので、全件をスクロールで見せ、最新の記録を下に出しておく
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0, 140)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	box.add_child(scroll)
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(list)
+	for entry in Game.chronicle:
+		var story := _label(Loc.t("ui.chronicle_story", {"life": int(entry.get("life", 0)), "story": Game.story_of(entry)}), Color.WHITE, 14)
+		story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		list.add_child(story)
+		list.add_child(_label(Game.format_entry({"key": "ui.chronicle_stats", "args": entry}), DIM, 12))
+	list.resized.connect(func(): scroll.scroll_vertical = int(list.size.y))
 
 	var awaken := Button.new()
 	awaken.text = tr("ui.awaken")

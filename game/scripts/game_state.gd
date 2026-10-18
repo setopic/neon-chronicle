@@ -1,6 +1,6 @@
 extends Node
 
-## ゲームの進行状態。DOM-02〜DOM-06。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
+## ゲームの進行状態。DOM-02〜DOM-07。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
 
 signal life_ended
 signal life_started
@@ -17,6 +17,7 @@ const MAX_DURABILITY := 100.0
 const LOW_DURABILITY := 25.0
 const MAX_LOGS := 50
 const EVENT_INTERVAL := 90.0  # 危険度1の仕事で、イベントが起きる平均の間隔（秒）。DOM-06
+const DEED_XP := 0.02  # クロニクルに残った選択1種類あたりの経験の増え方。DOM-07
 ## ログやクロニクルの引数のうち、id から表示名に変える項目
 const NAME_ARGS := {"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades", "event": "events"}
 
@@ -32,13 +33,14 @@ var implants: Array = []
 var job_time := {}
 var alive := true
 var pending_event := ""  # 待っているイベントのid。無いときは空
+var last_deed := ""  # 最後に選んだ選択肢（"<イベント>.<選択肢>"）。周を終わらせた選択は入れない
 
 # --- 転生しても残る状態 ---
 var life_number := 1
 var memory_points := 0
 var last_points_gained := 0
 var upgrades := {}
-var chronicle: Array = []  # 過去の人生 [{life, job, age, earned, points}]
+var chronicle: Array = []  # 終わった周の記録 [{life, job, age, earned, points, deed, end}]
 var logs: Array = []  # [{key, args}]。言語を切り替えても訳し直せるようキーで持つ
 
 var _pending := 0.0
@@ -104,7 +106,7 @@ func effect(key: String) -> float:
 
 
 func xp_mult() -> float:
-	return 1.0 + effect("xp")
+	return 1.0 + effect("xp") + deed_bonus()
 
 
 func decay_per_sec(danger: float) -> float:
@@ -222,6 +224,7 @@ func choose(choice_id: String) -> void:
 		return
 	var event_id := pending_event
 	pending_event = ""
+	var deed := "%s.%s" % [event_id, choice_id]
 	var gain := choice_credits(choice)
 	credits = maxf(0.0, credits + gain)
 	if gain > 0.0:
@@ -236,7 +239,9 @@ func choose(choice_id: String) -> void:
 		_log("log.durability_low")
 	event_changed.emit()
 	if durability <= 0.0:
-		_end_life()
+		_end_life(event_id)
+	else:
+		last_deed = deed
 
 
 # --- 人生の終わりと転生 ---
@@ -256,7 +261,8 @@ func points_for_life() -> int:
 	return maxi(1, int(sqrt(life_earned / 50.0)) + levels / 3)
 
 
-func _end_life() -> void:
+## 周を終わらせたイベントのid。体の劣化で終わったときは空
+func _end_life(fatal_event := "") -> void:
 	alive = false
 	pending_event = ""
 	last_points_gained = points_for_life()
@@ -264,6 +270,7 @@ func _end_life() -> void:
 	chronicle.append({
 		"life": life_number, "job": main_job(), "age": age,
 		"earned": life_earned, "points": last_points_gained,
+		"deed": last_deed, "end": fatal_event,
 	})
 	_log("log.death", {"points": last_points_gained})
 	save_game()
@@ -286,6 +293,7 @@ func _start_life() -> void:
 	age = 0.0
 	current_job = ""
 	pending_event = ""
+	last_deed = ""
 	job_time = {}
 	skill_level = {}
 	skill_xp = {}
@@ -296,6 +304,39 @@ func _start_life() -> void:
 		skill_xp[skill] = 0.0
 	_log("log.awaken", {"life": life_number})
 	life_started.emit()
+
+
+# --- クロニクル ---
+
+## 記録の物語文。仕事・最後に選んだ選択肢・倒れた理由から組み立てる（DOM-07）。
+## 記録には id だけを持たせ、文はいまの言語で毎回組み立てる。#6 より前の記録は deed と end を持たない
+func story_of(entry: Dictionary) -> String:
+	var job: String = entry.get("job", "")
+	var job_part := tr("job.%s.chronicle" % job) if job != "" else tr("chronicle.no_job")
+	var end: String = entry.get("end", "")
+	var end_part := Loc.t("chronicle.end_event", {"event": GameData.name_of("events", end)}) if end != "" else tr("chronicle.end_decay")
+	var deed: String = entry.get("deed", "")
+	if deed == "":
+		return Loc.t("chronicle.story_short", {"job": job_part, "end": end_part})
+	return Loc.t("chronicle.story", {"job": job_part, "deed": tr("event.%s.chronicle" % deed), "end": end_part})
+
+
+## クロニクルに残った選択肢の種類。いまのデータに無いもの（外したMODの選択肢）は数えない
+func chronicle_deeds() -> int:
+	var seen := {}
+	for entry in chronicle:
+		var deed: String = entry.get("deed", "")
+		var parts := deed.split(".")
+		if parts.size() != 2:
+			continue
+		for c in GameData.events.get(parts[0], {}).get("choices", []):
+			if c.get("id") == parts[1]:
+				seen[deed] = true
+	return seen.size()
+
+
+func deed_bonus() -> float:
+	return DEED_XP * chronicle_deeds()
 
 
 # --- ログ ---
@@ -342,7 +383,7 @@ func save_game() -> void:
 		"credits": credits, "life_earned": life_earned, "durability": durability, "age": age,
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
 		"implants": implants, "job_time": job_time, "alive": alive, "pending_event": pending_event,
-		"life_number": life_number, "memory_points": memory_points,
+		"last_deed": last_deed, "life_number": life_number, "memory_points": memory_points,
 		"last_points_gained": last_points_gained, "upgrades": upgrades,
 		"chronicle": chronicle, "logs": logs,
 	}
@@ -370,6 +411,7 @@ func load_game() -> bool:
 	pending_event = data.get("pending_event", "")
 	if not GameData.events.has(pending_event):
 		pending_event = ""
+	last_deed = data.get("last_deed", "")
 	life_number = int(data.get("life_number", 1))
 	memory_points = int(data.get("memory_points", 0))
 	last_points_gained = int(data.get("last_points_gained", 0))

@@ -45,7 +45,7 @@ related: []
 
 ## 未決事項
 
-クロニクルの物語文、ストーリー、音楽と効果音、オフライン中の進行は、まだ入っていない。
+ストーリー、音楽と効果音、オフライン中の進行は、まだ入っていない。
 
 ---
 
@@ -58,6 +58,7 @@ related: []
 - (decides) [ADR-0001 設計文書をグラフとして管理する](../50-adr/adr-0001-graph-driven-docs.md)
 - (decides) [ADR-0002 素材のライセンスの一覧をゲームの中に置く](../50-adr/adr-0002-asset-licenses-in-game.md)
 - (decides) [ADR-0004 イベントの起き方と結果を決まった量で表す](../50-adr/adr-0004-event-rules.md)
+- (decides) [ADR-0005 クロニクルの物語文を仕事と選択と倒れた理由から組み立てる](../50-adr/adr-0005-chronicle-story.md)
 - (depends_on) [UC-01 itch.ioでブラウザ版を公開する](../30-usecases/uc-01-itch-web-release.md)
 
 <!-- graph:auto:end -->

@@ -94,5 +94,6 @@ implemented_by:
 このノードを参照しているノード
 
 - (decides) [ADR-0004 イベントの起き方と結果を決まった量で表す](../50-adr/adr-0004-event-rules.md)
+- (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 
 <!-- graph:auto:end -->

@@ -24,7 +24,7 @@
 
 ## 未確定なもの
 
-イベントと選択肢、クロニクルの物語文、ストーリー、音楽と効果音、オフライン中の進行は、まだ決まっていない。残りの作業はGitHubのissueとProjectで管理する。
+ストーリー、音楽と効果音、オフライン中の進行は、まだ決まっていない。残りの作業はGitHubのissueとProjectで管理する。
 
 ## 設計文書の図
 
@@ -61,6 +61,7 @@ graph LR
     DOM-04["DOM-04<br/>インプラント"]
     DOM-05["DOM-05<br/>転生と永続強化"]
     DOM-06["DOM-06<br/>イベントと選択肢"]
+    DOM-07["DOM-07<br/>クロニクルの物語"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -70,6 +71,7 @@ graph LR
     ADR-0002["ADR-0002<br/>素材のライセンスの一覧をゲームの中に置く"]
     ADR-0003["ADR-0003<br/>物語の文書を既定の種別で書く"]
     ADR-0004["ADR-0004<br/>イベントの起き方と結果を決まった量で表す"]
+    ADR-0005["ADR-0005<br/>クロニクルの物語文を仕事と選択と倒れた理由から組み立てる"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -82,6 +84,8 @@ graph LR
   ADR-0003 -.->|decides| DOM-05
   ADR-0004 -.->|decides| DOM-06
   ADR-0004 -.->|decides| ARCH-01
+  ADR-0005 -.->|decides| DOM-07
+  ADR-0005 -.->|decides| ARCH-01
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -92,6 +96,10 @@ graph LR
   DOM-06 -->|depends_on| DOM-01
   DOM-06 -->|depends_on| DOM-02
   DOM-06 -->|depends_on| DOM-03
+  DOM-07 -->|depends_on| DOM-02
+  DOM-07 -->|depends_on| DOM-03
+  DOM-07 -->|depends_on| DOM-05
+  DOM-07 -->|depends_on| DOM-06
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04

@@ -18,7 +18,7 @@ implemented_by:
 
 仕事は、周の間に就いて、時間とともにクレジットと経験を得る活動である。スキルは、仕事で経験を積むと上がる腕前で、仕事の稼ぎを増やし、新しい仕事に就けるようにする。
 
-効果は、稼ぎ・経験・劣化を割合で増減させる値と、開始レベルを足す値である。効果を持つものは、スキルのほかにもある（[DOM-04](./dom-04-implants.md)・[DOM-05](./dom-05-rebirth.md)）。どれが持つ効果も、種類ごとに足し合わせて使う。
+効果は、稼ぎ・経験・劣化を割合で増減させる値と、開始レベルを足す値である。効果を持つものは、スキルのほかにもある（[DOM-04](./dom-04-implants.md)・[DOM-05](./dom-05-rebirth.md)・[DOM-07](./dom-07-chronicle-story.md)）。どれが持つ効果も、種類ごとに足し合わせて使う。
 
 ## 属性
 
@@ -100,5 +100,6 @@ implemented_by:
 - (depends_on) [DOM-04 インプラント](./dom-04-implants.md)
 - (depends_on) [DOM-05 転生と永続強化](./dom-05-rebirth.md)
 - (depends_on) [DOM-06 イベントと選択肢](./dom-06-events.md)
+- (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 
 <!-- graph:auto:end -->
