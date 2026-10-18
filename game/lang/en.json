@@ -79,7 +79,7 @@
     "ui.music": "Music",
     "ui.sfx": "Sound effects",
     "ui.effect_credits": "Credits {n}",
-    "ui.effect_durability": "Durability {n}",
+    "ui.effect_durability": "Integrity {n}",
     "ui.effect_xp": "{skill} XP {n}",
     "ui.effect_none": "No change",
     "log.event": "Event: {event}",
