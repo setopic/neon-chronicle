@@ -1,10 +1,11 @@
 extends Node
 
-## ゲームの進行状態。DOM-02〜DOM-05。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
+## ゲームの進行状態。DOM-02〜DOM-06。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
 
 signal life_ended
 signal life_started
 signal log_added
+signal event_changed
 
 const SAVE_PATH := "user://save.json"
 const SAVE_VERSION := 1
@@ -15,8 +16,9 @@ const BASE_DECAY := 0.4  # 体の劣化（耐久/秒）。何もしなくても�
 const MAX_DURABILITY := 100.0
 const LOW_DURABILITY := 25.0
 const MAX_LOGS := 50
+const EVENT_INTERVAL := 90.0  # 危険度1の仕事で、イベントが起きる平均の間隔（秒）。DOM-06
 ## ログやクロニクルの引数のうち、id から表示名に変える項目
-const NAME_ARGS := {"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades"}
+const NAME_ARGS := {"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades", "event": "events"}
 
 # --- 1人生の状態 ---
 var credits := 0.0
@@ -29,6 +31,7 @@ var skill_level := {}
 var implants: Array = []
 var job_time := {}
 var alive := true
+var pending_event := ""  # 待っているイベントのid。無いときは空
 
 # --- 転生しても残る状態 ---
 var life_number := 1
@@ -61,6 +64,8 @@ func _process(delta: float) -> void:
 func _tick(dt: float) -> void:
 	if not alive:
 		return
+	if pending_event != "" and Loc.setting("pause_on_event", false):
+		return
 	age += dt
 	var danger := 1.0
 	if GameData.jobs.has(current_job):
@@ -73,6 +78,8 @@ func _tick(dt: float) -> void:
 		for skill in xp:
 			_add_xp(skill, xp[skill] * xp_mult() * dt)
 		danger = job.get("danger", 1.0)
+		if pending_event == "" and randf() < danger * dt / EVENT_INTERVAL:
+			_start_event()
 	var before := durability
 	durability -= decay_per_sec(danger) * dt
 	if before > LOW_DURABILITY and durability <= LOW_DURABILITY:
@@ -119,7 +126,11 @@ func income_per_sec(job_id: String) -> float:
 # --- 仕事とスキル ---
 
 func can_take_job(job_id: String) -> bool:
-	var requires: Dictionary = GameData.jobs.get(job_id, {}).get("requires", {})
+	return meets(GameData.jobs.get(job_id, {}).get("requires", {}))
+
+
+## スキルのレベルが、就く条件や選ぶ条件（{スキルのid: レベル}）を満たしているか
+func meets(requires: Dictionary) -> bool:
 	for skill in requires:
 		if skill_level.get(skill, 0) < requires[skill]:
 			return false
@@ -127,7 +138,7 @@ func can_take_job(job_id: String) -> bool:
 
 
 func set_job(job_id: String) -> void:
-	if not alive or job_id == current_job or not can_take_job(job_id):
+	if not alive or pending_event != "" or job_id == current_job or not can_take_job(job_id):
 		return
 	current_job = job_id
 	_log("log.job", {"job": job_id})
@@ -177,6 +188,57 @@ func buy_upgrade(id: String) -> void:
 	_log("log.upgrade", {"upgrade": id, "level": upgrades[id]})
 
 
+# --- イベント ---
+
+func _start_event() -> void:
+	var candidates := []
+	for id in GameData.order["events"]:
+		if GameData.events[id].get("jobs", []).has(current_job):
+			candidates.append(id)
+	if candidates.is_empty():
+		return
+	pending_event = candidates.pick_random()
+	_log("log.event", {"event": pending_event})
+	event_changed.emit()
+
+
+func event_choices() -> Array:
+	return GameData.events.get(pending_event, {}).get("choices", [])
+
+
+## 選択肢のクレジットの増減。いまの稼ぎの何秒分かで書いてある
+func choice_credits(choice: Dictionary) -> float:
+	return income_per_sec(current_job) * choice.get("credits", 0.0)
+
+
+func choose(choice_id: String) -> void:
+	if not alive:
+		return
+	var choice := {}
+	for c in event_choices():
+		if c.get("id") == choice_id:
+			choice = c
+	if choice.is_empty() or not meets(choice.get("requires", {})):
+		return
+	var event_id := pending_event
+	pending_event = ""
+	var gain := choice_credits(choice)
+	credits = maxf(0.0, credits + gain)
+	if gain > 0.0:
+		life_earned += gain
+	var xp: Dictionary = choice.get("xp", {})
+	for skill in xp:
+		_add_xp(skill, maxf(0.0, xp[skill]))
+	_log("event.%s.%s.result" % [event_id, choice_id])
+	var before := durability
+	durability = clampf(durability + choice.get("durability", 0.0), 0.0, MAX_DURABILITY)
+	if before > LOW_DURABILITY and durability <= LOW_DURABILITY and durability > 0.0:
+		_log("log.durability_low")
+	event_changed.emit()
+	if durability <= 0.0:
+		_end_life()
+
+
 # --- 人生の終わりと転生 ---
 
 func main_job() -> String:
@@ -196,6 +258,7 @@ func points_for_life() -> int:
 
 func _end_life() -> void:
 	alive = false
+	pending_event = ""
 	last_points_gained = points_for_life()
 	memory_points += last_points_gained
 	chronicle.append({
@@ -222,6 +285,7 @@ func _start_life() -> void:
 	durability = MAX_DURABILITY
 	age = 0.0
 	current_job = ""
+	pending_event = ""
 	job_time = {}
 	skill_level = {}
 	skill_xp = {}
@@ -277,7 +341,7 @@ func save_game() -> void:
 		"version": SAVE_VERSION,
 		"credits": credits, "life_earned": life_earned, "durability": durability, "age": age,
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
-		"implants": implants, "job_time": job_time, "alive": alive,
+		"implants": implants, "job_time": job_time, "alive": alive, "pending_event": pending_event,
 		"life_number": life_number, "memory_points": memory_points,
 		"last_points_gained": last_points_gained, "upgrades": upgrades,
 		"chronicle": chronicle, "logs": logs,
@@ -303,6 +367,9 @@ func load_game() -> bool:
 	implants = data.get("implants", [])
 	job_time = data.get("job_time", {})
 	alive = data.get("alive", true)
+	pending_event = data.get("pending_event", "")
+	if not GameData.events.has(pending_event):
+		pending_event = ""
 	life_number = int(data.get("life_number", 1))
 	memory_points = int(data.get("memory_points", 0))
 	last_points_gained = int(data.get("last_points_gained", 0))

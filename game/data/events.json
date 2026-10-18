@@ -1,0 +1,56 @@
+{
+  "events": [
+    {
+      "id": "odd_package",
+      "jobs": ["courier"],
+      "choices": [
+        { "id": "deliver", "credits": 45, "durability": -4 },
+        { "id": "inspect", "requires": { "negotiation": 2 }, "credits": 90, "xp": { "negotiation": 8 } },
+        { "id": "dump", "credits": -15 }
+      ]
+    },
+    {
+      "id": "gang_toll",
+      "jobs": ["courier"],
+      "choices": [
+        { "id": "pay", "credits": -20 },
+        { "id": "talk", "requires": { "negotiation": 3 }, "xp": { "negotiation": 10 } },
+        { "id": "run", "durability": -8, "xp": { "combat": 6 } }
+      ]
+    },
+    {
+      "id": "corp_trace",
+      "jobs": ["hacker"],
+      "choices": [
+        { "id": "cut", "credits": -30 },
+        { "id": "push", "credits": 90, "durability": -12 },
+        { "id": "counter", "requires": { "hacking": 5 }, "credits": 60, "xp": { "hacking": 15 } }
+      ]
+    },
+    {
+      "id": "rival_hacker",
+      "jobs": ["hacker"],
+      "choices": [
+        { "id": "decline" },
+        { "id": "accept", "requires": { "hacking": 3 }, "credits": 30, "xp": { "hacking": 20 } }
+      ]
+    },
+    {
+      "id": "betrayal",
+      "jobs": ["mercenary"],
+      "choices": [
+        { "id": "fight", "credits": 60, "durability": -15, "xp": { "combat": 15 } },
+        { "id": "give_up", "credits": -40 },
+        { "id": "talk", "requires": { "negotiation": 4 }, "xp": { "negotiation": 10 } }
+      ]
+    },
+    {
+      "id": "ambush",
+      "jobs": ["mercenary"],
+      "choices": [
+        { "id": "retreat", "durability": -5 },
+        { "id": "charge", "requires": { "combat": 8 }, "credits": 80, "durability": -10, "xp": { "combat": 10 } }
+      ]
+    }
+  ]
+}

@@ -29,6 +29,7 @@ var _points_label: Label
 var _rebirth_points_label: Label
 var _log_label: RichTextLabel
 var _upgrade_buttons := {}
+var _choice_buttons := {}  # 選択肢のid -> ボタン
 
 
 func _ready() -> void:
@@ -40,6 +41,7 @@ func _ready() -> void:
 	Loc.language_changed.connect(_build)
 	Game.life_ended.connect(_build)
 	Game.life_started.connect(_build)
+	Game.event_changed.connect(_build)
 	Game.log_added.connect(_refresh_log)
 	_build()
 
@@ -60,6 +62,7 @@ func _build() -> void:
 	_skill_rows.clear()
 	_implant_buttons.clear()
 	_upgrade_buttons.clear()
+	_choice_buttons.clear()
 
 	_content = Control.new()
 	_content.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -85,6 +88,8 @@ func _build() -> void:
 
 	if not Game.alive:
 		_content.add_child(_build_rebirth())
+	elif Game.pending_event != "":
+		_content.add_child(_build_event())
 	_refresh()
 	_refresh_log()
 
@@ -122,6 +127,12 @@ func _build_header() -> Control:
 			language.select(language.item_count - 1)
 	language.item_selected.connect(func(i): Loc.set_language(language.get_item_metadata(i)))
 	tools.add_child(language)
+	var pause := Button.new()
+	pause.toggle_mode = true
+	pause.text = tr("ui.pause_on_event")
+	pause.button_pressed = Loc.setting("pause_on_event", false)
+	pause.toggled.connect(func(on): Loc.set_setting("pause_on_event", on))
+	tools.add_child(pause)
 	var reset := Button.new()
 	reset.text = tr("ui.reset")
 	reset.pressed.connect(_confirm_reset)
@@ -245,6 +256,32 @@ func _build_rebirth() -> Control:
 	return dim
 
 
+## 待っているイベントと選択肢。時間を止めない設定では、選ぶ間も後ろで進行が続く（DOM-06）
+func _build_event() -> Control:
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.5)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.add_child(center)
+
+	var box := _panel(GameData.name_of("events", Game.pending_event))
+	var panel: Control = box.get_parent().get_parent()
+	panel.custom_minimum_size = Vector2(620, 0)
+	center.add_child(panel)
+	var text := _label(GameData.desc_of("events", Game.pending_event), Color.WHITE, 17)
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(text)
+	for choice in Game.event_choices():
+		var button := Button.new()
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.custom_minimum_size = Vector2(0, 40)
+		button.pressed.connect(Game.choose.bind(choice["id"]))
+		box.add_child(button)
+		_choice_buttons[choice["id"]] = button
+	return dim
+
+
 # --- 更新 ---
 
 func _refresh() -> void:
@@ -263,7 +300,7 @@ func _refresh() -> void:
 			button.text = "%s    %s" % [name, Loc.t("ui.job_income", {"n": "%.1f" % Game.income_per_sec(id)})]
 			button.disabled = not Game.alive
 		else:
-			button.text = "%s    %s" % [name, _requirement_text(id)]
+			button.text = "%s    %s" % [name, _requirement_text(GameData.jobs[id].get("requires", {}))]
 			button.disabled = true
 		button.set_pressed_no_signal(id == Game.current_job)
 	for id in _skill_rows:
@@ -299,6 +336,18 @@ func _refresh() -> void:
 		button.text = "%s  %s    %s    %s" % [
 			GameData.name_of("upgrades", id), Loc.t("ui.level", {"level": level}), cost, GameData.desc_of("upgrades", id)]
 		button.disabled = Game.upgrade_maxed(id) or Game.memory_points < Game.upgrade_cost(id)
+	for choice in Game.event_choices():
+		var button: Button = _choice_buttons.get(choice["id"])
+		if button == null:
+			continue
+		var parts := [tr("event.%s.%s.name" % [Game.pending_event, choice["id"]])]
+		if Game.meets(choice.get("requires", {})):
+			parts.append(_choice_effects(choice))
+			button.disabled = false
+		else:
+			parts.append(_requirement_text(choice.get("requires", {})))
+			button.disabled = true
+		button.text = "    ".join(parts)
 	_points_label.text = Loc.t("ui.memory_points", {"n": Game.memory_points})
 	if is_instance_valid(_rebirth_points_label):
 		_rebirth_points_label.text = _points_label.text
@@ -313,12 +362,30 @@ func _refresh_log() -> void:
 	_log_label.text = "\n".join(lines)
 
 
-func _requirement_text(job_id: String) -> String:
+func _requirement_text(requires: Dictionary) -> String:
 	var parts := PackedStringArray()
-	var requires: Dictionary = GameData.jobs[job_id].get("requires", {})
 	for skill in requires:
 		parts.append(Loc.t("ui.requires", {"skill": GameData.name_of("skills", skill), "level": int(requires[skill])}))
 	return " ".join(parts)
+
+
+## 選んだときに増減する量。クレジットはいまの稼ぎから計算した額で見せる
+func _choice_effects(choice: Dictionary) -> String:
+	var parts := PackedStringArray()
+	var credits := Game.choice_credits(choice)
+	if credits != 0.0:
+		parts.append(Loc.t("ui.effect_credits", {"n": _signed(credits)}))
+	var durability: float = choice.get("durability", 0.0)
+	if durability != 0.0:
+		parts.append(Loc.t("ui.effect_durability", {"n": _signed(durability)}))
+	var xp: Dictionary = choice.get("xp", {})
+	for skill in xp:
+		parts.append(Loc.t("ui.effect_xp", {"skill": GameData.name_of("skills", skill), "n": _signed(xp[skill])}))
+	return " ".join(parts) if not parts.is_empty() else tr("ui.effect_none")
+
+
+func _signed(n: float) -> String:
+	return ("+" if n >= 0.0 else "-") + Game.format_number(absf(n))
 
 
 func _confirm_reset() -> void:
