@@ -1,0 +1,24 @@
+{
+  "profiles": [
+    { "id": "city", "notes": [
+      { "id": "project", "fragment": "project" },
+      { "id": "core", "fragment": "core" }
+    ] },
+    { "id": "self", "notes": [
+      { "id": "contract", "fragment": "contract" },
+      { "id": "hacker", "fragment": "name" },
+      { "id": "project", "fragment": "project" },
+      { "id": "core", "fragment": "core" }
+    ] },
+    { "id": "mio", "notes": [
+      { "id": "white_room", "fragment": "white_room" },
+      { "id": "project", "fragment": "project" }
+    ] },
+    { "id": "jin", "notes": [
+      { "id": "old_friend", "fragment": "name" }
+    ] },
+    { "id": "rei", "event": "rei_1", "notes": [
+      { "id": "list", "event": "rei_2" }
+    ] }
+  ]
+}

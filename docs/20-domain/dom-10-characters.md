@@ -34,6 +34,8 @@ implemented_by:
 | レイ | レイの人物のイベント（[DOM-13](./dom-13-character-events.md)） |
 | 九条 | まだ名前では出ない |
 
+ミオ・ジン・レイは、[DOM-14](./dom-14-city-and-people-profiles.md)の資料にも出る。九条の資料は無い。
+
 ミオの一言は、倒れた理由（体の限界かイベントか）と周の番号（第1周・第9周まで・第10周から）で変わる。エンディングにたどり着いた周には出ない。
 
 ## 不変条件
@@ -73,5 +75,6 @@ implemented_by:
 - (depends_on) [DOM-11 体の種類](./dom-11-body-types.md)
 - (depends_on) [DOM-12 ジンの依頼](./dom-12-jin-requests.md)
 - (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)
+- (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 
 <!-- graph:auto:end -->

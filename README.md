@@ -68,6 +68,7 @@ graph LR
     DOM-11["DOM-11<br/>体の種類"]
     DOM-12["DOM-12<br/>ジンの依頼"]
     DOM-13["DOM-13<br/>人物のイベント"]
+    DOM-14["DOM-14<br/>街と人物の資料"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -87,6 +88,7 @@ graph LR
     ADR-0012["ADR-0012<br/>転生のときに4種類の体から1つを選ぶ"]
     ADR-0013["ADR-0013<br/>周の始まりにジンの依頼を1つ示し、果たせば記憶ポイントを上乗せする"]
     ADR-0014["ADR-0014<br/>人物のイベントを1周に1段ずつ進め、前の段の選択で文と選択肢を変える"]
+    ADR-0015["ADR-0015<br/>街と人物の資料を上のボタンから開き、記憶の断片が戻るまで追記を伏せる"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -117,6 +119,7 @@ graph LR
   ADR-0013 -.->|decides| DOM-12
   ADR-0014 -.->|decides| DOM-13
   ADR-0014 -.->|decides| DOM-10
+  ADR-0015 -.->|decides| DOM-14
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -159,6 +162,11 @@ graph LR
   DOM-13 -->|depends_on| DOM-06
   DOM-13 -->|depends_on| DOM-08
   DOM-13 -->|depends_on| DOM-10
+  DOM-14 -->|depends_on| DOM-01
+  DOM-14 -->|depends_on| DOM-08
+  DOM-14 -->|depends_on| DOM-09
+  DOM-14 -->|depends_on| DOM-10
+  DOM-14 -->|depends_on| DOM-13
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04

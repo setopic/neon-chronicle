@@ -81,5 +81,6 @@ related: []
 - (decides) [ADR-0009 生き直しを闇医者が乗っ取った企業の計画として説明し、4人の人物を置く](../50-adr/adr-0009-world-rationale-and-characters.md)
 - (depends_on) [DOM-10 登場人物](./dom-10-characters.md)
 - (depends_on) [DOM-12 ジンの依頼](./dom-12-jin-requests.md)
+- (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 
 <!-- graph:auto:end -->

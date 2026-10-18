@@ -98,5 +98,6 @@ implemented_by:
 - (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
 - (depends_on) [DOM-10 登場人物](./dom-10-characters.md)
 - (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)
+- (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 
 <!-- graph:auto:end -->

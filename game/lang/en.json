@@ -287,6 +287,28 @@
     "body.combat.desc": "Body decay rate +25%, income +80%",
     "body.prototype.name": "Prototype body",
     "body.prototype.desc": "Body decay rate +25%, XP +60%",
-    "ui.body_choice": "Pick your next body from the ones Mio has ready."
+    "ui.body_choice": "Pick your next body from the ones Mio has ready.",
+
+    "ui.profiles": "City & People",
+    "profile.city.name": "Neon City",
+    "profile.city.desc": "A future city ruled by a giant corporation. The corporation can be your client or your enemy.",
+    "profile.city.project": "The corporation's research division runs the Iteration Project. It puts extracted minds into disposable bodies for dirty work, and when a body falls, loads the mind copy into a new one.",
+    "profile.city.core": "At the center of the corporate network is the core server. The subjects' mind copies are kept there, and so is your real body.",
+    "profile.self.name": "Yourself",
+    "profile.self.desc": "Every time your body falls, you wake up in a new one at the back-alley clinic. The skills you trained and the credits you earned don't carry over to the next body. You can't remember your past, or even your own name.",
+    "profile.self.contract": "You signed a contract giving your body to the corporation's research division in exchange for erasing your debts.",
+    "profile.self.hacker": "You were once a skilled hacker who broke through corporate firewalls. The corporation wanted those skills, so it extracted only your mind.",
+    "profile.self.project": "You are one of the Iteration Project's subjects. But you alone wake up at Mio's clinic, not in a corporate facility.",
+    "profile.self.core": "Your real body lies asleep, preserved deep inside the corporation's core server.",
+    "profile.mio.name": "Mio",
+    "profile.mio.desc": "A street doctor at the back-alley clinic. Every time your body falls, Mio greets you in your new one. Mio remembers you from past lives, whatever body you are in.",
+    "profile.mio.white_room": "Mio was one of the technicians who transferred your mind in the white operating room. The one who whispered \"I'm sorry\" was Mio.",
+    "profile.mio.project": "Subjects normally wake up in a corporate facility. You wake up at the clinic because Mio rewrote where your mind copy is loaded.",
+    "profile.jin.name": "Jin",
+    "profile.jin.desc": "The fixer who finds you work. Your body is different every life, so Jin always talks to you as a stranger.",
+    "profile.jin.old_friend": "An old friend who used to call you by name. Jin can't tell it's you in your new body.",
+    "profile.rei.name": "Rei",
+    "profile.rei.desc": "A hacker who called out to you from beyond the firewall. Rei is a subject whose mind is used by the same program as yours, and remembers past lives too.",
+    "profile.rei.list": "Rei is trying to steal the list of subjects from a corporate vault, and asked for your help."
   }
 }

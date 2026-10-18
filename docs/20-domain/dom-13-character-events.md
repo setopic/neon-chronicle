@@ -96,5 +96,6 @@ implemented_by:
 このノードを参照しているノード
 
 - (decides) [ADR-0014 人物のイベントを1周に1段ずつ進め、前の段の選択で文と選択肢を変える](../50-adr/adr-0014-character-events-across-lives.md)
+- (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 
 <!-- graph:auto:end -->
