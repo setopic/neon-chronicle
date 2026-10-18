@@ -11,7 +11,10 @@ var save_path := "user://save.json"  # 通しの検査（ci/playthrough.gd）が
 const SAVE_VERSION := 1
 const SAVE_INTERVAL := 5.0
 const STEP := 0.25  # シミュレーションの刻み（秒）
-const MAX_CATCHUP := 60.0  # 1フレームで進める最大秒数（タブが裏にあった時用）
+const MAX_CATCHUP := 60.0  # ふつうのフレームで進める最大秒数
+const MAX_AWAY := 8.0 * 3600.0  # 閉じていた時間を進める上限（秒）。ADR-0007
+const AWAY_GAP := 1.0  # 前のフレームからこれより空いたら、閉じていた（タブが裏にあった）とみなす
+const AWAY_LOG := 60.0  # これ以上の時間を進めたら、ログに残す
 const BASE_DECAY := 0.4  # 体の劣化（耐久/秒）。何もしなくても約250秒で寿命
 const MAX_DURABILITY := 100.0
 const LOW_DURABILITY := 25.0
@@ -50,15 +53,24 @@ var logs: Array = []  # [{key, args}]。言語を切り替えても訳し直せ�
 
 var _pending := 0.0
 var _save_timer := 0.0
+var _last_seen := 0.0  # 最後に時間を進めた時刻（Unix時間）。ロードしたときはセーブした時刻
 
 
 func _ready() -> void:
+	_last_seen = Time.get_unix_time_from_system()
 	if not load_game():
 		_start_life()
 
 
 func _process(delta: float) -> void:
-	_pending = minf(_pending + delta, MAX_CATCHUP)
+	# 閉じていた時間とタブが裏にあった時間は、壁の時計で測る。ブラウザでは裏にある間フレームが来ないため（ADR-0007）
+	var now := Time.get_unix_time_from_system()
+	var gap := maxf(delta, now - _last_seen)
+	_last_seen = now
+	if gap > AWAY_GAP:
+		_advance_away(minf(gap, MAX_AWAY))
+	else:
+		_pending = minf(_pending + delta, MAX_CATCHUP)
 	while _pending >= STEP:
 		_pending -= STEP
 		_tick(STEP)
@@ -68,10 +80,26 @@ func _process(delta: float) -> void:
 		save_game()
 
 
+## 閉じていた時間を、開いているときと同じ刻みで進める。周が終わっても自動で転生はしない（ADR-0007）
+func _advance_away(seconds: float) -> void:
+	if alive and not is_paused() and seconds >= AWAY_LOG:
+		_log("log.away", {"age": seconds})
+	_pending += seconds
+
+
+## 「イベントで止める」の設定で、時間が止まっているか（ADR-0004）
+func is_paused() -> bool:
+	return pending_event != "" and Loc.setting("pause_on_event", false)
+
+
+func _notification(what: int) -> void:
+	# ブラウザではタブを閉じる前に保存の機会が来ないことがあるので、離れたときにも保存する
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_WM_CLOSE_REQUEST:
+		save_game()
+
+
 func _tick(dt: float) -> void:
-	if not alive:
-		return
-	if pending_event != "" and Loc.setting("pause_on_event", false):
+	if not alive or is_paused():
 		return
 	age += dt
 	var danger := 1.0
@@ -420,6 +448,8 @@ static func format_number(n: float) -> String:
 
 static func format_time(seconds: float) -> String:
 	var s := int(seconds)
+	if s >= 3600:
+		return "%d:%02d:%02d" % [s / 3600, s / 60 % 60, s % 60]
 	return "%d:%02d" % [s / 60, s % 60]
 
 
@@ -427,7 +457,7 @@ static func format_time(seconds: float) -> String:
 
 func save_game() -> void:
 	var data := {
-		"version": SAVE_VERSION,
+		"version": SAVE_VERSION, "saved_at": Time.get_unix_time_from_system(),
 		"credits": credits, "life_earned": life_earned, "durability": durability, "age": age,
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
 		"implants": implants, "job_time": job_time, "alive": alive, "pending_event": pending_event,
@@ -468,6 +498,8 @@ func load_game() -> bool:
 	fragments = data.get("fragments", [])
 	last_fragments = data.get("last_fragments", [])
 	logs = data.get("logs", [])
+	# 次のフレームで、セーブしてから今までの時間を進める。#9 より前のセーブは時刻を持たない
+	_last_seen = data.get("saved_at", Time.get_unix_time_from_system())
 	# JSON では整数も小数になるため、ログの Lv などを整数に戻す
 	for entry in logs:
 		for k in ["level", "life", "points"]:
