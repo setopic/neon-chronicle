@@ -1,6 +1,6 @@
 extends Node
 
-## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-12。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
+## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-13。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
 
 signal life_ended
 signal life_started
@@ -44,6 +44,7 @@ var pending_event := ""  # 待っているイベントのid。無いときは空
 var last_deed := ""  # 最後に選んだ選択肢（"<イベント>.<選択肢>"）。周を終わらせた選択は入れない
 var request := ""  # その周のジンの依頼のid。示せる依頼が無いときは空。DOM-12
 var request_done := false
+var met_characters: Array = []  # その周に人物のイベントが起きた人物。1つの周で進む話は、人物ごとに1段まで。DOM-13
 
 # --- 転生しても残る状態 ---
 var life_number := 1
@@ -53,6 +54,7 @@ var last_request_bonus := 0  # last_points_gained のうち、ジンの依頼の
 var upgrades := {}
 var chronicle: Array = []  # 終わった周の記録 [{life, body, job, age, earned, points, deed, end, ending}]
 var fragments: Array = []  # 戻った記憶の断片のid。DOM-08
+var character_choices := {}  # 人物のイベントで選んだ選択肢 {イベントのid: 選択肢のid}。話の進み具合を表す。DOM-13
 var last_fragments: Array = []  # 直前の周の終わりに戻った記憶の断片のid
 var logs: Array = []  # [{key, args}]。言語を切り替えても訳し直せるようキーで持つ
 
@@ -238,17 +240,53 @@ func buy_upgrade(id: String) -> void:
 func _start_event() -> void:
 	var candidates := []
 	for id in GameData.order["events"]:
-		if GameData.events[id].get("jobs", []).has(current_job):
+		if GameData.events[id].get("jobs", []).has(current_job) and _can_start(id):
 			candidates.append(id)
 	if candidates.is_empty():
 		return
 	pending_event = candidates.pick_random()
+	var character: String = GameData.events[pending_event].get("character", "")
+	if character != "":
+		met_characters.append(character)
 	_log("log.event", {"event": pending_event})
 	event_changed.emit()
 
 
+## 人物のイベントは、その人物の次の段だけが、その周にまだ話が進んでいないときに起きる（DOM-13）
+func _can_start(event_id: String) -> bool:
+	var event: Dictionary = GameData.events[event_id]
+	var character: String = event.get("character", "")
+	if character == "":
+		return true
+	if met_characters.has(character) or next_character_event(character) != event_id:
+		return false
+	return event.get("fragment", "") == "" or fragments.has(event["fragment"])
+
+
+## その人物の、まだ起きていない最初のイベント。data に並んだ順が話の順である。話が終わっていれば空
+func next_character_event(character: String) -> String:
+	for id in GameData.order["events"]:
+		if GameData.events[id].get("character", "") == character and not character_choices.has(id):
+			return id
+	return ""
+
+
+## 待っているイベントの説明。前の段で選んだ選択肢ごとに文を書き分けたイベントは、その文を使う（DOM-13）
+func event_desc(event_id: String) -> String:
+	var by: String = GameData.events.get(event_id, {}).get("desc_by", "")
+	if by == "":
+		return GameData.desc_of("events", event_id)
+	return tr("event.%s.desc.%s" % [event_id, character_choices.get(by, "")])
+
+
+## 待っているイベントの選択肢。前の選択の条件を満たさない選択肢は、選び直せないので出さない（DOM-13）
 func event_choices() -> Array:
-	return GameData.events.get(pending_event, {}).get("choices", [])
+	return GameData.events.get(pending_event, {}).get("choices", []).filter(func(c):
+		var after: String = c.get("requires_choice", "")
+		if after == "":
+			return true
+		var parts := after.split(".")
+		return parts.size() == 2 and character_choices.get(parts[0], "") == parts[1])
 
 
 ## 選択肢のクレジットの増減。いまの稼ぎの何秒分かで書いてある
@@ -267,6 +305,8 @@ func choose(choice_id: String) -> void:
 		return
 	var event_id := pending_event
 	pending_event = ""
+	if GameData.events[event_id].get("character", "") != "":
+		character_choices[event_id] = choice_id
 	_log("event.%s.%s.result" % [event_id, choice_id])
 	# エンディングの選択肢は、ほかの結果を持たず、その場で周を終える（DOM-08）
 	if choice.has("ending"):
@@ -347,6 +387,7 @@ func _start_life(body_id := "") -> void:
 	# 依頼は前の周の終わりのスキルのレベルで決めるので、スキルを戻す前に選ぶ。第1周には前の周が無い
 	request = pick_request(skill_level if life_number > 1 else {})
 	request_done = false
+	met_characters = []
 	implants = implants.filter(func(id): return GameData.implants.get(id, {}).get("persistent", false))
 	credits = 0.0
 	life_earned = 0.0
@@ -532,9 +573,10 @@ func save_game() -> void:
 		"credits": credits, "life_earned": life_earned, "durability": durability, "age": age,
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
 		"implants": implants, "job_time": job_time, "alive": alive, "body": body, "pending_event": pending_event,
-		"last_deed": last_deed, "request": request, "request_done": request_done, "life_number": life_number, "memory_points": memory_points,
+		"last_deed": last_deed, "request": request, "request_done": request_done, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
 		"last_points_gained": last_points_gained, "last_request_bonus": last_request_bonus, "upgrades": upgrades,
-		"chronicle": chronicle, "fragments": fragments, "last_fragments": last_fragments, "logs": logs,
+		"chronicle": chronicle, "fragments": fragments, "last_fragments": last_fragments,
+		"character_choices": character_choices, "logs": logs,
 	}
 	var file := FileAccess.open(save_path, FileAccess.WRITE)
 	if file:
@@ -568,6 +610,8 @@ func load_game() -> bool:
 	if not GameData.requests.has(request):
 		request = ""
 	request_done = data.get("request_done", false)
+	# #38 より前のセーブには、人物のイベントが無い
+	met_characters = data.get("met_characters", [])
 	life_number = int(data.get("life_number", 1))
 	memory_points = int(data.get("memory_points", 0))
 	last_points_gained = int(data.get("last_points_gained", 0))
@@ -579,6 +623,7 @@ func load_game() -> bool:
 			entry["body"] = first_body()
 	fragments = data.get("fragments", [])
 	last_fragments = data.get("last_fragments", [])
+	character_choices = data.get("character_choices", {})
 	logs = data.get("logs", [])
 	# 次のフレームで、セーブしてから今までの時間を進める。#9 より前のセーブは時刻を持たない
 	_last_seen = data.get("saved_at", Time.get_unix_time_from_system())
@@ -599,6 +644,7 @@ func reset_game() -> void:
 	chronicle = []
 	fragments = []
 	last_fragments = []
+	character_choices = {}
 	logs = []
 	implants = []
 	_start_life()
