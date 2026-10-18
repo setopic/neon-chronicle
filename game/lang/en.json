@@ -16,7 +16,7 @@
     "ui.requires": "Requires: {skill} Lv {level}",
     "ui.durability": "Integrity {now} / {max}",
     "ui.age": "Time {age}",
-    "ui.decay": "Decay rate {n} / sec",
+    "ui.decay": "Body decay rate {n} / sec",
     "ui.implant_owned": "Installed",
     "ui.cost_credits": "{n} credits",
     "ui.cost_points": "{n} pt",
@@ -64,7 +64,7 @@
     "implant.neural_chip.name": "Neural accelerator",
     "implant.neural_chip.desc": "Skill XP +50%",
     "implant.bone_frame.name": "Reinforced skeleton",
-    "implant.bone_frame.desc": "Decay rate -30%",
+    "implant.bone_frame.desc": "Body decay rate -30%",
     "implant.credit_spoofer.name": "Credit score spoofer",
     "implant.credit_spoofer.desc": "Income +50%. Installed in your net identity, not your body, so it stays after rebirth.",
 
@@ -73,7 +73,7 @@
     "upgrade.contacts.name": "Black market contacts",
     "upgrade.contacts.desc": "Income +25%",
     "upgrade.frame.name": "Sturdy chassis",
-    "upgrade.frame.desc": "Decay rate -10%",
+    "upgrade.frame.desc": "Body decay rate -10%",
     "upgrade.talent.name": "Inherited talent",
     "upgrade.talent.desc": "All skills start at Lv +1",
 
@@ -211,11 +211,11 @@
     "body.standard.name": "Standard body",
     "body.standard.desc": "No effect",
     "body.labor.name": "Labor body",
-    "body.labor.desc": "Decay rate -25%, XP -10%",
+    "body.labor.desc": "Body decay rate -25%, XP -10%",
     "body.combat.name": "Combat body",
-    "body.combat.desc": "Decay rate +25%, income +80%",
+    "body.combat.desc": "Body decay rate +25%, income +80%",
     "body.prototype.name": "Prototype body",
-    "body.prototype.desc": "Decay rate +25%, XP +60%",
+    "body.prototype.desc": "Body decay rate +25%, XP +60%",
     "ui.body_choice": "Pick your next body from the ones Mio has ready."
   }
 }
