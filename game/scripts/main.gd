@@ -139,6 +139,8 @@ func _build_header() -> Control:
 	pause.button_pressed = Loc.setting("pause_on_event", false)
 	pause.toggled.connect(func(on): Loc.set_setting("pause_on_event", on))
 	tools.add_child(pause)
+	tools.add_child(_toggle(tr("ui.music"), Sound.music_on(), Sound.set_music))
+	tools.add_child(_toggle(tr("ui.sfx"), Sound.sfx_on(), Sound.set_sfx))
 	var reset := Button.new()
 	reset.text = tr("ui.reset")
 	reset.pressed.connect(_confirm_reset)
@@ -558,6 +560,15 @@ static func license_text() -> String:
 # --- 部品 ---
 
 ## 見出しつきのパネルを作り、中身を入れる VBox を返す（パネル本体は VBox の親の親）
+func _toggle(text: String, on: bool, changed: Callable) -> Button:
+	var button := Button.new()
+	button.toggle_mode = true
+	button.text = text
+	button.button_pressed = on
+	button.toggled.connect(changed)
+	return button
+
+
 func _panel(title: String) -> VBoxContainer:
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL

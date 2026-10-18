@@ -3,7 +3,7 @@ extends Node
 ## 言語ファイル（lang/*.json）を読み込み、TranslationServer に登録する。
 ## 形式: {"locale": "ja", "name": "日本語", "strings": {"キー": "文字列"}}
 ## MOD の lang/ に同じ locale のファイルを置くと文字列を追加・上書きでき、新しい locale なら言語が増える。
-## 言語のほかの設定（イベントで止めるか。ADR-0004）も、同じ settings.json に保存する。
+## 言語のほかの設定（イベントで止めるか。ADR-0004。音楽と効果音を鳴らすか。ADR-0008）も、同じ settings.json に保存する。
 
 signal language_changed
 

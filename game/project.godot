@@ -10,6 +10,7 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 Loc="*res://scripts/loc.gd"
 GameData="*res://scripts/game_data.gd"
 Game="*res://scripts/game_state.gd"
+Sound="*res://scripts/sound.gd"
 
 [display]
 window/size/viewport_width=1280
