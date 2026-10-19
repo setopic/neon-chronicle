@@ -82,6 +82,7 @@ graph LR
     DOM-25["DOM-25<br/>体の元の持ち主と特性"]
     DOM-26["DOM-26<br/>体の容量とインプラントの取り外し"]
     DOM-27["DOM-27<br/>前の周の跡"]
+    DOM-28["DOM-28<br/>イベントの波"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -131,6 +132,7 @@ graph LR
     ADR-0042["ADR-0042<br/>体の種類ごとに容量を持たせ、インプラントを外せるようにする"]
     ADR-0043["ADR-0043<br/>ミオにも3段の人物のイベントを持たせる"]
     ADR-0044["ADR-0044<br/>1つ前の周の選択を、次の周の跡のイベントに出す"]
+    ADR-0045["ADR-0045<br/>イベントの起きやすさに、緊張と耐久で波を付ける"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -223,6 +225,9 @@ graph LR
   ADR-0043 -.->|decides| DOM-10
   ADR-0043 -.->|decides| DOM-14
   ADR-0044 -.->|decides| DOM-27
+  ADR-0045 ==>|supersedes| ADR-0004
+  ADR-0045 -.->|decides| DOM-28
+  ADR-0045 -.->|decides| DOM-06
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -314,8 +319,8 @@ graph LR
   DOM-25 -->|depends_on| DOM-23
   DOM-26 -->|depends_on| DOM-04
   DOM-26 -->|depends_on| DOM-11
-  DOM-27 -->|depends_on| DOM-06
   DOM-27 -->|depends_on| DOM-07
+  DOM-28 -->|depends_on| DOM-06
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04
@@ -335,7 +340,7 @@ graph LR
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
-  class ADR-0005,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0024 deprecated;
+  class ADR-0004,ADR-0005,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0024 deprecated;
 ```
 
 <!-- graph:diagram:end -->

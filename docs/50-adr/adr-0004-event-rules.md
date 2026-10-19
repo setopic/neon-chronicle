@@ -2,7 +2,7 @@
 id: ADR-0004
 type: adr
 title: イベントの起き方と結果を決まった量で表す
-status: stable
+status: deprecated
 tags: [loop, story]
 decides:
   - DOM-06
@@ -14,7 +14,7 @@ related: []
 # イベントの起き方と結果を決まった量で表す
 
 - 日付: 2026-10-18
-- 状態: stable
+- 状態: deprecated（[ADR-0045](./adr-0045-event-waves.md)が置き換えた）
 
 ## 背景
 
@@ -71,5 +71,9 @@ related: []
 
 - [ARCH-01 ゲームの全体構成](../10-architecture/arch-01-game-overview.md)
 - [DOM-06 イベントと選択肢](../20-domain/dom-06-events.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0045 イベントの起きやすさに、緊張と耐久で波を付ける](./adr-0045-event-waves.md)
 
 <!-- graph:auto:end -->

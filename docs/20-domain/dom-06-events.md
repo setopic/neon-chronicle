@@ -44,11 +44,11 @@ implemented_by:
 次の値は属性ではなく導出値である。
 
 ```
-イベントが起きる確率（1秒あたり） = 危険度 ÷ 90
+イベントが起きる基本の確率（1秒あたり） = 危険度 ÷ 90
 クレジットの増減 = いまの稼ぎ × 選択肢のクレジットの増減（秒）
 ```
 
-危険度が1の仕事では、平均90秒に1回起きる。起きたイベントは、いまの仕事で起きるイベントの中から、同じ確率で1つ選ぶ。
+基本の確率では、危険度が1の仕事で平均90秒に1回起きる。起きたイベントは、いまの仕事で起きるイベントの中から、同じ確率で1つ選ぶ。
 
 ## 不変条件
 
@@ -96,6 +96,7 @@ implemented_by:
 このノードを参照しているノード
 
 - (decides) [ADR-0004 イベントの起き方と結果を決まった量で表す](../50-adr/adr-0004-event-rules.md)
+- (decides) [ADR-0045 イベントの起きやすさに、緊張と耐久で波を付ける](../50-adr/adr-0045-event-waves.md)
 - (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 - (depends_on) [DOM-10 登場人物](./dom-10-characters.md)
@@ -103,6 +104,6 @@ implemented_by:
 - (depends_on) [DOM-15 街の場所と勢力](./dom-15-city-places-and-powers.md)
 - (depends_on) [DOM-21 縛りの周](./dom-21-challenges.md)
 - (depends_on) [DOM-22 勢力の評判](./dom-22-faction-reputation.md)
-- (depends_on) [DOM-27 前の周の跡](./dom-27-traces-of-last-life.md)
+- (depends_on) [DOM-28 イベントの波](./dom-28-event-waves.md)
 
 <!-- graph:auto:end -->

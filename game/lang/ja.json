@@ -616,6 +616,8 @@
     "event.thief_hunt.run.result": "荷を抱えて走った。路地の奥で追いつかれ、何発か殴られてから振り切った。",
     "event.thief_hunt.run.chronicle": "前の体で持ち逃げした保護料のことで、ザンダー・ファミリーに追われ",
     "event.thief_hunt.fall": "保護料泥棒と間違われて、ザンダー・ファミリーに殴られて倒れた",
+    "ui.calm": "ひと息つける（危ないイベントが起きにくい）",
+    "log.calm": "危ない目が続いた。しばらくは、ひと息つけそうだ。",
     "ui.request_done": "果たした",
     "ui.request_bonus": "（ジンの依頼 +{n}）",
     "request.job": "{job}として{min}分働く",
