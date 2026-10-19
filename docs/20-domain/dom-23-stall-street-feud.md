@@ -72,5 +72,6 @@ implemented_by:
 
 - (decides) [ADR-0038 ザンダー・ファミリーと屋台組合の対立を、3段の勢力の話にする](../50-adr/adr-0038-stall-street-feud.md)
 - (depends_on) [DOM-25 体の元の持ち主と特性](./dom-25-body-former-owners.md)
+- (depends_on) [DOM-30 分岐図](./dom-30-branch-chart.md)
 
 <!-- graph:auto:end -->

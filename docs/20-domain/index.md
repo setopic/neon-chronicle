@@ -45,6 +45,7 @@ tags: [index]
 - [DOM-27 前の周の跡](./dom-27-traces-of-last-life.md)
 - [DOM-28 イベントの波](./dom-28-event-waves.md)
 - [DOM-29 目覚めの日](./dom-29-day-of-waking.md)
+- [DOM-30 分岐図](./dom-30-branch-chart.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
@@ -357,5 +358,11 @@ python -m tools.graph new --type domain --id DOM-02 --title "..." --slug some-sl
 | --- | --- | --- |
 | 目覚めの日 | 中枢サーバーの奥で眠らされている被験体の体を、すべて目覚めさせるエンディング | |
 | 話の条件 | 話の進み具合で、決まった選択肢を選んでいるときだけ選択肢を出す条件 | |
+
+### [DOM-30 分岐図](./dom-30-branch-chart.md)
+
+| 用語 | 意味 | 旧称 |
+| --- | --- | --- |
+| 分岐図 | 周をまたいで進む話の段とエンディングを、選択肢ごとに並べた図 | |
 
 <!-- graph:terms:end -->

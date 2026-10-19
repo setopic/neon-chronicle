@@ -63,6 +63,7 @@ tags: [index]
 - [ADR-0044 1つ前の周の選択を、次の周の跡のイベントに出す](./adr-0044-traces-of-last-life.md)
 - [ADR-0045 イベントの起きやすさに、緊張と耐久で波を付ける](./adr-0045-event-waves.md)
 - [ADR-0046 レイとの約束と屋台組合の評判で開く、3つ目のエンディングを足す](./adr-0046-third-ending.md)
+- [ADR-0047 話とエンディングの分岐図を、街と人物の画面の3つ目のタブに出す](./adr-0047-branch-chart.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

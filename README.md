@@ -84,6 +84,7 @@ graph LR
     DOM-27["DOM-27<br/>前の周の跡"]
     DOM-28["DOM-28<br/>イベントの波"]
     DOM-29["DOM-29<br/>目覚めの日"]
+    DOM-30["DOM-30<br/>分岐図"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -135,6 +136,7 @@ graph LR
     ADR-0044["ADR-0044<br/>1つ前の周の選択を、次の周の跡のイベントに出す"]
     ADR-0045["ADR-0045<br/>イベントの起きやすさに、緊張と耐久で波を付ける"]
     ADR-0046["ADR-0046<br/>レイとの約束と屋台組合の評判で開く、3つ目のエンディングを足す"]
+    ADR-0047["ADR-0047<br/>話とエンディングの分岐図を、街と人物の画面の3つ目のタブに出す"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -233,6 +235,7 @@ graph LR
   ADR-0046 ==>|supersedes| ADR-0006
   ADR-0046 -.->|decides| DOM-29
   ADR-0046 -.->|decides| DOM-08
+  ADR-0047 -.->|decides| DOM-30
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -330,6 +333,9 @@ graph LR
   DOM-29 -->|depends_on| DOM-13
   DOM-29 -->|depends_on| DOM-20
   DOM-29 -->|depends_on| DOM-22
+  DOM-30 -->|depends_on| DOM-23
+  DOM-30 -->|depends_on| DOM-25
+  DOM-30 -->|depends_on| DOM-29
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04
