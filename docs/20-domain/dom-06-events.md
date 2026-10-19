@@ -103,5 +103,6 @@ implemented_by:
 - (depends_on) [DOM-15 街の場所と勢力](./dom-15-city-places-and-powers.md)
 - (depends_on) [DOM-21 縛りの周](./dom-21-challenges.md)
 - (depends_on) [DOM-22 勢力の評判](./dom-22-faction-reputation.md)
+- (depends_on) [DOM-27 前の周の跡](./dom-27-traces-of-last-life.md)
 
 <!-- graph:auto:end -->

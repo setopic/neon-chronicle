@@ -42,6 +42,7 @@ tags: [index]
 - [DOM-24 仕事の区画と身元](./dom-24-job-districts-and-identity.md)
 - [DOM-25 体の元の持ち主と特性](./dom-25-body-former-owners.md)
 - [DOM-26 体の容量とインプラントの取り外し](./dom-26-body-capacity.md)
+- [DOM-27 前の周の跡](./dom-27-traces-of-last-life.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
@@ -330,5 +331,13 @@ python -m tools.graph new --type domain --id DOM-02 --title "..." --slug some-sl
 | 体の容量 | 体の種類ごとの、組み込めるインプラントの大きさの合計の上限 | |
 | 大きさ | インプラントが体の容量のうちに使う量 | |
 | 外す | 組み込んだインプラントを、体から取り除くこと。代金は戻らない | |
+
+### [DOM-27 前の周の跡](./dom-27-traces-of-last-life.md)
+
+| 用語 | 意味 | 旧称 |
+| --- | --- | --- |
+| 前の周の跡 | 1つ前の周に選んだ選択肢が、次の周の街に残した結果 | |
+| 跡のイベント | 1つ前の周に決まった選択肢を選んだときだけ起きるイベント | |
+| 跡の条件 | 跡のイベントが起きるのに要る、1つ前の周の選択肢 | |
 
 <!-- graph:terms:end -->
