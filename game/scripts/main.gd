@@ -293,44 +293,60 @@ func _build_rebirth() -> Control:
 	var last: Dictionary = Game.chronicle.back() if not Game.chronicle.is_empty() else {}
 	var box := _panel(tr("ui.rebirth_title_ending" if last.get("ending", "") != "" else "ui.rebirth_title"))
 	var panel: Control = box.get_parent().get_parent()
-	# 体の種類のボタンを横に4つ並べるため、ほかのパネルより広くする
-	panel.custom_minimum_size = Vector2(880, 0)
+	# 1280x720に収めるため、画面の幅いっぱいに広げて左右の列に分ける。
+	# 左は周の結果と永続強化、右は年代記と体の選択で、上下の段で左右の幅をそろえる
+	panel.custom_minimum_size = Vector2(1240, 0)
 	center.add_child(panel)
+	var top := _rebirth_columns(box)
+	var intro: VBoxContainer = top[0]
+	var history: VBoxContainer = top[1]
+	var bottom := _rebirth_columns(box)
+	var left: VBoxContainer = bottom[0]
+	var right: VBoxContainer = bottom[1]
 
 	var summary := _label(Game.format_entry({"key": "ui.rebirth_summary", "args": last}), Color.WHITE, 17)
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(summary)
+	intro.add_child(summary)
 	if not last.is_empty():
 		var story := _label(Game.story_of(last), CYAN, 17)
 		story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		box.add_child(story)
+		intro.add_child(story)
 		# エンディングのあとは物語が終わっているので、診療所の場面を出さない
 		if last.get("ending", "") == "":
 			var mio := _label(tr(Game.mio_line_key(last)), Color.WHITE, 16)
 			mio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			box.add_child(mio)
+			intro.add_child(mio)
 	var gained := Loc.t("ui.points_gained", {"n": Game.last_points_gained})
 	if Game.last_request_bonus > 0:
 		gained += Loc.t("ui.request_bonus", {"n": Game.last_request_bonus})
 	if Game.last_challenge_bonus > 0:
 		gained += Loc.t("ui.challenge_bonus", {"n": Game.last_challenge_bonus})
-	box.add_child(_label(gained, PINK, 20))
-	box.add_child(_label(_fragment_progress(), DIM, 14))
+	intro.add_child(_label(gained, PINK, 20))
+	intro.add_child(_label(_fragment_progress(), DIM, 14))
 
 	# 説明は見出しと同じ行に置き、画面の高さに収める
 	var heading := HBoxContainer.new()
 	heading.add_theme_constant_override("separation", 14)
-	box.add_child(heading)
+	left.add_child(heading)
 	heading.add_child(_section_title(tr("ui.upgrades")))
 	var note := _label(tr("ui.upgrades_note"), DIM, 14)
 	note.size_flags_vertical = Control.SIZE_SHRINK_END
+	note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	heading.add_child(note)
+	# 残りの記憶ポイントも見出しの行に置き、ボタンの列の下に行を足さない
+	_rebirth_points_label = _label("", PINK, 16)
+	_rebirth_points_label.size_flags_vertical = Control.SIZE_SHRINK_END
+	heading.add_child(_rebirth_points_label)
 	for id in GameData.order["upgrades"]:
 		var button := Button.new()
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.tooltip_text = GameData.desc_of("upgrades", id)
+		# 列の幅に収まらない説明は折り返す。折り返さないと、最も長い行がパネルの幅を決める
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.theme_type_variation = "CompactButton"
 		button.pressed.connect(Game.buy_upgrade.bind(id))
-		box.add_child(button)
+		left.add_child(button)
 		_upgrade_buttons[id] = button
 	# 排他の組の永続強化は、払った記憶ポイントを戻して選び直せる。レベルを持つものにだけ出す（DOM-31）
 	for id in GameData.order["upgrades"]:
@@ -338,21 +354,22 @@ func _build_rebirth() -> Control:
 			continue
 		var refund := Button.new()
 		refund.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		refund.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		refund.theme_type_variation = "CompactButton"
 		refund.pressed.connect(Game.refund_upgrade.bind(id))
-		box.add_child(refund)
+		left.add_child(refund)
 		_refund_buttons[id] = refund
-	_rebirth_points_label = _label("", PINK, 16)
-	box.add_child(_rebirth_points_label)
 
-	box.add_child(_section_title(tr("ui.chronicle")))
-	box.add_child(_label(Loc.t("ui.chronicle_bonus", {
+	history.add_child(_section_title(tr("ui.chronicle")))
+	history.add_child(_label(Loc.t("ui.chronicle_bonus", {
 		"n": Game.chronicle_deeds(), "pct": int(round(Game.deed_bonus() * 100.0)),
 	}), PINK, 14))
 	# 物語文は1件で2〜3行になるので、全件をスクロールで見せ、最新の記録を下に出しておく
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(0, 70)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	box.add_child(scroll)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	history.add_child(scroll)
 	var list := VBoxContainer.new()
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
@@ -360,7 +377,9 @@ func _build_rebirth() -> Control:
 		var story := _label(Loc.t("ui.chronicle_story", {"life": int(entry.get("life", 0)), "story": Game.story_of(entry)}), Color.WHITE, 14)
 		story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		list.add_child(story)
-		list.add_child(_label(Game.format_entry({"key": "ui.chronicle_stats", "args": entry}), DIM, 12))
+		var stats := _label(Game.format_entry({"key": "ui.chronicle_stats", "args": entry}), DIM, 12)
+		stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		list.add_child(stats)
 	list.resized.connect(func(): scroll.scroll_vertical = int(list.size.y))
 
 	# 体の種類ごとに目覚めるボタンを置く。選ぶことと目覚めることを1回の操作にして、画面の高さを増やさない（ADR-0012）
@@ -368,7 +387,7 @@ func _build_rebirth() -> Control:
 	if not GameData.order["challenges"].is_empty():
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
-		box.add_child(row)
+		right.add_child(row)
 		row.add_child(_label(tr("ui.challenge_choice"), DIM, 14))
 		var picker := OptionButton.new()
 		picker.add_item(tr("ui.challenge_none"))
@@ -376,15 +395,21 @@ func _build_rebirth() -> Control:
 			picker.add_item(Loc.t("ui.challenge_option", {"challenge": GameData.name_of("challenges", id),
 				"desc": GameData.desc_of("challenges", id),
 				"n": roundi(GameData.challenges[id].get("bonus", 0.0) * 100.0)}))
+		# 縛りの説明は長いので、いちばん長い項目の幅に合わせず、列の幅で切る
+		picker.fit_to_longest_item = false
+		picker.clip_text = true
+		picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		picker.select(GameData.order["challenges"].find(Game.next_challenge) + 1)
 		picker.item_selected.connect(_pick_challenge)
 		row.add_child(picker)
-	box.add_child(_label(tr("ui.body_choice"), DIM, 14))
+	var body_choice := _label(tr("ui.body_choice"), DIM, 14)
+	body_choice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	right.add_child(body_choice)
 	var bodies := GridContainer.new()
-	bodies.columns = 4
+	bodies.columns = 2
 	bodies.add_theme_constant_override("h_separation", 8)
 	bodies.add_theme_constant_override("v_separation", 8)
-	box.add_child(bodies)
+	right.add_child(bodies)
 	for id in GameData.order["bodies"]:
 		var awaken := Button.new()
 		# 体の質は、目覚める前に分かるようにボタンに出す（ADR-0032）
@@ -396,12 +421,30 @@ func _build_rebirth() -> Control:
 			Loc.t("ui.awaken", {"body": GameData.name_of("bodies", id)}), quality_text,
 			GameData.desc_of("bodies", id) + "  " + Loc.t("ui.capacity_short", {"max": int(GameData.bodies[id].get("capacity", 99))}),
 			tr("body.%s.trait" % id)]
+		awaken.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		awaken.add_theme_font_size_override("font_size", 14)
 		awaken.disabled = not Game.can_choose_body(id)
 		awaken.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		awaken.add_theme_color_override("font_color", CYAN)
 		awaken.pressed.connect(Game.rebirth.bind(id))
 		bodies.add_child(awaken)
 	return dim
+
+
+## 転生の画面の1段。左右の列を返す。永続強化の説明が1行に収まるよう、左の列を広く取る
+func _rebirth_columns(box: VBoxContainer) -> Array:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 16)
+	box.add_child(row)
+	var columns := []
+	for ratio in [1.4, 1.0]:
+		var column := VBoxContainer.new()
+		column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		column.size_flags_stretch_ratio = ratio
+		column.add_theme_constant_override("separation", 4)
+		row.add_child(column)
+		columns.append(column)
+	return columns
 
 
 ## 周の終わりに戻った記憶の断片か、たどり着いたエンディングの文。閉じると転生の画面に移る。
@@ -549,7 +592,7 @@ func _refresh() -> void:
 		var button: Button = _upgrade_buttons[id]
 		var level: int = Game.upgrades.get(id, 0)
 		var cost := tr("ui.max") if Game.upgrade_maxed(id) else Loc.t("ui.cost_points", {"n": Game.upgrade_cost(id)})
-		button.text = "%s  %s    %s    %s%s" % [
+		button.text = "%s  %s  %s  %s%s" % [
 			GameData.name_of("upgrades", id), Loc.t("ui.level", {"level": level}), cost, GameData.desc_of("upgrades", id), _upgrade_group_text(id)]
 		button.disabled = not Game.can_buy_upgrade(id)
 	for choice in Game.event_choices():
@@ -674,7 +717,7 @@ func _effects_text(effects: Dictionary, keep_zero := false) -> String:
 func _upgrade_group_text(id: String) -> String:
 	var taken: String = Game.upgrade_taken_in_group(id)
 	if taken != "":
-		return "    " + Loc.t("ui.upgrade_taken", {"name": GameData.name_of("upgrades", taken)})
+		return "  " + Loc.t("ui.upgrade_taken", {"name": GameData.name_of("upgrades", taken)})
 	var group: String = GameData.upgrades[id].get("group", "")
 	if group == "":
 		return ""
@@ -682,7 +725,7 @@ func _upgrade_group_text(id: String) -> String:
 	for other in GameData.order["upgrades"]:
 		if other != id and GameData.upgrades[other].get("group", "") == group:
 			names.append(GameData.name_of("upgrades", other))
-	return "    " + Loc.t("ui.upgrade_group", {"names": tr("ui.list_sep").join(names)})
+	return "  " + Loc.t("ui.upgrade_group", {"names": tr("ui.list_sep").join(names)})
 
 
 ## インプラントのボタン。組み込んでいなければ買い、組み込んでいれば外す
@@ -937,6 +980,14 @@ func _make_theme() -> Theme:
 		t.set_stylebox("pressed", type, pressed)
 		t.set_stylebox("hover_pressed", type, pressed)
 		t.set_stylebox("disabled", type, disabled)
+	# 転生の画面の永続強化のボタン。数が多いので、上下の余白と文字を詰めて1280x720に収める
+	t.set_type_variation("CompactButton", "Button")
+	t.set_font_size("font_size", "CompactButton", 14)
+	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
+		var compact: StyleBoxFlat = t.get_stylebox(state, "Button").duplicate()
+		compact.content_margin_top = 4
+		compact.content_margin_bottom = 4
+		t.set_stylebox(state, "CompactButton", compact)
 	t.set_color("font_disabled_color", "Button", Color(0.5, 0.5, 0.6))
 	# キーボードで選んでいるボタンの枠。標準の白い枠は、ほかの色から浮く
 	var focus := StyleBoxFlat.new()
