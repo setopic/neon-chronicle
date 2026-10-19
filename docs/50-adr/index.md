@@ -36,6 +36,7 @@ tags: [index]
 - [ADR-0017 画面の右上のボタンとダイアログの見た目をそろえる](./adr-0017-header-and-dialog-look.md)
 - [ADR-0018 街を複数の企業が分け合い、場所と住人をイベントと資料に出す](./adr-0018-companies-places-and-residents.md)
 - [ADR-0019 衣食住は文だけで書き、食べ物は合成食の企業が握る](./adr-0019-food-clothing-housing.md)
+- [ADR-0020 街を区画と3本の橋で分け、地図は設計文書の図に残す](./adr-0020-city-districts-and-map.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
