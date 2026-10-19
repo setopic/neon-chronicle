@@ -23,6 +23,7 @@ Godot 4.7.2 / GDScript。ブラウザ向けに Compatibility 描画とスレッ�
 | `scripts/job_scene.gd` | ログの左に描く、就いている仕事の様子（ADR-0053） |
 | `scripts/minigame.gd` | 仕事のミニゲームの共通の形と、仮のミニゲーム（ADR-0054） |
 | `scripts/minigame_hacking.gd` | ハッカーと中枢サーバーへの侵入の仕事のミニゲーム（ADR-0055） |
+| `scripts/minigame_courier.gd` | 運び屋の仕事のミニゲーム（ADR-0056） |
 | `scripts/sound.gd` | 音楽と効果音を鳴らす |
 | `audio/` | 音楽と効果音の WAV と、それを合成する `make_sounds.py` |
 

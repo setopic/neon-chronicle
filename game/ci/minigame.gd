@@ -51,6 +51,7 @@ func _process(_delta: float) -> bool:
 	_expect(not _game.minigame_active, "やめたら放置の仕事に戻る")
 
 	_check_hacking()
+	_check_courier()
 
 	DirAccess.remove_absolute(SAVE_PATH)
 	print("NG" if _failed else "OK: ミニゲームの報酬は二重に入らない")
@@ -68,6 +69,19 @@ func _check_hacking() -> void:
 		for cell in game.path:
 			game._pick(cell)
 		_expect(scores == [1.0], "ハッキングの表は、作った道でそろう（%s）" % [scores])
+		game.free()
+
+
+## 運び屋のミニゲームは、表を作るときに見つけた手で、レベル0の歩数以内に届けられる（ADR-0056）
+func _check_courier() -> void:
+	for i in 20:
+		var game: CourierGame = Minigame.create("courier", 0)
+		root.add_child(game)
+		var scores := []
+		game.finished.connect(func(score): scores.append(score))
+		for key in game.solution:
+			game.move(key)
+		_expect(scores.size() == 1 and scores[0] >= 0.5, "運び屋の地図は、見つけた手で届けられる（%s）" % [scores])
 		game.free()
 
 
