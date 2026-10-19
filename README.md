@@ -145,6 +145,7 @@ graph LR
     ADR-0052["ADR-0052<br/>画面の見た目の方向と、その土台を決める"]
     ADR-0053["ADR-0053<br/>仕事の様子を、ログの左に線と点で描く"]
     ADR-0054["ADR-0054<br/>仕事の1回を、ミニゲームで置き換えて遊べるようにする"]
+    ADR-0055["ADR-0055<br/>ハッカーの仕事のミニゲームを、符号の表を縦横にたどる遊びにする"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -255,6 +256,7 @@ graph LR
   ADR-0052 -.->|decides| ARCH-01
   ADR-0053 -.->|decides| ARCH-01
   ADR-0054 -.->|decides| DOM-03
+  ADR-0055 -.->|decides| DOM-03
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02

@@ -14,6 +14,7 @@ static func create(kind: String, skill_level: int) -> Minigame:
 	var game: Minigame = null
 	match kind:
 		"timing": game = TimingGame.new()
+		"hacking": game = HackingGame.new()
 	if game != null:
 		game.level = skill_level
 	return game

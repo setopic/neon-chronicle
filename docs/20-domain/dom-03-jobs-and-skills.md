@@ -119,6 +119,7 @@ implemented_by:
 - (decides) [ADR-0003 物語の文書を既定の種別で書く](../50-adr/adr-0003-story-docs-default-types.md)
 - (decides) [ADR-0051 仕事を、終わったら報酬が入る形にする](../50-adr/adr-0051-job-pays-on-completion.md)
 - (decides) [ADR-0054 仕事の1回を、ミニゲームで置き換えて遊べるようにする](../50-adr/adr-0054-minigame-frame.md)
+- (decides) [ADR-0055 ハッカーの仕事のミニゲームを、符号の表を縦横にたどる遊びにする](../50-adr/adr-0055-hacking-minigame.md)
 - (depends_on) [DOM-04 インプラント](./dom-04-implants.md)
 - (depends_on) [DOM-05 転生と永続強化](./dom-05-rebirth.md)
 - (depends_on) [DOM-06 イベントと選択肢](./dom-06-events.md)
