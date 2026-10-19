@@ -205,7 +205,8 @@ func _build_right() -> Control:
 	box.add_child(_body_label)
 	# 体の種類の効果は転生の画面でしか見えなかったので、周の間も出す。合計は出どころを分けずに1行にする（ADR-0016）
 	_body_effects_label = _label(Loc.t("ui.body_effects", {
-		"body": GameData.name_of("bodies", Game.body), "effects": GameData.desc_of("bodies", Game.body)}), DIM, 14)
+		"body": GameData.name_of("bodies", Game.body), "quality": Game.body_quality,
+		"effects": GameData.desc_of("bodies", Game.body)}), DIM, 14)
 	_body_effects_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_body_effects_label)
 	_effect_total_label = _label("", DIM, 14)
@@ -326,7 +327,13 @@ func _build_rebirth() -> Control:
 	box.add_child(bodies)
 	for id in GameData.order["bodies"]:
 		var awaken := Button.new()
-		awaken.text = "%s\n%s" % [Loc.t("ui.awaken", {"body": GameData.name_of("bodies", id)}), GameData.desc_of("bodies", id)]
+		# 体の質は、目覚める前に分かるようにボタンに出す（ADR-0032）
+		var quality := Game.next_quality(id)
+		var quality_text := Loc.t("ui.body_quality", {"quality": quality, "pct": roundi(Game.QUALITY_DECAY * quality * 100.0)}) \
+			if Game.can_choose_body(id) else Loc.t("ui.body_locked", {"n": Game.format_number(Game.QUALITY_CREDITS * 2.0)})
+		awaken.text = "%s\n%s\n%s" % [
+			Loc.t("ui.awaken", {"body": GameData.name_of("bodies", id)}), quality_text, GameData.desc_of("bodies", id)]
+		awaken.disabled = not Game.can_choose_body(id)
 		awaken.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		awaken.add_theme_color_override("font_color", CYAN)
 		awaken.pressed.connect(Game.rebirth.bind(id))

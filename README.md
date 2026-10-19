@@ -111,6 +111,7 @@ graph LR
     ADR-0029["ADR-0029<br/>ザンダー一家をザンダー・ファミリーと呼ぶ"]
     ADR-0030["ADR-0030<br/>被験体は借金の契約で集め、使い捨ての体は闇市場の部品で組み立てる"]
     ADR-0031["ADR-0031<br/>日本のやくざや的屋に寄った語を、欧米の街でも通じる語に改める"]
+    ADR-0032["ADR-0032<br/>体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -180,6 +181,10 @@ graph LR
   ADR-0031 -.->|decides| DOM-14
   ADR-0031 -.->|decides| DOM-15
   ADR-0031 -.->|decides| DOM-19
+  ADR-0032 ==>|supersedes| ADR-0012
+  ADR-0032 -.->|decides| DOM-05
+  ADR-0032 -.->|decides| DOM-09
+  ADR-0032 -.->|decides| DOM-11
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -213,6 +218,7 @@ graph LR
   DOM-11 -->|depends_on| DOM-02
   DOM-11 -->|depends_on| DOM-03
   DOM-11 -->|depends_on| DOM-05
+  DOM-11 -->|depends_on| DOM-09
   DOM-11 -->|depends_on| DOM-10
   DOM-12 -->|depends_on| DOM-03
   DOM-12 -->|depends_on| DOM-05
@@ -273,7 +279,7 @@ graph LR
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
-  class ADR-0005,ADR-0020,ADR-0022,ADR-0024 deprecated;
+  class ADR-0005,ADR-0012,ADR-0020,ADR-0022,ADR-0024 deprecated;
 ```
 
 <!-- graph:diagram:end -->

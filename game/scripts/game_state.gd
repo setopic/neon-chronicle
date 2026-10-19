@@ -22,6 +22,10 @@ const MAX_LOGS := 50
 const EVENT_INTERVAL := 90.0  # 危険度1の仕事で、イベントが起きる平均の間隔（秒）。DOM-06
 const DEED_XP := 0.02  # クロニクルに残った選択1種類あたりの経験の増え方。DOM-07
 const REQUEST_BONUS := 0.5  # ジンの依頼を果たした周に、記憶ポイントへ上乗せする割合。ADR-0013
+const POINTS_XP := 2.0  # 記憶ポイントの式で、その周で得た経験の合計を割る値。ADR-0032
+const QUALITY_MAX := 5  # 体の質の上限。ADR-0032
+const QUALITY_DECAY := 0.15  # 体の質1段階ごとに、基本の劣化を下げる割合
+const QUALITY_CREDITS := 1000.0  # 体の質の式で、前の周で稼いだクレジットを割る値
 ## ログやクロニクルの引数のうち、id から表示名に変える項目
 const NAME_ARGS := {
 	"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades", "event": "events",
@@ -40,6 +44,8 @@ var implants: Array = []
 var job_time := {}
 var alive := true
 var body := ""  # その周の体の種類のid。DOM-11
+var body_quality := 0  # その周の体の質。ADR-0032
+var life_xp := 0.0  # その周で得た経験の合計。記憶ポイントの式に入る
 var pending_event := ""  # 待っているイベントのid。無いときは空
 var last_deed := ""  # 最後に選んだ選択肢（"<イベント>.<選択肢>"）。周を終わらせた選択は入れない
 var request := ""  # その周のジンの依頼のid。示せる依頼が無いときは空。DOM-12
@@ -150,9 +156,10 @@ func xp_mult() -> float:
 	return 1.0 + effect("xp") + deed_bonus()
 
 
-## 基本の劣化は体の種類が持つ。効果の合計とは別に掛けるので、劣化の効果が下限に届いていても体の差が残る（ADR-0012）
+## 基本の劣化は体の種類が持ち、体の質で下がる。効果の合計とは別に掛けるので、劣化の効果が下限に届いていても体の差が残る（ADR-0012、ADR-0032）
 func decay_per_sec(danger: float) -> float:
-	return GameData.bodies.get(body, {}).get("decay", BASE_DECAY) * danger * maxf(0.2, 1.0 + effect("decay"))
+	var base: float = GameData.bodies.get(body, {}).get("decay", BASE_DECAY) * (1.0 - QUALITY_DECAY * body_quality)
+	return base * danger * maxf(0.2, 1.0 + effect("decay"))
 
 
 func current_decay() -> float:
@@ -199,6 +206,7 @@ func _add_xp(skill: String, amount: float) -> void:
 	if not GameData.skills.has(skill):
 		return
 	skill_xp[skill] = skill_xp.get(skill, 0.0) + amount
+	life_xp += amount
 	var level: int = skill_level.get(skill, 0)
 	while skill_xp[skill] >= xp_to_next(level):
 		skill_xp[skill] -= xp_to_next(level)
@@ -347,7 +355,37 @@ func points_for_life() -> int:
 	var levels := 0
 	for skill in skill_level:
 		levels += skill_level[skill]
-	return maxi(1, int(sqrt(life_earned / 50.0)) + levels / 3)
+	return maxi(1, int(sqrt(life_xp / POINTS_XP)) + levels / 3)
+
+
+# --- 体の質 ---
+
+## 稼いだクレジットは周ごとに大きく変わるので、2倍ごとに1段階上げる（ADR-0032）
+static func quality_for(earned: float) -> int:
+	if earned < QUALITY_CREDITS:
+		return 0
+	return clampi(int(floor(log(earned / QUALITY_CREDITS) / log(2.0))), 0, QUALITY_MAX)
+
+
+## 前の周で稼いだクレジットで決まる体の質。第1周は0
+func last_quality() -> int:
+	return quality_for(chronicle.back().get("earned", 0.0)) if not chronicle.is_empty() else 0
+
+
+## 次の周に body_id の体で目覚めたときの体の質。汎用の体だけは、これまでの最高の体の質の半分を下回らない
+func next_quality(body_id: String) -> int:
+	var quality := last_quality()
+	if body_id == first_body():
+		var best := 0
+		for entry in chronicle:
+			best = maxi(best, quality_for(entry.get("earned", 0.0)))
+		quality = maxi(quality, best / 2)
+	return quality
+
+
+## 汎用の体のほかは、前の周の体の質が1以上のときだけ選べる
+func can_choose_body(body_id: String) -> bool:
+	return GameData.bodies.has(body_id) and (body_id == first_body() or last_quality() >= 1)
 
 
 ## fatal_event は周を終わらせたイベントのid、ending はたどり着いたエンディングのid。どちらも無ければ空
@@ -371,7 +409,7 @@ func _end_life(fatal_event := "", ending := "") -> void:
 
 ## body_id は次の周の体の種類。転生の画面で選ぶ（DOM-11）
 func rebirth(body_id: String) -> void:
-	if alive or not GameData.bodies.has(body_id):
+	if alive or not can_choose_body(body_id):
 		return
 	life_number += 1
 	_start_life(body_id)
@@ -391,6 +429,7 @@ func _start_life(body_id := "") -> void:
 	implants = implants.filter(func(id): return GameData.implants.get(id, {}).get("persistent", false))
 	credits = 0.0
 	life_earned = 0.0
+	life_xp = 0.0
 	durability = MAX_DURABILITY
 	age = 0.0
 	current_job = ""
@@ -401,6 +440,7 @@ func _start_life(body_id := "") -> void:
 	skill_xp = {}
 	alive = true
 	body = body_id if body_id != "" else first_body()
+	body_quality = next_quality(body)
 	var start_level := int(effect("start_level"))
 	for skill in GameData.skills:
 		skill_level[skill] = start_level
@@ -579,7 +619,7 @@ func save_game() -> void:
 		"version": SAVE_VERSION, "saved_at": Time.get_unix_time_from_system(),
 		"credits": credits, "life_earned": life_earned, "durability": durability, "age": age,
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
-		"implants": implants, "job_time": job_time, "alive": alive, "body": body, "pending_event": pending_event,
+		"implants": implants, "job_time": job_time, "alive": alive, "body": body, "body_quality": body_quality, "life_xp": life_xp, "pending_event": pending_event,
 		"last_deed": last_deed, "request": request, "request_done": request_done, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
 		"last_points_gained": last_points_gained, "last_request_bonus": last_request_bonus, "upgrades": upgrades,
 		"chronicle": chronicle, "fragments": fragments, "last_fragments": last_fragments,
@@ -608,6 +648,8 @@ func load_game() -> bool:
 	alive = data.get("alive", true)
 	# #36 より前の体は、どれも効果の無い最初の体だった
 	body = data.get("body", first_body())
+	body_quality = int(data.get("body_quality", 0))
+	life_xp = data.get("life_xp", 0.0)
 	pending_event = data.get("pending_event", "")
 	if not GameData.events.has(pending_event):
 		pending_event = ""

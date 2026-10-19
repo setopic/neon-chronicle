@@ -46,9 +46,11 @@ implemented_by:
 次の値は属性ではなく導出値である。
 
 ```
-周の終わりに得る記憶ポイント = max(1, floor(√(その周で稼いだクレジット ÷ 50)) + floor(スキルのレベルの合計 ÷ 3))
+周の終わりに得る記憶ポイント = max(1, floor(√(その周で得た経験の合計 ÷ 2)) + floor(スキルのレベルの合計 ÷ 3))
 永続強化の値段 = 最初の値段 × 値段の伸び ^ いまのレベル
 ```
+
+記憶ポイントの式には、稼いだクレジットを入れない。稼いだクレジットは、次の周の体の質に効く（[DOM-11](./dom-11-body-types.md)）。
 
 ジンの依頼を果たした周は、周の終わりに得る記憶ポイントに、依頼の上乗せが足される（[DOM-12](./dom-12-jin-requests.md)）。
 
@@ -95,6 +97,7 @@ implemented_by:
 このノードを参照しているノード
 
 - (decides) [ADR-0003 物語の文書を既定の種別で書く](../50-adr/adr-0003-story-docs-default-types.md)
+- (decides) [ADR-0032 体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す](../50-adr/adr-0032-body-quality-and-memory-software.md)
 - (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 - (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)

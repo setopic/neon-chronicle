@@ -91,6 +91,8 @@ func _pick_body() -> String:
 	var best := ""
 	var best_xp := -INF
 	for id in _data.order["bodies"]:
+		if not _game.can_choose_body(id):
+			continue
 		var xp: float = _data.bodies[id].get("effects", {}).get("xp", 0.0)
 		if xp > best_xp:
 			best = id
