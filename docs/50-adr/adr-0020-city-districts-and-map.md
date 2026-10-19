@@ -2,7 +2,7 @@
 id: ADR-0020
 type: adr
 title: 街を区画と3本の橋で分け、地図は設計文書の図に残す
-status: stable
+status: deprecated
 tags: [world]
 decides:
   - DOM-15
@@ -13,7 +13,7 @@ related: []
 # 街を区画と3本の橋で分け、地図は設計文書の図に残す
 
 - 日付: 2026-10-19
-- 状態: stable
+- 状態: deprecated（[ADR-0022](./adr-0022-city-map-in-game.md)が置き換えた）
 
 ## 背景
 
@@ -70,5 +70,9 @@ DOM-15に、区画とつながりの表、用語「縄張り」「屋台通り�
 `decides`: この決定が影響を与えるノード（ADR用）
 
 - [DOM-15 街の場所と勢力](../20-domain/dom-15-city-places-and-powers.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0022 街の地図を「街と人物」の画面にタブで出し、中枢サーバーは断片が戻るまで伏せる](./adr-0022-city-map-in-game.md)
 
 <!-- graph:auto:end -->
