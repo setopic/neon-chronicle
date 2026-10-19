@@ -630,6 +630,7 @@
     "chart.feud": "屋台通りの対立",
     "ui.upgrade_refund": "{upgrade}を選び直す（記憶ポイント {n} を戻す）",
     "log.upgrade_refund": "{upgrade}を外して、記憶ポイント{points}を戻した。",
+    "ui.rewind_locked": "エンディングに一度たどり着くと、選んだ段から話を選び直せるようになる。",
     "ui.rewind_note": "選んだ段から、話を選び直せる。選び直した段は、次からまた起きる。評判や経験は戻らない。",
     "ui.rewind": "{line}：{event}から選び直す",
     "log.rewind": "{event}から、話を選び直すことにした。",

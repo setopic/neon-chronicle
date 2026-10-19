@@ -331,9 +331,16 @@ func refund_upgrade(id: String) -> void:
 	_log("log.upgrade_refund", {"upgrade": id, "points": spent})
 
 
+## 話を選び直せるか。どれか1つのエンディングに一度でもたどり着いてから選び直せる（DOM-31、ADR-0050）
+func can_rewind_story() -> bool:
+	return not endings_reached().is_empty()
+
+
 ## 話を、from_event の段から選び直せるようにする。その段と、それより後の段の選択を話の進み具合から消す。
 ## 消した段は、次からまた起きうる。評判や経験など、選んだときに得たものはそのまま残す（DOM-31）
 func rewind_story(line: String, from_event: String) -> void:
+	if not can_rewind_story():
+		return
 	var stages := []
 	for id in GameData.order["events"]:
 		if story_line(GameData.events[id]) == line:

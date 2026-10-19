@@ -140,6 +140,7 @@ graph LR
     ADR-0047["ADR-0047<br/>話とエンディングの分岐図を、街と人物の画面の3つ目のタブに出す"]
     ADR-0048["ADR-0048<br/>話の段と永続強化の組を、いつでも選び直せるようにする"]
     ADR-0049["ADR-0049<br/>転生の画面とメインの画面を1280x720に収める"]
+    ADR-0050["ADR-0050<br/>話の選び直しを、エンディングにたどり着いてから使えるようにする"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -243,6 +244,9 @@ graph LR
   ADR-0048 -.->|decides| DOM-31
   ADR-0048 -.->|decides| DOM-05
   ADR-0049 -.->|decides| ARCH-01
+  ADR-0050 ==>|supersedes| ADR-0048
+  ADR-0050 -.->|decides| DOM-31
+  ADR-0050 -.->|decides| DOM-05
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -363,7 +367,7 @@ graph LR
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
-  class ADR-0004,ADR-0005,ADR-0006,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0024,ADR-0033 deprecated;
+  class ADR-0004,ADR-0005,ADR-0006,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0024,ADR-0033,ADR-0048 deprecated;
 ```
 
 <!-- graph:diagram:end -->

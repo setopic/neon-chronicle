@@ -36,6 +36,10 @@ func _process(_delta: float) -> bool:
 	_expect(not _chart.seen("core_server"), "エンディングにたどり着くまで、結末の行は伏せる")
 	_expect(_chart.custom_minimum_size.x > 0.0 and _chart.custom_minimum_size.y > 0.0, "図の大きさが決まる")
 	# 話を選び直すと、その段から後の選択だけが消える（DOM-31）
+	# エンディングにたどり着く前は選び直せない（ADR-0050）
+	_game.rewind_story("rei", "rei_2")
+	_expect(_game.character_choices.has("rei_2"), "エンディングにたどり着く前は、選び直せない")
+	_game.chronicle = [{"ending": "reclaim"}]
 	_game.rewind_story("rei", "rei_2")
 	_expect(_game.character_choices.has("rei_1") and not _game.character_choices.has("rei_2"), "選び直した段から後の選択だけが消える")
 	# 排他の組の永続強化は、払った記憶ポイントをすべて戻して選び直せる
