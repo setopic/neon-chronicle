@@ -29,7 +29,7 @@ implemented_by:
 
 | 人物 | 画面に出るところ |
 | --- | --- |
-| ミオ | 転生の画面のミオの一言と体の種類を選ぶ文、最初の周の目覚め、記憶の断片「白い部屋」「計画書」 |
+| ミオ | 転生の画面のミオの一言と体の種類を選ぶ文、最初の周の目覚め、記憶の断片「白い部屋」「計画書」、ミオの人物のイベント（[DOM-13](./dom-13-character-events.md)） |
 | ジン | 周の始まりのジンの依頼（[DOM-12](./dom-12-jin-requests.md)）、仕事を始めたときのログ、最初の周の目覚め、記憶の断片「名前」、ジンの人物のイベント（[DOM-13](./dom-13-character-events.md)） |
 | レイ | レイの人物のイベント（[DOM-13](./dom-13-character-events.md)） |
 | 九条 | まだ名前では出ない |
@@ -72,6 +72,7 @@ implemented_by:
 - (decides) [ADR-0009 生き直しを闇医者が乗っ取った企業の計画として説明し、4人の人物を置く](../50-adr/adr-0009-world-rationale-and-characters.md)
 - (decides) [ADR-0010 ミオの一言を転生の画面に出し、人物を目覚めと断片の文に入れる](../50-adr/adr-0010-characters-in-screen-text.md)
 - (decides) [ADR-0014 人物のイベントを1周に1段ずつ進め、前の段の選択で文と選択肢を変える](../50-adr/adr-0014-character-events-across-lives.md)
+- (decides) [ADR-0043 ミオにも3段の人物のイベントを持たせる](../50-adr/adr-0043-mio-character-events.md)
 - (depends_on) [DOM-11 体の種類](./dom-11-body-types.md)
 - (depends_on) [DOM-12 ジンの依頼](./dom-12-jin-requests.md)
 - (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)

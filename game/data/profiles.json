@@ -25,7 +25,9 @@
     ] },
     { "id": "mio", "notes": [
       { "id": "white_room", "fragment": "white_room" },
-      { "id": "project", "fragment": "project" }
+      { "id": "project", "fragment": "project" },
+      { "id": "clinic", "event": "mio_1" },
+      { "id": "chase", "event": "mio_3" }
     ] },
     { "id": "jin", "notes": [
       { "id": "old_friend", "fragment": "name" }

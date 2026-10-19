@@ -320,6 +320,38 @@
       ]
     },
     {
+      "id": "mio_1",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "character": "mio",
+      "choices": [
+        { "id": "help", "durability": -3, "xp": { "negotiation": 8 } },
+        { "id": "leave" }
+      ]
+    },
+    {
+      "id": "mio_2",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "character": "mio",
+      "fragment": "white_room",
+      "desc_by": "mio_1",
+      "choices": [
+        { "id": "ask", "xp": { "negotiation": 12 } },
+        { "id": "silent" }
+      ]
+    },
+    {
+      "id": "mio_3",
+      "jobs": ["hacker", "mercenary"],
+      "character": "mio",
+      "fragment": "project",
+      "desc_by": "mio_2",
+      "choices": [
+        { "id": "cover", "requires": { "hacking": 10 }, "durability": -8, "xp": { "hacking": 15 } },
+        { "id": "guard", "requires": { "combat": 10 }, "durability": -10, "xp": { "combat": 15 } },
+        { "id": "warn" }
+      ]
+    },
+    {
       "id": "core_server",
       "jobs": ["core_breach"],
       "choices": [

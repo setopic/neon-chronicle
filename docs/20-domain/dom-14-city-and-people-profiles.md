@@ -61,7 +61,7 @@ implemented_by:
 | [生まれから死まで](./dom-19-resident-life-course.md) | | |
 | [体の元の持ち主たち](./dom-25-body-former-owners.md) | | 元の持ち主ごとの話の2段目 |
 | 自分（主人公） | | 「契約書」「名前」「計画書」「中枢サーバー」 |
-| ミオ | | 「白い部屋」「計画書」 |
+| ミオ | | 「白い部屋」「計画書」、ミオの1段目と3段目 |
 | ジン | | 「名前」 |
 | レイ | レイの1段目 | レイの2段目。[被験体の出どころ](./dom-20-test-subjects-origin.md)の追記と、名簿の追記の2つ |
 
@@ -120,6 +120,7 @@ implemented_by:
 - (decides) [ADR-0036 橋を架けた技師たちの記録を、イベントと資料の追記で集める](../50-adr/adr-0036-bridge-engineers-records.md)
 - (decides) [ADR-0038 ザンダー・ファミリーと屋台組合の対立を、3段の勢力の話にする](../50-adr/adr-0038-stall-street-feud.md)
 - (decides) [ADR-0041 体の元の持ち主の記憶を、体ごとの2段の話にする](../50-adr/adr-0041-former-owner-memories.md)
+- (decides) [ADR-0043 ミオにも3段の人物のイベントを持たせる](../50-adr/adr-0043-mio-character-events.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 
 <!-- graph:auto:end -->

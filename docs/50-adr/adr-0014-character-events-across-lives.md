@@ -2,7 +2,7 @@
 id: ADR-0014
 type: adr
 title: 人物のイベントを1周に1段ずつ進め、前の段の選択で文と選択肢を変える
-status: stable
+status: deprecated
 tags: [loop, story]
 decides:
   - DOM-13
@@ -14,7 +14,7 @@ related: []
 # 人物のイベントを1周に1段ずつ進め、前の段の選択で文と選択肢を変える
 
 - 日付: 2026-10-18
-- 状態: stable
+- 状態: deprecated（[ADR-0043](./adr-0043-mio-character-events.md)が置き換えた）
 
 ## 背景
 
@@ -78,5 +78,9 @@ DOM-13を足し、DOM-10の「画面に出るところ」の表を直す。`game
 
 - [DOM-10 登場人物](../20-domain/dom-10-characters.md)
 - [DOM-13 人物のイベント](../20-domain/dom-13-character-events.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0043 ミオにも3段の人物のイベントを持たせる](./adr-0043-mio-character-events.md)
 
 <!-- graph:auto:end -->

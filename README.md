@@ -128,6 +128,7 @@ graph LR
     ADR-0040["ADR-0040<br/>体の種類ごとに元の持ち主を1人決め、その特性を持たせる"]
     ADR-0041["ADR-0041<br/>体の元の持ち主の記憶を、体ごとの2段の話にする"]
     ADR-0042["ADR-0042<br/>体の種類ごとに容量を持たせ、インプラントを外せるようにする"]
+    ADR-0043["ADR-0043<br/>ミオにも3段の人物のイベントを持たせる"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -215,6 +216,10 @@ graph LR
   ADR-0041 -.->|decides| DOM-25
   ADR-0041 -.->|decides| DOM-14
   ADR-0042 -.->|decides| DOM-26
+  ADR-0043 ==>|supersedes| ADR-0014
+  ADR-0043 -.->|decides| DOM-13
+  ADR-0043 -.->|decides| DOM-10
+  ADR-0043 -.->|decides| DOM-14
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -325,7 +330,7 @@ graph LR
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
-  class ADR-0005,ADR-0012,ADR-0013,ADR-0020,ADR-0022,ADR-0024 deprecated;
+  class ADR-0005,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0024 deprecated;
 ```
 
 <!-- graph:diagram:end -->
