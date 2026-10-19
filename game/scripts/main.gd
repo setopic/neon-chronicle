@@ -29,6 +29,7 @@ var _body_label: Label
 var _body_effects_label: Label
 var _effect_total_label: Label
 var _request_label: Label
+var _challenge_label: Label
 var _request_buttons := {}
 var _implant_buttons := {}
 var _rebirth_points_label: Label
@@ -227,6 +228,8 @@ func _build_right() -> Control:
 		button.pressed.connect(Game.accept_request.bind(id))
 		box.add_child(button)
 		_request_buttons[id] = button
+	_challenge_label = _label("", PINK, 15)
+	box.add_child(_challenge_label)
 
 	box.add_child(_section_title(tr("ui.implants")))
 	for id in GameData.order["implants"]:
@@ -289,6 +292,8 @@ func _build_rebirth() -> Control:
 	var gained := Loc.t("ui.points_gained", {"n": Game.last_points_gained})
 	if Game.last_request_bonus > 0:
 		gained += Loc.t("ui.request_bonus", {"n": Game.last_request_bonus})
+	if Game.last_challenge_bonus > 0:
+		gained += Loc.t("ui.challenge_bonus", {"n": Game.last_challenge_bonus})
 	box.add_child(_label(gained, PINK, 20))
 	box.add_child(_label(_fragment_progress(), DIM, 14))
 
@@ -330,6 +335,21 @@ func _build_rebirth() -> Control:
 	list.resized.connect(func(): scroll.scroll_vertical = int(list.size.y))
 
 	# 体の種類ごとに目覚めるボタンを置く。選ぶことと目覚めることを1回の操作にして、画面の高さを増やさない（ADR-0012）
+	# 縛りは目覚める前に選ぶので、体の種類のボタンの上に置く。選んだものは目覚めるボタンを押したときに使う（DOM-21）
+	if not GameData.order["challenges"].is_empty():
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		box.add_child(row)
+		row.add_child(_label(tr("ui.challenge_choice"), DIM, 14))
+		var picker := OptionButton.new()
+		picker.add_item(tr("ui.challenge_none"))
+		for id in GameData.order["challenges"]:
+			picker.add_item(Loc.t("ui.challenge_option", {"challenge": GameData.name_of("challenges", id),
+				"desc": GameData.desc_of("challenges", id),
+				"n": roundi(GameData.challenges[id].get("bonus", 0.0) * 100.0)}))
+		picker.select(GameData.order["challenges"].find(Game.next_challenge) + 1)
+		picker.item_selected.connect(_pick_challenge)
+		row.add_child(picker)
 	box.add_child(_label(tr("ui.body_choice"), DIM, 14))
 	var bodies := GridContainer.new()
 	bodies.columns = 4
@@ -461,6 +481,10 @@ func _refresh() -> void:
 	}, true)})
 	_request_label.text = _request_text()
 	_request_label.visible = _request_label.text != ""
+	_challenge_label.visible = Game.challenge != ""
+	if Game.challenge != "":
+		_challenge_label.text = Loc.t("ui.challenge", {"challenge": GameData.name_of("challenges", Game.challenge),
+			"state": tr("ui.challenge_broken" if Game.challenge_broken else "ui.challenge_keeping")})
 	for id in _request_buttons:
 		_request_buttons[id].visible = Game.alive and Game.request == ""
 	for id in _implant_buttons:
@@ -606,6 +630,11 @@ func _upgrade_group_text(id: String) -> String:
 		if other != id and GameData.upgrades[other].get("group", "") == group:
 			names.append(GameData.name_of("upgrades", other))
 	return "    " + Loc.t("ui.upgrade_group", {"names": tr("ui.list_sep").join(names)})
+
+
+## 縛りを選ぶ欄の i 番目。0は縛りなし
+func _pick_challenge(i: int) -> void:
+	Game.next_challenge = GameData.order["challenges"][i - 1] if i > 0 else ""
 
 
 func _signed(n: float) -> String:

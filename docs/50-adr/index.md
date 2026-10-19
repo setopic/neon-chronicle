@@ -51,6 +51,7 @@ tags: [index]
 - [ADR-0032 体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す](./adr-0032-body-quality-and-memory-software.md)
 - [ADR-0033 永続強化を増やし、どちらか一方しか取れない組を作る](./adr-0033-upgrade-groups.md)
 - [ADR-0034 ジンの依頼を2つ並べ、受けるものを選ばせる](./adr-0034-choose-jin-request.md)
+- [ADR-0035 転生のときに縛りを1つ選び、守り通せば記憶ポイントを上乗せする](./adr-0035-challenges.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

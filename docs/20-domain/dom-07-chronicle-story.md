@@ -83,5 +83,6 @@ implemented_by:
 - (decides) [ADR-0005 クロニクルの物語文を仕事と選択と倒れた理由から組み立てる](../50-adr/adr-0005-chronicle-story.md)
 - (decides) [ADR-0011 倒れた理由の句をイベントごとに書く](../50-adr/adr-0011-fall-phrase-per-event.md)
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
+- (depends_on) [DOM-21 縛りの周](./dom-21-challenges.md)
 
 <!-- graph:auto:end -->

@@ -75,6 +75,7 @@ graph LR
     DOM-18["DOM-18<br/>住民の階級と暮らし"]
     DOM-19["DOM-19<br/>住民の生まれから死まで"]
     DOM-20["DOM-20<br/>被験体の出どころ"]
+    DOM-21["DOM-21<br/>縛りの周"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -114,6 +115,7 @@ graph LR
     ADR-0032["ADR-0032<br/>体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す"]
     ADR-0033["ADR-0033<br/>永続強化を増やし、どちらか一方しか取れない組を作る"]
     ADR-0034["ADR-0034<br/>ジンの依頼を2つ並べ、受けるものを選ばせる"]
+    ADR-0035["ADR-0035<br/>転生のときに縛りを1つ選び、守り通せば記憶ポイントを上乗せする"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -191,6 +193,7 @@ graph LR
   ADR-0033 -.->|decides| DOM-09
   ADR-0034 ==>|supersedes| ADR-0013
   ADR-0034 -.->|decides| DOM-12
+  ADR-0035 -.->|decides| DOM-21
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -266,6 +269,10 @@ graph LR
   DOM-20 -->|depends_on| DOM-15
   DOM-20 -->|depends_on| DOM-18
   DOM-20 -->|depends_on| DOM-19
+  DOM-21 -->|depends_on| DOM-04
+  DOM-21 -->|depends_on| DOM-05
+  DOM-21 -->|depends_on| DOM-06
+  DOM-21 -->|depends_on| DOM-07
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04
