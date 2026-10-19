@@ -1,0 +1,4 @@
+#!/bin/sh
+# コミットメッセージに、セッションのコスト指数を足す（.claude/hooks/cost_index.py、META-05）。
+sh .claude/hooks/cost_index.sh trailer "$1" </dev/null
+exit 0
