@@ -1,0 +1,40 @@
+{
+  "profiles": [
+    { "id": "city", "notes": [
+      { "id": "project", "fragment": "project" },
+      { "id": "subjects", "fragment": "project" },
+      { "id": "core", "fragment": "core" }
+    ] },
+    { "id": "history" },
+    { "id": "engineers", "event": "old_plaque", "notes": [{ "id": "blueprints", "event": "city_blueprints" }, { "id": "substation", "event": "substation" }, { "id": "core", "fragment": "core" }] },
+    { "id": "companies" },
+    { "id": "food_company" },
+    { "id": "corp_district" },
+    { "id": "lower_city" },
+    { "id": "black_market" },
+    { "id": "zander", "notes": [{ "id": "feud", "event": "feud_3" }] },
+    { "id": "union", "notes": [{ "id": "feud", "event": "feud_3" }] },
+    { "id": "residents" },
+    { "id": "life_course" },
+    { "id": "owners", "notes": [{ "id": "standard", "event": "owner_standard_2" }, { "id": "labor", "event": "owner_labor_2" }, { "id": "combat", "event": "owner_combat_2" }, { "id": "prototype", "event": "owner_prototype_2" }] },
+    { "id": "self", "notes": [
+      { "id": "contract", "fragment": "contract" },
+      { "id": "hacker", "fragment": "name" },
+      { "id": "project", "fragment": "project" },
+      { "id": "core", "fragment": "core" }
+    ] },
+    { "id": "mio", "notes": [
+      { "id": "white_room", "fragment": "white_room" },
+      { "id": "project", "fragment": "project" },
+      { "id": "clinic", "event": "mio_1" },
+      { "id": "chase", "event": "mio_3" }
+    ] },
+    { "id": "jin", "notes": [
+      { "id": "old_friend", "fragment": "name" }
+    ] },
+    { "id": "rei", "event": "rei_1", "notes": [
+      { "id": "origin", "event": "rei_2" },
+      { "id": "list", "event": "rei_2" }
+    ] }
+  ]
+}

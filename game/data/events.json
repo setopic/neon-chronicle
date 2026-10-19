@@ -15,7 +15,8 @@
       "choices": [
         { "id": "pay", "credits": -20 },
         { "id": "talk", "requires": { "negotiation": 3 }, "xp": { "negotiation": 10 } },
-        { "id": "run", "durability": -8, "xp": { "combat": 6 } }
+        { "id": "run", "durability": -8, "xp": { "combat": 6 } },
+        { "id": "zander_name", "requires_reputation": { "zander": 3 } }
       ]
     },
     {
@@ -53,11 +54,346 @@
       ]
     },
     {
+      "id": "medicine",
+      "jobs": ["courier"],
+      "choices": [
+        { "id": "deliver", "credits": 10, "durability": -3, "xp": { "negotiation": 6 }, "reputation": { "union": 1 } },
+        { "id": "resell", "credits": 60, "reputation": { "union": -1 } },
+        { "id": "refuse" }
+      ]
+    },
+    {
+      "id": "ration_run",
+      "jobs": ["courier"],
+      "choices": [
+        { "id": "push", "credits": 30, "durability": -4, "reputation": { "union": -1 } },
+        { "id": "share", "credits": -15, "xp": { "negotiation": 6 }, "reputation": { "union": 1 } },
+        { "id": "detour", "credits": 10 }
+      ]
+    },
+    {
+      "id": "protection_run",
+      "jobs": ["courier"],
+      "choices": [
+        { "id": "deliver", "credits": 30, "reputation": { "zander": 1 } },
+        { "id": "return", "credits": -10, "xp": { "negotiation": 8 }, "reputation": { "union": 1, "zander": -1 } },
+        { "id": "pocket", "credits": 90, "durability": -12, "reputation": { "zander": -2 } }
+      ]
+    },
+    {
+      "id": "old_plaque",
+      "jobs": ["courier"],
+      "record": true,
+      "choices": [
+        { "id": "pry", "credits": 40, "durability": -5 },
+        { "id": "ask", "xp": { "negotiation": 6 } },
+        { "id": "leave" }
+      ]
+    },
+    {
+      "id": "data_buyer",
+      "jobs": ["hacker"],
+      "choices": [
+        { "id": "sell", "credits": 30, "reputation": { "valdeck": 1 } },
+        { "id": "shop", "requires": { "negotiation": 4 }, "credits": 80, "xp": { "negotiation": 8 }, "reputation": { "valdeck": -1 } },
+        { "id": "leak", "xp": { "hacking": 10 } },
+        { "id": "valdeck_regular", "requires_reputation": { "valdeck": 3 }, "credits": 150, "reputation": { "valdeck": 1 } }
+      ]
+    },
+    {
+      "id": "substation",
+      "jobs": ["mercenary"],
+      "record": true,
+      "choices": [
+        { "id": "cut", "credits": 40, "reputation": { "valdeck": 1, "union": -1 } },
+        { "id": "restore", "durability": -10, "xp": { "combat": 10 }, "reputation": { "union": 1, "valdeck": -1 } }
+      ]
+    },
+    {
+      "id": "city_blueprints",
+      "jobs": ["hacker"],
+      "record": true,
+      "choices": [
+        { "id": "sell", "credits": 60 },
+        { "id": "read", "requires": { "hacking": 3 }, "credits": 30, "xp": { "hacking": 10 } },
+        { "id": "wipe" }
+      ]
+    },
+    {
+      "id": "power_tap",
+      "jobs": ["hacker"],
+      "choices": [
+        { "id": "hide", "requires": { "hacking": 4 }, "credits": 15, "durability": -6, "xp": { "hacking": 10 }, "reputation": { "union": 1, "yomi": -1 } },
+        { "id": "sell", "credits": 60, "reputation": { "yomi": 1, "union": -1 } },
+        { "id": "refuse" },
+        { "id": "yomi_contact", "requires_reputation": { "yomi": 3 }, "credits": 40, "reputation": { "union": 1 } }
+      ]
+    },
+    {
+      "id": "fake_id",
+      "jobs": ["hacker"],
+      "choices": [
+        { "id": "remake", "requires": { "hacking": 3 }, "credits": 10, "durability": -4, "xp": { "hacking": 8 }, "reputation": { "union": 1 } },
+        { "id": "overcharge", "credits": 50, "reputation": { "union": -1 } },
+        { "id": "refuse" }
+      ]
+    },
+    {
+      "id": "debt_body",
+      "jobs": ["mercenary"],
+      "choices": [
+        { "id": "hand_over", "credits": 40, "reputation": { "zander": 1, "union": -1 } },
+        { "id": "leave", "requires": { "negotiation": 3 }, "durability": -6, "xp": { "negotiation": 8 }, "reputation": { "union": 1, "zander": -1 } },
+        { "id": "refuse" },
+        { "id": "union_pyre", "requires_reputation": { "union": 3 }, "credits": 40, "reputation": { "union": 1 } }
+      ]
+    },
+    {
+      "id": "grateful_stall",
+      "jobs": ["courier"],
+      "requires_trace": "medicine.deliver",
+      "choices": [
+        { "id": "accept", "durability": 8, "reputation": { "union": 1 } },
+        { "id": "decline", "xp": { "negotiation": 4 } }
+      ]
+    },
+    {
+      "id": "factory_payback",
+      "jobs": ["hacker"],
+      "requires_trace": "fake_id.remake",
+      "choices": [
+        { "id": "take", "credits": 60 },
+        { "id": "refuse", "reputation": { "union": 1 } }
+      ]
+    },
+    {
+      "id": "dark_street",
+      "jobs": ["hacker", "courier"],
+      "requires_trace": "power_tap.sell",
+      "choices": [
+        { "id": "rewire", "requires": { "hacking": 5 }, "durability": -4, "xp": { "hacking": 8 }, "reputation": { "union": 2 } },
+        { "id": "walk_past" }
+      ]
+    },
+    {
+      "id": "thief_hunt",
+      "jobs": ["courier"],
+      "requires_trace": "protection_run.pocket",
+      "choices": [
+        { "id": "bluff", "requires": { "negotiation": 5 }, "xp": { "negotiation": 8 } },
+        { "id": "run", "durability": -6 }
+      ]
+    },
+    {
+      "id": "feud_1",
+      "jobs": ["courier"],
+      "story": "feud",
+      "choices": [
+        { "id": "keep", "durability": -5, "xp": { "negotiation": 6 }, "reputation": { "union": 1, "zander": -1 } },
+        { "id": "hand", "credits": 40, "reputation": { "zander": 1, "union": -1 } }
+      ]
+    },
+    {
+      "id": "feud_2",
+      "jobs": ["mercenary", "courier"],
+      "story": "feud",
+      "desc_by": "feud_1",
+      "choices": [
+        { "id": "side_union", "requires_reputation": { "union": 3 }, "durability": -8, "xp": { "combat": 12 }, "reputation": { "union": 2, "zander": -2 } },
+        { "id": "side_zander", "requires_reputation": { "zander": 3 }, "credits": 80, "reputation": { "zander": 2, "union": -2 } },
+        { "id": "stay_out" }
+      ]
+    },
+    {
+      "id": "feud_3",
+      "jobs": ["mercenary", "courier"],
+      "story": "feud",
+      "desc_by": "feud_2",
+      "choices": [
+        { "id": "union_end", "requires_choice": "feud_2.side_union", "credits": 60, "reputation": { "union": 2 } },
+        { "id": "zander_end", "requires_choice": "feud_2.side_zander", "credits": 120, "reputation": { "zander": 2 } },
+        { "id": "truce", "requires": { "negotiation": 6 }, "xp": { "negotiation": 15 }, "reputation": { "union": 1, "zander": 1 } },
+        { "id": "walk_away" }
+      ]
+    },
+    {
+      "id": "owner_standard_1",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_standard",
+      "body": "standard",
+      "choices": [
+        { "id": "follow", "xp": { "negotiation": 6 } },
+        { "id": "shake" }
+      ]
+    },
+    {
+      "id": "owner_standard_2",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_standard",
+      "body": "standard",
+      "choices": [
+        { "id": "remember", "xp": { "negotiation": 10 } },
+        { "id": "let_go" }
+      ]
+    },
+    {
+      "id": "owner_labor_1",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_labor",
+      "body": "labor",
+      "choices": [
+        { "id": "follow", "xp": { "combat": 6 } },
+        { "id": "shake" }
+      ]
+    },
+    {
+      "id": "owner_labor_2",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_labor",
+      "body": "labor",
+      "choices": [
+        { "id": "remember", "xp": { "combat": 10 } },
+        { "id": "let_go" }
+      ]
+    },
+    {
+      "id": "owner_combat_1",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_combat",
+      "body": "combat",
+      "choices": [
+        { "id": "follow", "xp": { "combat": 6 } },
+        { "id": "shake" }
+      ]
+    },
+    {
+      "id": "owner_combat_2",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_combat",
+      "body": "combat",
+      "choices": [
+        { "id": "remember", "xp": { "combat": 10 } },
+        { "id": "let_go" }
+      ]
+    },
+    {
+      "id": "owner_prototype_1",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_prototype",
+      "body": "prototype",
+      "choices": [
+        { "id": "follow", "xp": { "hacking": 6 } },
+        { "id": "shake" }
+      ]
+    },
+    {
+      "id": "owner_prototype_2",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_prototype",
+      "body": "prototype",
+      "choices": [
+        { "id": "remember", "xp": { "hacking": 10 } },
+        { "id": "let_go" }
+      ]
+    },
+    {
+      "id": "rei_1",
+      "jobs": ["hacker"],
+      "character": "rei",
+      "choices": [
+        { "id": "listen", "xp": { "hacking": 6 } },
+        { "id": "refuse" }
+      ]
+    },
+    {
+      "id": "rei_2",
+      "jobs": ["hacker"],
+      "character": "rei",
+      "desc_by": "rei_1",
+      "choices": [
+        { "id": "help", "requires": { "hacking": 6 }, "credits": 40, "durability": -6, "xp": { "hacking": 12 } },
+        { "id": "decline" }
+      ]
+    },
+    {
+      "id": "rei_3",
+      "jobs": ["hacker"],
+      "character": "rei",
+      "desc_by": "rei_2",
+      "choices": [
+        { "id": "promise", "requires_choice": "rei_2.help", "xp": { "hacking": 15 } },
+        { "id": "alone", "xp": { "hacking": 5 } }
+      ]
+    },
+    {
+      "id": "jin_1",
+      "jobs": ["courier"],
+      "character": "jin",
+      "choices": [
+        { "id": "heed", "credits": -10 },
+        { "id": "ignore", "credits": 50, "durability": -10 }
+      ]
+    },
+    {
+      "id": "jin_2",
+      "jobs": ["mercenary"],
+      "character": "jin",
+      "desc_by": "jin_1",
+      "choices": [
+        { "id": "rescue", "durability": -12, "xp": { "combat": 12 } },
+        { "id": "leave" }
+      ]
+    },
+    {
+      "id": "jin_3",
+      "jobs": ["courier",  "mercenary"],
+      "character": "jin",
+      "fragment": "name",
+      "desc_by": "jin_2",
+      "choices": [
+        { "id": "tell", "xp": { "negotiation": 15 } },
+        { "id": "silent" }
+      ]
+    },
+    {
+      "id": "mio_1",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "character": "mio",
+      "choices": [
+        { "id": "help", "durability": -3, "xp": { "negotiation": 8 } },
+        { "id": "leave" }
+      ]
+    },
+    {
+      "id": "mio_2",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "character": "mio",
+      "fragment": "white_room",
+      "desc_by": "mio_1",
+      "choices": [
+        { "id": "ask", "xp": { "negotiation": 12 } },
+        { "id": "silent" }
+      ]
+    },
+    {
+      "id": "mio_3",
+      "jobs": ["hacker", "mercenary"],
+      "character": "mio",
+      "fragment": "project",
+      "desc_by": "mio_2",
+      "choices": [
+        { "id": "cover", "requires": { "hacking": 10 }, "durability": -8, "xp": { "hacking": 15 } },
+        { "id": "guard", "requires": { "combat": 10 }, "durability": -10, "xp": { "combat": 15 } },
+        { "id": "warn" }
+      ]
+    },
+    {
       "id": "core_server",
       "jobs": ["core_breach"],
       "choices": [
         { "id": "reclaim", "ending": "reclaim" },
-        { "id": "remain", "ending": "remain" }
+        { "id": "remain", "ending": "remain" },
+        { "id": "awaken", "ending": "awaken", "requires_story": "rei_3.promise", "requires_reputation": { "union": 5 } }
       ]
     }
   ]

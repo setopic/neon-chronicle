@@ -37,18 +37,18 @@ implemented_by:
 | 耐久の増減 | 小数 | | 負なら減らす |
 | 得る経験 | スキルごとの小数 | | 0以上 |
 
-エンディングにたどり着く選択肢の属性は、[DOM-08](./dom-08-memory-fragments-and-endings.md)が足している。
+エンディングにたどり着く選択肢の属性は、[DOM-08](./dom-08-memory-fragments-and-endings.md)が足している。人物との話が周をまたいで進むイベントの属性は、[DOM-13](./dom-13-character-events.md)が足している。
 
 周ごとの状態として、選ぶのを待っているイベントを持つ。待っているイベントが無いこともある。
 
 次の値は属性ではなく導出値である。
 
 ```
-イベントが起きる確率（1秒あたり） = 危険度 ÷ 90
+イベントが起きる基本の確率（1秒あたり） = 危険度 ÷ 90
 クレジットの増減 = いまの稼ぎ × 選択肢のクレジットの増減（秒）
 ```
 
-危険度が1の仕事では、平均90秒に1回起きる。起きたイベントは、いまの仕事で起きるイベントの中から、同じ確率で1つ選ぶ。
+基本の確率では、危険度が1の仕事で平均90秒に1回起きる。起きたイベントは、いまの仕事で起きるイベントの中から、同じ確率で1つ選ぶ。
 
 ## 不変条件
 
@@ -96,7 +96,14 @@ implemented_by:
 このノードを参照しているノード
 
 - (decides) [ADR-0004 イベントの起き方と結果を決まった量で表す](../50-adr/adr-0004-event-rules.md)
+- (decides) [ADR-0045 イベントの起きやすさに、緊張と耐久で波を付ける](../50-adr/adr-0045-event-waves.md)
 - (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
+- (depends_on) [DOM-10 登場人物](./dom-10-characters.md)
+- (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)
+- (depends_on) [DOM-15 街の場所と勢力](./dom-15-city-places-and-powers.md)
+- (depends_on) [DOM-21 縛りの周](./dom-21-challenges.md)
+- (depends_on) [DOM-22 勢力の評判](./dom-22-faction-reputation.md)
+- (depends_on) [DOM-28 イベントの波](./dom-28-event-waves.md)
 
 <!-- graph:auto:end -->

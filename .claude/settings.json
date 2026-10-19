@@ -1,0 +1,15 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "sh .claude/hooks/cost_index.sh statusline"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "sh .claude/hooks/cost_index.sh session-start" }
+        ]
+      }
+    ]
+  }
+}

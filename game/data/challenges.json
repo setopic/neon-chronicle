@@ -1,0 +1,7 @@
+{
+  "challenges": [
+    { "id": "no_implants", "rule": "implant", "bonus": 0.3 },
+    { "id": "one_job", "rule": "job", "bonus": 0.3 },
+    { "id": "no_safe", "rule": "choice", "bonus": 0.5 }
+  ]
+}

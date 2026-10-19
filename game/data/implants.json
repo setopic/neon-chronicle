@@ -1,7 +1,11 @@
 {
   "implants": [
-    { "id": "neural_chip", "cost": 100, "effects": { "xp": 0.5 } },
-    { "id": "bone_frame", "cost": 500, "effects": { "decay": -0.3 } },
-    { "id": "credit_spoofer", "cost": 2000, "effects": { "income": 0.5 }, "persistent": true }
+    { "id": "neural_chip", "cost": 100, "size": 1, "effects": { "xp": 0.5 } },
+    { "id": "pain_damper", "cost": 300, "size": 1, "effects": { "decay": -0.15 } },
+    { "id": "bone_frame", "cost": 500, "size": 2, "effects": { "decay": -0.3 } },
+    { "id": "market_eye", "cost": 600, "size": 1, "effects": { "income": 0.2 } },
+    { "id": "reflex_wiring", "cost": 800, "size": 2, "effects": { "income": 0.3, "decay": 0.1 } },
+    { "id": "memory_cortex", "cost": 1500, "size": 2, "effects": { "xp": 0.4 } },
+    { "id": "credit_spoofer", "cost": 2000, "size": 0, "effects": { "income": 0.5 }, "persistent": true }
   ]
 }

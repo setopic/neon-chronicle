@@ -1,12 +1,16 @@
-# GitHub Projectの着手日・終了日・実績を書き込む（META-05「見積もりと実績」）。
+# GitHub Projectの見積もり・着手日・終了日・実績を書き込む（META-05「見積もりと実績」）。
 #
 # 日付はClaudeを使わずに、GitHubの記録から決める。日付は日本時間で書く。
 #   終了日  issueを閉じた日
 #   着手日  そのissueを閉じるPR（本文に「Closes #番号」）が最初に作られた日。無ければ終了日と同じ日
 #
-# 実績だけは、作業したセッションの記録からしか出せない。そのため、issueを閉じるClaudeが
-# 「実績: 5,800」で始まるコメントを付け、ここでProjectに写す。
-# ClaudeのコメントはGitHubでは持ち主の名前で付くので、持ち主のコメントだけを拾う。
+# 実績も、issueを閉じたときにClaudeを使わずに決める。閉じたPRのコミットにある
+# 「Cost-Index: 5800 (session <id>)」の行（.claude/hooks/cost_index.py が足す）を拾い、
+# セッションごとの最大値を足す。値はそのコミットまでの累計だからである。行が1つも無ければ書かない。
+#
+# 見積もりは、GitHubの記録からは出せない。そのため、issueを立てたClaudeが「見積もり: 5,000」で
+# 始まるコメントを付け、ここでProjectに写す。「実績: 5,800」のコメントも同じように写すので、
+# 実績を手で直したいときに使う。ClaudeのコメントはGitHubでは持ち主の名前で付くので、持ち主のコメントだけを拾う。
 #
 # add-to-project.ymlと同じ設定を使う。どちらかが無ければ何もしない。
 #   Variables: PROJECT_URL         https://github.com/users/<持ち主>/projects/<番号>
@@ -32,7 +36,7 @@ jobs:
         (github.event_name == 'issues' && github.event.issue.state_reason == 'completed') ||
         (github.event_name == 'issue_comment' &&
          github.event.comment.author_association == 'OWNER' &&
-         startsWith(github.event.comment.body, '実績:'))
+         (startsWith(github.event.comment.body, '実績:') || startsWith(github.event.comment.body, '見積もり:')))
       )
     runs-on: ubuntu-latest
     env:
@@ -86,21 +90,38 @@ jobs:
 
           if [ "$GITHUB_EVENT_NAME" = issues ]; then
             # 参照しただけのPRは、そのissueに着手していないことがある。閉じたPRだけを見る。
-            first_pr=$(gh api graphql -F owner="${REPO%/*}" -F name="${REPO#*/}" -F n="$ISSUE" -f query='
+            prs=$(gh api graphql -F owner="${REPO%/*}" -F name="${REPO#*/}" -F n="$ISSUE" -f query='
               query($owner: String!, $name: String!, $n: Int!) {
                 repository(owner: $owner, name: $name) { issue(number: $n) {
-                  closedByPullRequestsReferences(first: 20, includeClosedPrs: true) { nodes { createdAt } }
+                  closedByPullRequestsReferences(first: 20, includeClosedPrs: true) { nodes {
+                    createdAt
+                    commits(last: 100) { nodes { commit { message } } }
+                  } }
                 } }
-              }' --jq '.data.repository.issue.closedByPullRequestsReferences.nodes[].createdAt' | sort | head -n1)
+              }' --jq '.data.repository.issue.closedByPullRequestsReferences.nodes')
+            first_pr=$(jq -r '.[].createdAt' <<<"$prs" | sort | head -n1)
             start=$(jst "${first_pr:-$CLOSED_AT}")
             end=$(jst "$CLOSED_AT")
             set_field 着手日 date "$start"
             set_field 終了日 date "$end"
             echo "着手日=$start 終了日=$end を $ISSUE_URL に書いた"
+
+            actual=$(jq -r '.[].commits.nodes[].commit.message' <<<"$prs" |
+              sed -nE 's/^Cost-Index: ([0-9]+) \(session ([^)]+)\)[[:space:]]*$/\2 \1/p' |
+              awk '{ if ($2 > m[$1]) m[$1] = $2 } END { s = 0; for (k in m) s += m[k]; print s }')
+            if [ "$actual" -gt 0 ]; then
+              set_field 実績 number "$actual"
+              echo "実績=$actual を $ISSUE_URL に書いた"
+            else
+              echo "Cost-Index の行が無いため、実績は書かない"
+            fi
           else
-            actual=$(tr -d '\r' <<<"$BODY" | sed -nE '1s/^実績:[[:space:]]*([0-9,]+)[[:space:]]*$/\1/p' | tr -d ',')
+            # 1行目が「実績: 5,800」か「見積もり: 5,000」で、欄の名前と値に分ける。
+            first=$(tr -d '\r' <<<"$BODY" | head -n1)
+            name=${first%%:*}
+            value=$(sed -nE 's/^[^:]+:[[:space:]]*([0-9,]+)[[:space:]]*$/\1/p' <<<"$first" | tr -d ',')
             # 形が崩れたコメントは、空欄で上書きせずに落とす。落ちたことは実行の一覧に残る。
-            [ -n "$actual" ] || { echo "::error::1行目から実績が読めない"; exit 1; }
-            set_field 実績 number "$actual"
-            echo "実績=$actual を $ISSUE_URL に書いた"
+            [ -n "$value" ] || { echo "::error::1行目から${name}が読めない"; exit 1; }
+            set_field "$name" number "$value"
+            echo "${name}=$value を $ISSUE_URL に書いた"
           fi
