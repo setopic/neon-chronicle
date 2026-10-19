@@ -87,5 +87,6 @@ implemented_by:
 
 - (decides) [ADR-0025 企業の時代より前の街を市とし、市の財政破綻で企業の時代が始まったことにする](../50-adr/adr-0025-city-history-before-corporations.md)
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
+- (depends_on) [DOM-18 住民の階級と暮らし](./dom-18-resident-classes.md)
 
 <!-- graph:auto:end -->

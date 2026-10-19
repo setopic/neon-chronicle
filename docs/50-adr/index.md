@@ -43,6 +43,7 @@ tags: [index]
 - [ADR-0024 下層街に、ギャングのザンダー一家と住人の屋台組合を置く](./adr-0024-lower-city-gang-and-union.md)
 - [ADR-0025 企業の時代より前の街を市とし、市の財政破綻で企業の時代が始まったことにする](./adr-0025-city-history-before-corporations.md)
 - [ADR-0026 屋台組合が、台帳でみかじめを割り振り、外から来た人に住む場所を割り振る](./adr-0026-union-ledger-and-housing.md)
+- [ADR-0027 企業の階級と下層街の稼ぎを決め、身元で橋の行き来を分ける](./adr-0027-resident-classes-and-identity.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

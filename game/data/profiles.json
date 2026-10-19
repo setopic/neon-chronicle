@@ -12,6 +12,7 @@
     { "id": "black_market" },
     { "id": "zander" },
     { "id": "union" },
+    { "id": "residents" },
     { "id": "self", "notes": [
       { "id": "contract", "fragment": "contract" },
       { "id": "hacker", "fragment": "name" },
