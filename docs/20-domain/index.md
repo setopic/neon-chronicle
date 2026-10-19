@@ -38,6 +38,7 @@ tags: [index]
 - [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
 - [DOM-21 縛りの周](./dom-21-challenges.md)
 - [DOM-22 勢力の評判](./dom-22-faction-reputation.md)
+- [DOM-23 屋台通りの対立](./dom-23-stall-street-feud.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
@@ -297,5 +298,12 @@ python -m tools.graph new --type domain --id DOM-02 --title "..." --slug some-sl
 | 評判 | 勢力の1つが主人公をどう見ているかを表す整数。転生しても残る | |
 | 評判の増減 | 選択肢を選んだときに、勢力の評判に足す値 | |
 | 評判の条件 | 選択肢を選ぶのに要る、勢力の評判の値 | |
+
+### [DOM-23 屋台通りの対立](./dom-23-stall-street-feud.md)
+
+| 用語 | 意味 | 旧称 |
+| --- | --- | --- |
+| 勢力の話のイベント | 人物の代わりに話のidを持ち、人物のイベントと同じく1つの周に1段ずつ進むイベント | |
+| 屋台通りの対立 | ザンダー・ファミリーと屋台組合が、屋台通りの保護料をめぐって争う、勢力の話の1つ | |
 
 <!-- graph:terms:end -->

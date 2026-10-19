@@ -55,8 +55,8 @@ implemented_by:
 | 企業区画 | | |
 | 下層街 | | |
 | 闇市場 | | |
-| ザンダー・ファミリー | | |
-| 屋台組合 | | |
+| ザンダー・ファミリー | | 屋台通りの対立の3段目 |
+| 屋台組合 | | 屋台通りの対立の3段目 |
 | [住民の暮らし](./dom-18-resident-classes.md) | | |
 | [生まれから死まで](./dom-19-resident-life-course.md) | | |
 | 自分（主人公） | | 「契約書」「名前」「計画書」「中枢サーバー」 |
@@ -117,6 +117,7 @@ implemented_by:
 - (decides) [ADR-0030 被験体は借金の契約で集め、使い捨ての体は闇市場の部品で組み立てる](../50-adr/adr-0030-test-subjects-and-bodies.md)
 - (decides) [ADR-0031 日本のやくざや的屋に寄った語を、欧米の街でも通じる語に改める](../50-adr/adr-0031-western-terms.md)
 - (decides) [ADR-0036 橋を架けた技師たちの記録を、イベントと資料の追記で集める](../50-adr/adr-0036-bridge-engineers-records.md)
+- (decides) [ADR-0038 ザンダー・ファミリーと屋台組合の対立を、3段の勢力の話にする](../50-adr/adr-0038-stall-street-feud.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 
 <!-- graph:auto:end -->
