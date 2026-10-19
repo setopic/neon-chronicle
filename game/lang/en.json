@@ -363,9 +363,9 @@
     "profile.food_company.name": "Lindholm Foods",
     "profile.food_company.desc": "A corporation that makes and sells synthetic food. In vats at factories on its own turf, it grows blocks of food from algae and cultured meat and supplies most of the shops in the city. The rations the Undercity food stalls stew and grill are this company's too. Real meat and vegetables only reach the Corporate District, and Undercity residents almost never taste them.",
     "profile.corp_district.name": "Corporate District",
-    "profile.corp_district.desc": "A district lined with corporate towers. Each corporation holds its own turf, guarded by its own private soldiers. A few bridges link it to the Undercity, watched by Montfort Security, and most mercenary work happens here. Employees and private soldiers wear their own corporation's uniforms and live in company housing inside its turf. This is the only district where real meat and vegetables are eaten. It is also the only district with running water. The city has no public transit, and employees ride in their own corporation's cars.",
+    "profile.corp_district.desc": "A district lined with corporate towers. Each corporation holds its own turf, guarded by its own private soldiers. Three bridges link it to the Undercity: Olsen Bridge, Villard Bridge and Hagen Bridge. They span the drainage canal at the foot of the cliff. Each is named after the person who built it, back before the corporations divided up the city, and Montfort Security now watches them all. Most mercenary work happens here. Employees and private soldiers wear their own corporation's uniforms and live in company housing inside its turf. This is the only district where real meat and vegetables are eaten. It is also the only district with running water. The city has no public transit, and employees ride in their own corporation's cars.",
     "profile.lower_city.name": "Undercity",
-    "profile.lower_city.desc": "A sunless city spread out beneath the towers of the Corporate District. Residents who belong to no corporation make a living running food stalls and repair shops. They live in shacks and containers stacked at the feet of the towers and under the bridges, and no one is their landlord. Their clothes are castoffs and synthetic fabric drifted down from the Corporate District, remade to fit. The food stalls stew and grill Lindholm Foods synthetic rations. The back-alley clinic is here, and so are the alleys couriers run through. Gangs hang around the alleys and take money from anyone passing. Power comes in through the substation at the north bridge, but most residents tap the grid with lines of their own. There is no running water; residents collect and filter rain, or buy clean water at the stalls. They get around on foot or by bike, and couriers carry the cargo.",
+    "profile.lower_city.desc": "A sunless city spread out beneath the towers of the Corporate District. Residents who belong to no corporation make a living running food stalls and repair shops. They live in shacks and containers stacked at the feet of the towers and under the bridges, and no one is their landlord. Their clothes are castoffs and synthetic fabric drifted down from the Corporate District, remade to fit. The food stalls stew and grill Lindholm Foods synthetic rations. The back-alley clinic is here, and so are the alleys couriers run through. Gangs hang around the alleys and take money from anyone passing. Power comes in through the substation at the foot of Olsen Bridge, but most residents tap the grid with lines of their own. There is no running water; residents collect and filter rain, or buy clean water at the stalls. They get around on foot or by bike, and couriers carry the cargo.",
     "profile.black_market.name": "Black Market",
     "profile.black_market.desc": "A market under the Undercity where stolen data, body parts, and implants change hands. Corporate buyers come and go here too, hiding who they are.",
     "profile.self.name": "Yourself",
@@ -403,8 +403,9 @@
     "map.deep.note": "Shacks and containers",
     "map.black_market": "Black Market",
     "map.black_market.note": "Under the Undercity",
-    "map.north_bridge": "North Bridge",
-    "map.middle_bridge": "Middle Bridge",
-    "map.south_bridge": "South Bridge"
+    "map.canal": "Drainage canal",
+    "map.olsen_bridge": "Olsen Bridge",
+    "map.villard_bridge": "Villard Bridge",
+    "map.hagen_bridge": "Hagen Bridge"
   }
 }

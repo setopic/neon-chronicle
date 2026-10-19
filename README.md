@@ -98,6 +98,7 @@ graph LR
     ADR-0020["ADR-0020<br/>街を区画と3本の橋で分け、地図は設計文書の図に残す"]
     ADR-0021["ADR-0021<br/>電気はヨミ・システムズ、水はリンドホルム食品が握り、街に公共の交通は置かない"]
     ADR-0022["ADR-0022<br/>街の地図を「街と人物」の画面にタブで出し、中枢サーバーは断片が戻るまで伏せる"]
+    ADR-0023["ADR-0023<br/>橋に人名を付け、地図を地形の分かる描き方にする"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -142,6 +143,9 @@ graph LR
   ADR-0021 -.->|decides| DOM-15
   ADR-0022 ==>|supersedes| ADR-0020
   ADR-0022 -.->|decides| DOM-16
+  ADR-0023 ==>|supersedes| ADR-0022
+  ADR-0023 -.->|decides| DOM-15
+  ADR-0023 -.->|decides| DOM-16
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -216,7 +220,7 @@ graph LR
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
-  class ADR-0005,ADR-0020 deprecated;
+  class ADR-0005,ADR-0020,ADR-0022 deprecated;
 ```
 
 <!-- graph:diagram:end -->

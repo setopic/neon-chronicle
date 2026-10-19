@@ -2,7 +2,7 @@
 id: ADR-0022
 type: adr
 title: 街の地図を「街と人物」の画面にタブで出し、中枢サーバーは断片が戻るまで伏せる
-status: stable
+status: deprecated
 tags: [world]
 decides:
   - DOM-16
@@ -14,7 +14,7 @@ related: []
 # 街の地図を「街と人物」の画面にタブで出し、中枢サーバーは断片が戻るまで伏せる
 
 - 日付: 2026-10-19
-- 状態: stable
+- 状態: deprecated（[ADR-0023](./adr-0023-bridge-names-and-terrain-map.md)が置き換えた）
 
 ## 背景
 
@@ -77,5 +77,9 @@ DOM-16を足し、地図の描くものと出る条件を書く。DOM-14の資�
 `decides`: この決定が影響を与えるノード（ADR用）
 
 - [DOM-16 街の地図](../20-domain/dom-16-city-map.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0023 橋に人名を付け、地図を地形の分かる描き方にする](./adr-0023-bridge-names-and-terrain-map.md)
 
 <!-- graph:auto:end -->
