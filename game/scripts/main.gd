@@ -118,7 +118,12 @@ func _build() -> void:
 	middle_scroll.add_child(middle)
 	middle.add_child(_build_left())
 	middle.add_child(_build_right())
-	main_column.add_child(_build_log())
+	# 仕事の様子は、ログの左に置く。体の状態の欄は周の始まりに行が増えるので、そこには置かない（ADR-0053）
+	var bottom := HBoxContainer.new()
+	bottom.add_theme_constant_override("separation", 10)
+	main_column.add_child(bottom)
+	bottom.add_child(_build_job_scene())
+	bottom.add_child(_build_log())
 	var implants_scroll := _scroll(lower)
 	implants_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	implants_scroll.add_child(_build_implants())
@@ -348,10 +353,21 @@ func _build_implants() -> Control:
 	return box.get_parent().get_parent()
 
 
+func _build_job_scene() -> Control:
+	var box := _panel(tr("ui.job_scene"))
+	var panel: Control = box.get_parent().get_parent()
+	panel.size_flags_horizontal = Control.SIZE_FILL
+	panel.custom_minimum_size = Vector2(300, 0)
+	var scene := JobScene.new()
+	scene.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	box.add_child(scene)
+	return panel
+
+
 func _build_log() -> Control:
 	var box := _panel(tr("ui.log"))
 	var panel: Control = box.get_parent().get_parent()
-	panel.size_flags_horizontal = Control.SIZE_FILL
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	panel.custom_minimum_size = Vector2(0, 180)
 	_log_label = RichTextLabel.new()
 	_log_label.scroll_following = true

@@ -11,6 +11,8 @@
     "ui.body": "体の状態",
     "ui.implants": "インプラント",
     "ui.log": "ログ",
+    "ui.job_scene": "仕事の様子",
+    "ui.job_scene_idle": "仕事を選ぶと、ここに様子が出る",
     "ui.level": "Lv {level}",
     "ui.job_income": "+{n} / 秒",
     "ui.requires": "必要：{items}",
