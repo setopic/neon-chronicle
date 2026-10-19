@@ -39,6 +39,7 @@ tags: [index]
 - [DOM-21 縛りの周](./dom-21-challenges.md)
 - [DOM-22 勢力の評判](./dom-22-faction-reputation.md)
 - [DOM-23 屋台通りの対立](./dom-23-stall-street-feud.md)
+- [DOM-24 仕事の区画と身元](./dom-24-job-districts-and-identity.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
@@ -305,5 +306,12 @@ python -m tools.graph new --type domain --id DOM-02 --title "..." --slug some-sl
 | --- | --- | --- |
 | 勢力の話のイベント | 人物の代わりに話のidを持ち、人物のイベントと同じく1つの周に1段ずつ進むイベント | |
 | 屋台通りの対立 | ザンダー・ファミリーと屋台組合が、屋台通りの保護料をめぐって争う、勢力の話の1つ | |
+
+### [DOM-24 仕事の区画と身元](./dom-24-job-districts-and-identity.md)
+
+| 用語 | 意味 | 旧称 |
+| --- | --- | --- |
+| 仕事の区画 | 仕事をする場所である区画。仕事ごとに1つ決まっている | |
+| 身元が要る仕事 | 橋の向こうの区画で働くので、偽の身元を持っているときだけ就ける仕事 | |
 
 <!-- graph:terms:end -->

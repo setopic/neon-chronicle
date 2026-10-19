@@ -2,6 +2,7 @@
   "jobs": [
     {
       "id": "courier",
+      "district": "stalls",
       "income": 1.0,
       "skill": "negotiation",
       "skill_bonus": 0.15,
@@ -11,6 +12,7 @@
     },
     {
       "id": "hacker",
+      "district": "black_market",
       "income": 5.0,
       "skill": "hacking",
       "skill_bonus": 0.15,
@@ -20,6 +22,8 @@
     },
     {
       "id": "mercenary",
+      "district": "waldeck",
+      "needs_identity": true,
       "income": 20.0,
       "skill": "combat",
       "skill_bonus": 0.15,
@@ -29,6 +33,7 @@
     },
     {
       "id": "core_breach",
+      "district": "yomi",
       "income": 50.0,
       "skill": "hacking",
       "skill_bonus": 0.15,

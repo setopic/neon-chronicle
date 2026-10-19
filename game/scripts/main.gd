@@ -31,6 +31,7 @@ var _effect_total_label: Label
 var _request_label: Label
 var _challenge_label: Label
 var _reputation_label: Label
+var _identity_button: Button
 var _request_buttons := {}
 var _implant_buttons := {}
 var _rebirth_points_label: Label
@@ -244,6 +245,11 @@ func _build_right() -> Control:
 		button.pressed.connect(Game.buy_implant.bind(id))
 		box.add_child(button)
 		_implant_buttons[id] = button
+	# 偽の身元は闇市場で買う。インプラントと同じくクレジットで買うので、同じ欄に置く（DOM-24）
+	_identity_button = Button.new()
+	_identity_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_identity_button.pressed.connect(Game.buy_identity)
+	box.add_child(_identity_button)
 
 	return box.get_parent().get_parent()
 
@@ -494,6 +500,9 @@ func _refresh() -> void:
 			"state": tr("ui.challenge_broken" if Game.challenge_broken else "ui.challenge_keeping")})
 	for id in _request_buttons:
 		_request_buttons[id].visible = Game.alive and Game.request == ""
+	if is_instance_valid(_identity_button):
+		_identity_button.text = tr("ui.identity_owned") if Game.identity else Loc.t("ui.identity_buy", {"n": Game.format_number(Game.IDENTITY_COST)})
+		_identity_button.disabled = Game.identity or not Game.alive or Game.credits < Game.IDENTITY_COST
 	for id in _implant_buttons:
 		var button: Button = _implant_buttons[id]
 		var data: Dictionary = GameData.implants[id]
@@ -547,6 +556,8 @@ func _job_requirement_text(job_id: String) -> String:
 		items.append(Loc.t("ui.requires_fragments", {
 			"n": Game.fragments.size(), "max": GameData.order["fragments"].size(),
 		}))
+	if job.get("needs_identity", false) and not Game.identity:
+		items.append(tr("ui.requires_identity"))
 	return _requirement_text(job.get("requires", {}), items)
 
 
