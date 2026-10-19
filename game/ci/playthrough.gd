@@ -78,11 +78,11 @@ func _pick_job() -> String:
 func _pick_choice() -> String:
 	var pick := ""
 	for choice in _game.event_choices():
-		if not _game.meets(choice.get("requires", {})):
+		if not _game.choice_open(choice):
 			continue
 		if choice.get("ending", "") == "reclaim":
 			return choice["id"]
-		if pick == "" or not choice.get("requires", {}).is_empty():
+		if pick == "" or _game.has_condition(choice):
 			pick = choice["id"]
 	return pick
 

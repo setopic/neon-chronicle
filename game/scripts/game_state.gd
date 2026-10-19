@@ -1,6 +1,6 @@
 extends Node
 
-## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-14、DOM-21。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
+## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-14、DOM-21、DOM-22。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
 
 signal life_ended
 signal life_started
@@ -25,11 +25,12 @@ const REQUEST_BONUS := 0.5  # 上乗せの割合を持たない依頼を果た�
 const POINTS_XP := 2.0  # 記憶ポイントの式で、その周で得た経験の合計を割る値。ADR-0032
 const QUALITY_MAX := 5  # 体の質の上限。ADR-0032
 const QUALITY_DECAY := 0.15  # 体の質1段階ごとに、基本の劣化を下げる割合
+const REPUTATION_LIMIT := 10  # 評判の上限。下限はこれを負にした値。DOM-22
 const QUALITY_CREDITS := 1000.0  # 体の質の式で、前の周で稼いだクレジットを割る値
 ## ログやクロニクルの引数のうち、id から表示名に変える項目
 const NAME_ARGS := {
 	"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades", "event": "events",
-	"fragment": "fragments", "ending": "endings", "body": "bodies", "challenge": "challenges",
+	"fragment": "fragments", "ending": "endings", "body": "bodies", "challenge": "challenges", "faction": "factions",
 }
 
 # --- 1人生の状態 ---
@@ -63,6 +64,7 @@ var last_request_bonus := 0  # last_points_gained のうち、ジンの依頼の
 var last_challenge_bonus := 0  # last_points_gained のうち、縛りの上乗せの分
 var next_challenge := ""  # 転生の画面で選んでいる縛り。セーブには書かない
 var upgrades := {}
+var reputation := {}  # 勢力のidごとの評判。転生しても残る。DOM-22
 var chronicle: Array = []  # 終わった周の記録 [{life, body, job, age, earned, points, deed, end, ending}]
 var fragments: Array = []  # 戻った記憶の断片のid。DOM-08
 var character_choices := {}  # 人物のイベントで選んだ選択肢 {イベントのid: 選択肢のid}。話の進み具合を表す。DOM-13
@@ -329,9 +331,32 @@ func event_choices() -> Array:
 ## 待っているイベントに、選ぶ条件があって、いま選べる選択肢があるか
 func _has_open_conditioned_choice() -> bool:
 	for c in event_choices():
-		if not c.get("requires", {}).is_empty() and meets(c["requires"]):
+		if has_condition(c) and choice_open(c):
 			return true
 	return false
+
+
+## 選ぶ条件（スキルのレベルか評判）を持つ選択肢か
+func has_condition(choice: Dictionary) -> bool:
+	return not choice.get("requires", {}).is_empty() or not choice.get("requires_reputation", {}).is_empty()
+
+
+## 選ぶ条件を満たしていて、いま選べる選択肢か。評判の条件は、その値以上（DOM-22）
+func choice_open(choice: Dictionary) -> bool:
+	if not meets(choice.get("requires", {})):
+		return false
+	var needs: Dictionary = choice.get("requires_reputation", {})
+	for id in needs:
+		if reputation.get(id, 0) < needs[id]:
+			return false
+	return true
+
+
+## 評判を変える。上限と下限で止める（DOM-22）
+func change_reputation(changes: Dictionary) -> void:
+	for id in changes:
+		if GameData.factions.has(id):
+			reputation[id] = clampi(reputation.get(id, 0) + int(changes[id]), -REPUTATION_LIMIT, REPUTATION_LIMIT)
 
 
 ## 選択肢のクレジットの増減。いまの稼ぎの何秒分かで書いてある
@@ -346,10 +371,10 @@ func choose(choice_id: String) -> void:
 	for c in event_choices():
 		if c.get("id") == choice_id:
 			choice = c
-	if choice.is_empty() or not meets(choice.get("requires", {})):
+	if choice.is_empty() or not choice_open(choice):
 		return
 	# 選ぶ条件のある選択肢を選べるのに、選ぶ条件の無い選択肢を選んだら、縛りを破ったことになる（DOM-21）
-	if choice.get("requires", {}).is_empty() and _has_open_conditioned_choice():
+	if not has_condition(choice) and _has_open_conditioned_choice():
 		break_challenge("choice")
 	var event_id := pending_event
 	pending_event = ""
@@ -370,6 +395,7 @@ func choose(choice_id: String) -> void:
 	var xp: Dictionary = choice.get("xp", {})
 	for skill in xp:
 		_add_xp(skill, maxf(0.0, xp[skill]))
+	change_reputation(choice.get("reputation", {}))
 	_check_request()
 	var before := durability
 	durability = clampf(durability + choice.get("durability", 0.0), 0.0, MAX_DURABILITY)
@@ -704,7 +730,7 @@ func save_game() -> void:
 		"implants": implants, "job_time": job_time, "alive": alive, "body": body, "body_quality": body_quality, "life_xp": life_xp, "pending_event": pending_event,
 		"last_deed": last_deed, "request_offers": request_offers, "request": request, "request_done": request_done,
 		"challenge": challenge, "challenge_broken": challenge_broken, "last_challenge_bonus": last_challenge_bonus, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
-		"last_points_gained": last_points_gained, "last_request_bonus": last_request_bonus, "upgrades": upgrades,
+		"last_points_gained": last_points_gained, "last_request_bonus": last_request_bonus, "upgrades": upgrades, "reputation": reputation,
 		"chronicle": chronicle, "fragments": fragments, "last_fragments": last_fragments,
 		"character_choices": character_choices, "logs": logs,
 	}
@@ -757,6 +783,8 @@ func load_game() -> bool:
 	challenge_broken = data.get("challenge_broken", false)
 	last_challenge_bonus = int(data.get("last_challenge_bonus", 0))
 	upgrades = _int_values(data.get("upgrades", {}))
+	# #84 より前のセーブには、評判が無い
+	reputation = _int_values(data.get("reputation", {}))
 	chronicle = data.get("chronicle", [])
 	for entry in chronicle:
 		if not entry.has("body"):
@@ -783,6 +811,7 @@ func reset_game() -> void:
 	last_challenge_bonus = 0
 	next_challenge = ""
 	upgrades = {}
+	reputation = {}
 	chronicle = []
 	fragments = []
 	last_fragments = []

@@ -37,6 +37,7 @@ tags: [index]
 - [DOM-19 住民の生まれから死まで](./dom-19-resident-life-course.md)
 - [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
 - [DOM-21 縛りの周](./dom-21-challenges.md)
+- [DOM-22 勢力の評判](./dom-22-faction-reputation.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
@@ -288,5 +289,13 @@ python -m tools.graph new --type domain --id DOM-02 --title "..." --slug some-sl
 | 縛り | 転生のときに自分に課す、その周の間に守る条件 | |
 | 縛りを破る | 縛りの守る条件に反する操作をすること | |
 | 縛りの上乗せ | 縛りを守り通した周の終わりに、記憶ポイントに足す量 | |
+
+### [DOM-22 勢力の評判](./dom-22-faction-reputation.md)
+
+| 用語 | 意味 | 旧称 |
+| --- | --- | --- |
+| 評判 | 勢力の1つが主人公をどう見ているかを表す整数。転生しても残る | |
+| 評判の増減 | 選択肢を選んだときに、勢力の評判に足す値 | |
+| 評判の条件 | 選択肢を選ぶのに要る、勢力の評判の値 | |
 
 <!-- graph:terms:end -->

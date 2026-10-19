@@ -195,5 +195,6 @@ flowchart TB
 - (depends_on) [DOM-18 住民の階級と暮らし](./dom-18-resident-classes.md)
 - (depends_on) [DOM-19 住民の生まれから死まで](./dom-19-resident-life-course.md)
 - (depends_on) [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
+- (depends_on) [DOM-22 勢力の評判](./dom-22-faction-reputation.md)
 
 <!-- graph:auto:end -->

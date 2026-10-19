@@ -30,6 +30,7 @@ var _body_effects_label: Label
 var _effect_total_label: Label
 var _request_label: Label
 var _challenge_label: Label
+var _reputation_label: Label
 var _request_buttons := {}
 var _implant_buttons := {}
 var _rebirth_points_label: Label
@@ -230,6 +231,10 @@ func _build_right() -> Control:
 		_request_buttons[id] = button
 	_challenge_label = _label("", PINK, 15)
 	box.add_child(_challenge_label)
+	# 評判は周をまたいで残るので、周の状態と並べて出す。0の勢力は出さない（DOM-22）
+	_reputation_label = _label("", DIM, 14)
+	_reputation_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(_reputation_label)
 
 	box.add_child(_section_title(tr("ui.implants")))
 	for id in GameData.order["implants"]:
@@ -481,6 +486,8 @@ func _refresh() -> void:
 	}, true)})
 	_request_label.text = _request_text()
 	_request_label.visible = _request_label.text != ""
+	_reputation_label.text = _reputation_text()
+	_reputation_label.visible = _reputation_label.text != ""
 	_challenge_label.visible = Game.challenge != ""
 	if Game.challenge != "":
 		_challenge_label.text = Loc.t("ui.challenge", {"challenge": GameData.name_of("challenges", Game.challenge),
@@ -513,11 +520,11 @@ func _refresh() -> void:
 		if button == null:
 			continue
 		var parts := [tr("event.%s.%s.name" % [Game.pending_event, choice["id"]])]
-		if Game.meets(choice.get("requires", {})):
+		if Game.choice_open(choice):
 			parts.append(_choice_effects(choice))
 			button.disabled = false
 		else:
-			parts.append(_requirement_text(choice.get("requires", {})))
+			parts.append(_requirement_text(choice.get("requires", {}), _reputation_items(choice.get("requires_reputation", {}))))
 			button.disabled = true
 		button.text = "    ".join(parts)
 	if is_instance_valid(_rebirth_points_label):
@@ -601,6 +608,9 @@ func _choice_effects(choice: Dictionary) -> String:
 	var xp: Dictionary = choice.get("xp", {})
 	for skill in xp:
 		parts.append(Loc.t("ui.effect_xp", {"skill": GameData.name_of("skills", skill), "n": _signed(xp[skill])}))
+	var changes: Dictionary = choice.get("reputation", {})
+	for id in changes:
+		parts.append(Loc.t("ui.effect_reputation", {"faction": GameData.name_of("factions", id), "n": _signed(changes[id])}))
 	return " ".join(parts) if not parts.is_empty() else tr("ui.effect_none")
 
 
@@ -630,6 +640,24 @@ func _upgrade_group_text(id: String) -> String:
 		if other != id and GameData.upgrades[other].get("group", "") == group:
 			names.append(GameData.name_of("upgrades", other))
 	return "    " + Loc.t("ui.upgrade_group", {"names": tr("ui.list_sep").join(names)})
+
+
+## 評判の条件（{勢力のid: 値}）を、選ぶ条件の文に並べる項目にする
+func _reputation_items(needs: Dictionary) -> PackedStringArray:
+	var items := PackedStringArray()
+	for id in needs:
+		items.append(Loc.t("ui.reputation_at", {"faction": GameData.name_of("factions", id), "n": int(needs[id])}))
+	return items
+
+
+## 0でない評判を、勢力の並んだ順に1行にする。どれも0なら空
+func _reputation_text() -> String:
+	var items := PackedStringArray()
+	for id in GameData.order["factions"]:
+		var n: int = Game.reputation.get(id, 0)
+		if n != 0:
+			items.append(Loc.t("ui.reputation_item", {"faction": GameData.name_of("factions", id), "n": _signed(n)}))
+	return Loc.t("ui.reputation", {"items": tr("ui.list_sep").join(items)}) if not items.is_empty() else ""
 
 
 ## 縛りを選ぶ欄の i 番目。0は縛りなし
