@@ -4,6 +4,7 @@
       { "id": "project", "fragment": "project" },
       { "id": "core", "fragment": "core" }
     ] },
+    { "id": "history" },
     { "id": "companies" },
     { "id": "food_company" },
     { "id": "corp_district" },
