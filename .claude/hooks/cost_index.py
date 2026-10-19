@@ -6,7 +6,11 @@ Claudeを通さずに実績を出すための仕組みで、2つの場面で呼�
                  .git/claude-sessions/<セッションid> に残す。あわせて core.hooksPath を
                  .githooks に向け、コミットのたびに下の trailer が回るようにする
   trailer <file> .githooks/prepare-commit-msg。そのセッションのここまでの消費を
-                 「Cost-Index: <値> (session <id>)」としてコミットメッセージに足す
+                 「Cost-Index: <値> (session <id>)」としてコミットメッセージに足す。
+                 statuslineが残した使用率が新しければ、「Usage:」の行も足す
+  statusline     Claude Codeのステータスライン。標準入力のJSONから5時間と週の使用率を取って
+                 表示し、.git/claude-sessions/usage.json に残す。ProとMaxのプランで、
+                 ステータスラインを描く画面（ターミナルのclaude）のときだけ値が来る
 
 issueが閉じると、project-record.ymlが閉じたPRのコミットからこの行を拾い、
 セッションごとの最大値を足してProjectの「実績」に書く。
@@ -19,6 +23,8 @@ import os
 import re
 import subprocess
 import sys
+import time
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # token_log.pyと同じ重み（META-05の表）。
@@ -27,6 +33,11 @@ MODEL_WEIGHTS = (("opus", 5), ("fable", 5), ("sonnet", 3), ("haiku", 1))
 CACHE_5M_WEIGHT = 1.25
 CACHE_1H_WEIGHT = 2
 TRAILER = "Cost-Index"
+USAGE_TRAILER = "Usage"
+# これより古い使用率は、コミットの時点の値とみなさない。ステータスラインは応答のたびに書き直される。
+USAGE_MAX_AGE = 600
+JST = timezone(timedelta(hours=9))
+WINDOWS = (("five_hour", "5h"), ("seven_day", "7d"))
 
 
 def git(*args):
@@ -100,6 +111,37 @@ def cost_index(transcript):
     return round(total / 1000)
 
 
+def statusline():
+    data = json.loads(sys.stdin.buffer.read().decode("utf-8") or "{}")
+    limits = data.get("rate_limits") or {}
+    shown = [(label, limits[key]) for key, label in WINDOWS if isinstance(limits.get(key), dict)]
+    if not shown:
+        return
+    print("  ".join(f"{label} {w.get('used_percentage', 0):g}%" for label, w in shown))
+    d = sessions_dir()
+    d.mkdir(exist_ok=True)
+    (d / "usage.json").write_text(
+        json.dumps({"at": time.time(), "rate_limits": limits}), encoding="utf-8", newline="\n"
+    )
+
+
+def usage_line():
+    """「5h 23% (resets 2026-10-19T14:00+09:00), 7d 41% (resets ...)」。新しい記録が無ければNone。"""
+    path = sessions_dir() / "usage.json"
+    if not path.is_file():
+        return None
+    saved = json.loads(path.read_text(encoding="utf-8"))
+    if time.time() - saved.get("at", 0) > USAGE_MAX_AGE:
+        return None
+    parts = []
+    for key, label in WINDOWS:
+        w = saved["rate_limits"].get(key)
+        if isinstance(w, dict) and w.get("used_percentage") is not None:
+            resets = datetime.fromtimestamp(w["resets_at"], JST).strftime("%Y-%m-%dT%H:%M+09:00")
+            parts.append(f"{label} {w['used_percentage']:g}% (resets {resets})")
+    return ", ".join(parts) or None
+
+
 def trailer(message_file):
     session, transcript = current_session()
     if not session:
@@ -108,9 +150,14 @@ def trailer(message_file):
     if not value:
         return
     path = Path(message_file)
-    text = re.sub(rf"^{TRAILER}: .*\n?", "", path.read_text(encoding="utf-8"), flags=re.M)  # amendのときは書き直す
+    # amendのときは書き直す
+    text = re.sub(rf"^({TRAILER}|{USAGE_TRAILER}): .*\n?", "", path.read_text(encoding="utf-8"), flags=re.M)
+    lines = [f"{TRAILER}: {value} (session {session})"]
+    usage = usage_line()
+    if usage:
+        lines.append(f"{USAGE_TRAILER}: {usage}")
     out = subprocess.run(
-        ["git", "interpret-trailers", "--trailer", f"{TRAILER}: {value} (session {session})"],
+        ["git", "interpret-trailers", *[a for line in lines for a in ("--trailer", line)]],
         input=text, capture_output=True, text=True, encoding="utf-8",
     )
     if out.returncode == 0:
@@ -123,5 +170,7 @@ if __name__ == "__main__":
             session_start()
         elif sys.argv[1:2] == ["trailer"] and len(sys.argv) > 2:
             trailer(sys.argv[2])
+        elif sys.argv[1:2] == ["statusline"]:
+            statusline()
     except Exception as e:  # 実績のためにコミットを止めない
         print(f"cost_index: {e}", file=sys.stderr)
