@@ -70,5 +70,6 @@ implemented_by:
 - (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
 - (depends_on) [DOM-19 住民の生まれから死まで](./dom-19-resident-life-course.md)
 - (depends_on) [DOM-21 縛りの周](./dom-21-challenges.md)
+- (depends_on) [DOM-26 体の容量とインプラントの取り外し](./dom-26-body-capacity.md)
 
 <!-- graph:auto:end -->

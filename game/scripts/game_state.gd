@@ -1,6 +1,6 @@
 extends Node
 
-## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-14、DOM-21〜DOM-24。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
+## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-14、DOM-21〜DOM-26。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
 
 signal life_ended
 signal life_started
@@ -234,6 +234,14 @@ func _add_xp(skill: String, amount: float) -> void:
 
 # --- インプラントと永続強化 ---
 
+## 組み込んだインプラントを外す。払ったクレジットは戻らない（DOM-26）
+func remove_implant(id: String) -> void:
+	if not alive or not implants.has(id):
+		return
+	implants.erase(id)
+	_log("log.implant_removed", {"implant": id})
+
+
 ## 闇市場で偽の身元を買う。周の終わりまで持ち、次の周には持ち越さない（DOM-24）
 func buy_identity() -> void:
 	if not alive or identity or credits < IDENTITY_COST:
@@ -248,9 +256,27 @@ func implant_cost(id: String) -> float:
 	return GameData.implants.get(id, {}).get("cost", 0.0) * maxf(0.5, 1.0 + effect("implant_cost"))
 
 
+## いまの体の容量。容量を持たない体の種類（MODで足したものなど）は、上限を設けない（DOM-26）
+func capacity() -> int:
+	return int(GameData.bodies.get(body, {}).get("capacity", 99))
+
+
+## 組み込んでいるインプラントの大きさの合計
+func implant_load() -> int:
+	var total := 0
+	for id in implants:
+		total += int(GameData.implants.get(id, {}).get("size", 1))
+	return total
+
+
+## 体の容量に収まるか。容量を超えるインプラントは組み込めない（DOM-26）
+func implant_fits(id: String) -> bool:
+	return implant_load() + int(GameData.implants.get(id, {}).get("size", 1)) <= capacity()
+
+
 func buy_implant(id: String) -> void:
 	var cost := implant_cost(id)
-	if not alive or implants.has(id) or credits < cost:
+	if not alive or implants.has(id) or credits < cost or not implant_fits(id):
 		return
 	credits -= cost
 	implants.append(id)

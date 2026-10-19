@@ -1,8 +1,8 @@
 {
   "bodies": [
-    { "id": "standard", "decay": 0.4, "effects": {}, "trait_effects": { "xp_negotiation": 0.2 } },
-    { "id": "labor", "decay": 0.3, "effects": { "xp": -0.1 }, "trait_effects": { "income": 0.1 } },
-    { "id": "combat", "decay": 0.5, "effects": { "income": 0.8 }, "trait_effects": { "xp_combat": 0.3 } },
-    { "id": "prototype", "decay": 0.5, "effects": { "xp": 0.6 }, "trait_effects": { "xp_hacking": 0.3 } }
+    { "id": "standard", "decay": 0.4, "capacity": 3, "effects": {}, "trait_effects": { "xp_negotiation": 0.2 } },
+    { "id": "labor", "decay": 0.3, "capacity": 4, "effects": { "xp": -0.1 }, "trait_effects": { "income": 0.1 } },
+    { "id": "combat", "decay": 0.5, "capacity": 5, "effects": { "income": 0.8 }, "trait_effects": { "xp_combat": 0.3 } },
+    { "id": "prototype", "decay": 0.5, "capacity": 2, "effects": { "xp": 0.6 }, "trait_effects": { "xp_hacking": 0.3 } }
   ]
 }
