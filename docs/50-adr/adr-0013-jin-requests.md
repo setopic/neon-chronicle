@@ -2,7 +2,7 @@
 id: ADR-0013
 type: adr
 title: 周の始まりにジンの依頼を1つ示し、果たせば記憶ポイントを上乗せする
-status: stable
+status: deprecated
 tags: [loop, story]
 decides:
   - DOM-12
@@ -13,7 +13,7 @@ related: []
 # 周の始まりにジンの依頼を1つ示し、果たせば記憶ポイントを上乗せする
 
 - 日付: 2026-10-18
-- 状態: stable
+- 状態: deprecated（[ADR-0034](./adr-0034-choose-jin-request.md)が置き換えた）
 
 ## 背景
 
@@ -76,5 +76,9 @@ DOM-12を足し、依頼の値を`game/data/requests.json`に置く。言語フ�
 `decides`: この決定が影響を与えるノード（ADR用）
 
 - [DOM-12 ジンの依頼](../20-domain/dom-12-jin-requests.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0034 ジンの依頼を2つ並べ、受けるものを選ばせる](./adr-0034-choose-jin-request.md)
 
 <!-- graph:auto:end -->

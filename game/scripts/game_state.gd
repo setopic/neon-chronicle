@@ -21,7 +21,7 @@ const LOW_DURABILITY := 25.0
 const MAX_LOGS := 50
 const EVENT_INTERVAL := 90.0  # 危険度1の仕事で、イベントが起きる平均の間隔（秒）。DOM-06
 const DEED_XP := 0.02  # クロニクルに残った選択1種類あたりの経験の増え方。DOM-07
-const REQUEST_BONUS := 0.5  # ジンの依頼を果たした周に、記憶ポイントへ上乗せする割合。ADR-0013
+const REQUEST_BONUS := 0.5  # 上乗せの割合を持たない依頼を果たした周に、記憶ポイントへ上乗せする割合。ADR-0034
 const POINTS_XP := 2.0  # 記憶ポイントの式で、その周で得た経験の合計を割る値。ADR-0032
 const QUALITY_MAX := 5  # 体の質の上限。ADR-0032
 const QUALITY_DECAY := 0.15  # 体の質1段階ごとに、基本の劣化を下げる割合
@@ -48,7 +48,8 @@ var body_quality := 0  # その周の体の質。ADR-0032
 var life_xp := 0.0  # その周で得た経験の合計。記憶ポイントの式に入る
 var pending_event := ""  # 待っているイベントのid。無いときは空
 var last_deed := ""  # 最後に選んだ選択肢（"<イベント>.<選択肢>"）。周を終わらせた選択は入れない
-var request := ""  # その周のジンの依頼のid。示せる依頼が無いときは空。DOM-12
+var request_offers: Array = []  # その周に並べたジンの依頼のid。0〜2個。DOM-12
+var request := ""  # その周に受けた依頼のid。まだ受けていないときは空
 var request_done := false
 var met_characters: Array = []  # その周に人物のイベントが起きた人物。1つの周で進む話は、人物ごとに1段まで。DOM-13
 
@@ -415,7 +416,8 @@ func _end_life(fatal_event := "", ending := "") -> void:
 	alive = false
 	pending_event = ""
 	last_points_gained = points_for_life()
-	last_request_bonus = maxi(1, roundi(last_points_gained * REQUEST_BONUS)) if request_done else 0
+	var bonus: float = GameData.requests.get(request, {}).get("bonus", REQUEST_BONUS)
+	last_request_bonus = maxi(1, roundi(last_points_gained * bonus)) if request_done else 0
 	last_points_gained += last_request_bonus
 	memory_points += last_points_gained
 	chronicle.append({
@@ -445,7 +447,8 @@ func first_body() -> String:
 
 func _start_life(body_id := "") -> void:
 	# 依頼は前の周の終わりのスキルのレベルで決めるので、スキルを戻す前に選ぶ。第1周には前の周が無い
-	request = pick_request(skill_level if life_number > 1 else {})
+	request_offers = pick_requests(skill_level if life_number > 1 else {})
+	request = ""
 	request_done = false
 	met_characters = []
 	implants = implants.filter(func(id): return GameData.implants.get(id, {}).get("persistent", false))
@@ -469,23 +472,34 @@ func _start_life(body_id := "") -> void:
 		skill_level[skill] = start_level
 		skill_xp[skill] = 0.0
 	_log("log.awaken_first" if life_number == 1 else "log.awaken", {"life": life_number, "body": body})
-	if request != "":
-		_log("request.%s.offer" % request, request_args(request))
+	for id in request_offers:
+		_log("request.%s.offer" % id, request_args(id))
 	life_started.emit()
 
 
 # --- ジンの依頼 ---
 
-## 示す条件を前の周の終わりのスキルのレベル（levels）が満たす依頼を、周の番号で順に回す。乱数は使わない（ADR-0013）
-func pick_request(levels: Dictionary) -> String:
+## 示す条件を前の周の終わりのスキルのレベル（levels）が満たす依頼を、周の番号で順に回し、2つまで並べる。
+## 2つめは1つめの次の依頼。乱数は使わない（ADR-0034）
+func pick_requests(levels: Dictionary) -> Array:
 	var candidates := []
 	for id in GameData.order["requests"]:
 		var requires: Dictionary = GameData.requests[id].get("requires", {})
 		if requires.keys().all(func(skill): return levels.get(skill, 0) >= requires[skill]):
 			candidates.append(id)
-	if candidates.is_empty():
-		return ""
-	return candidates[(life_number - 1) % candidates.size()]
+	var offers := []
+	for i in mini(2, candidates.size()):
+		offers.append(candidates[(life_number - 1 + i) % candidates.size()])
+	return offers
+
+
+## 並べた依頼のうち1つを受ける。受けたあとは周の終わりまで変わらない。進み具合は周の始まりから数える（ADR-0034）
+func accept_request(id: String) -> void:
+	if not alive or request != "" or not request_offers.has(id):
+		return
+	request = id
+	_log("log.request_accepted")
+	_check_request()
 
 
 ## 依頼の中身を、ログと画面の文に差し込む引数にする。時間は分で書くので、秒は60で割る
@@ -643,7 +657,7 @@ func save_game() -> void:
 		"credits": credits, "life_earned": life_earned, "durability": durability, "age": age,
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
 		"implants": implants, "job_time": job_time, "alive": alive, "body": body, "body_quality": body_quality, "life_xp": life_xp, "pending_event": pending_event,
-		"last_deed": last_deed, "request": request, "request_done": request_done, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
+		"last_deed": last_deed, "request_offers": request_offers, "request": request, "request_done": request_done, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
 		"last_points_gained": last_points_gained, "last_request_bonus": last_request_bonus, "upgrades": upgrades,
 		"chronicle": chronicle, "fragments": fragments, "last_fragments": last_fragments,
 		"character_choices": character_choices, "logs": logs,
@@ -682,6 +696,8 @@ func load_game() -> bool:
 	if not GameData.requests.has(request):
 		request = ""
 	request_done = data.get("request_done", false)
+	# #81 より前のセーブは、依頼を1つだけ示していた。示した依頼は受けたものとして扱う
+	request_offers = data.get("request_offers", [request] if request != "" else []).filter(func(id): return GameData.requests.has(id))
 	# #38 より前のセーブには、人物のイベントが無い
 	met_characters = data.get("met_characters", [])
 	life_number = int(data.get("life_number", 1))
