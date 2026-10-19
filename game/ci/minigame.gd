@@ -52,6 +52,7 @@ func _process(_delta: float) -> bool:
 
 	_check_hacking()
 	_check_courier()
+	_check_mercenary()
 
 	DirAccess.remove_absolute(SAVE_PATH)
 	print("NG" if _failed else "OK: ミニゲームの報酬は二重に入らない")
@@ -82,6 +83,21 @@ func _check_courier() -> void:
 		for key in game.solution:
 			game.move(key)
 		_expect(scores.size() == 1 and scores[0] >= 0.5, "運び屋の地図は、見つけた手で届けられる（%s）" % [scores])
+		game.free()
+
+
+## 傭兵のミニゲームは、顔を出した敵をすぐに撃てば度合いが1になり、何もしなければ0になる（ADR-0057）
+func _check_mercenary() -> void:
+	for quick in [true, false]:
+		var game: MercenaryGame = Minigame.create("mercenary", 0)
+		root.add_child(game)
+		var scores := []
+		game.finished.connect(func(score): scores.append(score))
+		for i in 1000:
+			game.advance(0.1)
+			if quick and game.active >= 0:
+				game.shoot(game.active)
+		_expect(scores == [1.0 if quick else 0.0], "傭兵は、すぐに撃てば1、撃たなければ0になる（%s）" % [scores])
 		game.free()
 
 
