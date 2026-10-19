@@ -108,7 +108,7 @@
     "event.gang_toll.pay.name": "払う",
     "event.gang_toll.pay.result": "通行料を払って路地を抜けた。",
     "event.gang_toll.talk.name": "話をつける",
-    "event.gang_toll.talk.result": "顔の利く名前を出すと、ヒルは道を空けた。",
+    "event.gang_toll.talk.result": "顔の利く名前を出すと、ヒルの連中は道を空けた。",
     "event.gang_toll.run.name": "走り抜ける",
     "event.gang_toll.run.result": "殴られながらも、路地を走り抜けた。",
     "event.corp_trace.name": "企業の追跡",
