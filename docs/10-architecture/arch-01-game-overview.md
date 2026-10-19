@@ -25,7 +25,7 @@ related: []
 | `game/data/*.json` | 仕事・スキル・インプラント・永続強化・イベント・記憶の断片・エンディングの数値を持つ | 表示文を持つこと |
 | `game/lang/*.json` | 言語ごとの表示文を、`<種類>.<id>.name`のようなキーで持つ | 数値を持つこと |
 | `mod_paths.gd` | 本体とMODの読み込み先をまとめる | ファイルを読むこと |
-| `loc.gd`（`Loc`） | 言語ファイルを読み、言語を切り替える。言語と「イベントで止める」「音楽」「効果音」の設定を`user://settings.json`に保存する（[ADR-0004](../50-adr/adr-0004-event-rules.md)、[ADR-0008](../50-adr/adr-0008-audio.md)） | 数値を扱うこと |
+| `loc.gd`（`Loc`） | 言語ファイルを読み、言語を切り替える。言語と「イベントで止める」「音楽」「効果音」の設定を`user://settings.json`に保存する（[ADR-0045](../50-adr/adr-0045-event-waves.md)、[ADR-0008](../50-adr/adr-0008-audio.md)） | 数値を扱うこと |
 | `game_data.gd`（`GameData`） | `data`を読む。同じidは後から読んだものが上書きする | 進行の状態を持つこと |
 | `sound.gd`（`Sound`） | 音楽と効果音を鳴らす。「音楽」と「効果音」の設定で消したものは鳴らさない（[ADR-0008](../50-adr/adr-0008-audio.md)） | 進行を変えること |
 | `game/audio/` | 音楽と効果音のWAVと、それを合成する`make_sounds.py`を持つ（[ADR-0008](../50-adr/adr-0008-audio.md)） | 外部の素材を持つこと |

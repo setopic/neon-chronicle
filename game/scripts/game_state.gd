@@ -1,6 +1,6 @@
 extends Node
 
-## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-14、DOM-21〜DOM-26。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
+## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-14、DOM-21〜DOM-28。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
 
 signal life_ended
 signal life_started
@@ -20,6 +20,10 @@ const MAX_DURABILITY := 100.0
 const LOW_DURABILITY := 25.0
 const MAX_LOGS := 50
 const EVENT_INTERVAL := 90.0  # 危険度1の仕事で、イベントが起きる平均の間隔（秒）。DOM-06
+const TENSION_CALM := 15.0  # 緊張がこれ以上なら、ひと息つける間になる。DOM-28
+const TENSION_FADE := 0.1  # 緊張が1秒ごとに下がる量
+const CALM_RATE := 0.5  # ひと息つける間の、イベントの起きやすさの倍率
+const LATE_RATE := 0.5  # 耐久が0に近づくほど、イベントの起きやすさに足す割合
 const DEED_XP := 0.02  # クロニクルに残った選択1種類あたりの経験の増え方。DOM-07
 const REQUEST_BONUS := 0.5  # 上乗せの割合を持たない依頼を果たした周に、記憶ポイントへ上乗せする割合。ADR-0034
 const POINTS_XP := 2.0  # 記憶ポイントの式で、その周で得た経験の合計を割る値。ADR-0032
@@ -56,6 +60,7 @@ var request_done := false
 var challenge := ""  # その周の縛りのid。選ばなかった周は空。DOM-21
 var challenge_broken := false
 var identity := false  # その周に偽の身元を持っているか。周の終わりに失う。DOM-24
+var tension := 0.0  # その周の緊張。耐久を減らす選択肢を選ぶと上がり、時間とともに下がる。DOM-28
 var life_choices := {}  # その周に選んだ選択肢 {イベントのid: 選択肢のid}。DOM-27
 var met_characters: Array = []  # その周に人物のイベントが起きた人物。1つの周で進む話は、人物ごとに1段まで。DOM-13
 
@@ -137,7 +142,8 @@ func _tick(dt: float) -> void:
 		for skill in xp:
 			_add_xp(skill, xp[skill] * (xp_mult() + effect("xp_" + skill)) * dt)
 		danger = job.get("danger", 1.0)
-		if pending_event == "" and randf() < danger * dt / EVENT_INTERVAL:
+		tension = maxf(0.0, tension - TENSION_FADE * dt)
+		if pending_event == "" and randf() < danger * dt / EVENT_INTERVAL * event_rate():
 			_start_event()
 	_check_request()
 	var before := durability
@@ -327,12 +333,36 @@ func _start_event() -> void:
 			candidates.append(id)
 	if candidates.is_empty():
 		return
+	# ひと息つける間は、耐久を減らす選択肢の無い穏やかなイベントから選ぶ。穏やかなものが無ければ、そのまま選ぶ（DOM-28）
+	if is_calm():
+		var calm := candidates.filter(func(id): return is_gentle(id))
+		if not calm.is_empty():
+			candidates = calm
 	pending_event = candidates.pick_random()
 	var character := story_line(GameData.events[pending_event])
 	if character != "":
 		met_characters.append(character)
 	_log("log.event", {"event": pending_event})
 	event_changed.emit()
+
+
+## 緊張が高く、ひと息つける間か（DOM-28）
+func is_calm() -> bool:
+	return tension >= TENSION_CALM
+
+
+## 耐久を減らす選択肢を持たない、穏やかなイベントか
+func is_gentle(event_id: String) -> bool:
+	for c in GameData.events.get(event_id, {}).get("choices", []):
+		if c.get("durability", 0.0) < 0.0:
+			return false
+	return true
+
+
+## イベントの起きやすさの倍率。耐久が0に近づくほど上がり、ひと息つける間は下がる（DOM-28）
+func event_rate() -> float:
+	var rate := 1.0 + LATE_RATE * (1.0 - durability / MAX_DURABILITY)
+	return rate * (CALM_RATE if is_calm() else 1.0)
 
 
 ## 人物のイベントと勢力の話のイベントは、その話の次の段だけが、その周にまだ話が進んでいないときに起きる（DOM-13、DOM-23）
@@ -461,6 +491,10 @@ func choose(choice_id: String) -> void:
 	durability = clampf(durability + choice.get("durability", 0.0), 0.0, MAX_DURABILITY)
 	if before > LOW_DURABILITY and durability <= LOW_DURABILITY and durability > 0.0:
 		_log("log.durability_low")
+	var was_calm := is_calm()
+	tension += maxf(0.0, -choice.get("durability", 0.0))
+	if not was_calm and is_calm():
+		_log("log.calm")
 	event_changed.emit()
 	if durability <= 0.0:
 		_end_life(event_id)
@@ -562,6 +596,7 @@ func _start_life(body_id := "", challenge_id := "") -> void:
 	request_done = false
 	met_characters = []
 	life_choices = {}
+	tension = 0.0
 	challenge = challenge_id if GameData.challenges.has(challenge_id) and life_number > 1 else ""
 	challenge_broken = false
 	identity = false
@@ -792,7 +827,7 @@ func save_game() -> void:
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
 		"implants": implants, "job_time": job_time, "alive": alive, "body": body, "body_quality": body_quality, "life_xp": life_xp, "pending_event": pending_event,
 		"last_deed": last_deed, "request_offers": request_offers, "request": request, "request_done": request_done,
-		"challenge": challenge, "challenge_broken": challenge_broken, "identity": identity, "last_challenge_bonus": last_challenge_bonus, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
+		"challenge": challenge, "challenge_broken": challenge_broken, "identity": identity, "tension": tension, "last_challenge_bonus": last_challenge_bonus, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
 		"last_points_gained": last_points_gained, "last_request_bonus": last_request_bonus, "upgrades": upgrades, "reputation": reputation, "life_choices": life_choices, "last_life_choices": last_life_choices,
 		"chronicle": chronicle, "fragments": fragments, "last_fragments": last_fragments,
 		"character_choices": character_choices, "logs": logs,
@@ -846,6 +881,8 @@ func load_game() -> bool:
 	challenge_broken = data.get("challenge_broken", false)
 	# #86 より前のセーブの周には、身元が無い。傭兵に就いていたら、身元を持っていたものとして扱う
 	identity = data.get("identity", data.get("current_job", "") == "mercenary")
+	# #92 より前のセーブの周は、緊張0から始める
+	tension = float(data.get("tension", 0.0))
 	last_challenge_bonus = int(data.get("last_challenge_bonus", 0))
 	upgrades = _int_values(data.get("upgrades", {}))
 	# #84 より前のセーブには、評判が無い

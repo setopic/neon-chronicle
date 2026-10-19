@@ -33,6 +33,7 @@ var _challenge_label: Label
 var _reputation_label: Label
 var _identity_button: Button
 var _capacity_label: Label
+var _calm_label: Label
 var _request_buttons := {}
 var _implant_buttons := {}
 var _rebirth_points_label: Label
@@ -233,6 +234,9 @@ func _build_right() -> Control:
 		_request_buttons[id] = button
 	_challenge_label = _label("", PINK, 15)
 	box.add_child(_challenge_label)
+	# ひと息つける間は、危ないイベントが起きにくいことを出す（DOM-28）
+	_calm_label = _label(tr("ui.calm"), CYAN, 14)
+	box.add_child(_calm_label)
 	# 評判は周をまたいで残るので、周の状態と並べて出す。0の勢力は出さない（DOM-22）
 	_reputation_label = _label("", DIM, 14)
 	_reputation_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -498,6 +502,7 @@ func _refresh() -> void:
 	}, true)})
 	_request_label.text = _request_text()
 	_request_label.visible = _request_label.text != ""
+	_calm_label.visible = Game.alive and Game.is_calm()
 	_reputation_label.text = _reputation_text()
 	_reputation_label.visible = _reputation_label.text != ""
 	_challenge_label.visible = Game.challenge != ""

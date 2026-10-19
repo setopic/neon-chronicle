@@ -4,7 +4,7 @@ type: domain
 title: 前の周の跡
 status: stable
 tags: [loop, story]
-depends_on: [DOM-06, DOM-07]
+depends_on: [DOM-07]
 related: []
 implemented_by:
   - game/scripts/game_state.gd
@@ -67,7 +67,6 @@ implemented_by:
 
 `depends_on`: この文書が成立するために前提となるノード
 
-- [DOM-06 イベントと選択肢](./dom-06-events.md)
 - [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 
 このノードを参照しているノード

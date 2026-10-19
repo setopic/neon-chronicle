@@ -616,6 +616,8 @@
     "event.thief_hunt.run.result": "You ran with the cargo. They caught you deep in an alley and landed a few blows before you broke away.",
     "event.thief_hunt.run.chronicle": "was chased by the Zander Family over money you stole in another body",
     "event.thief_hunt.fall": "went down when the Zander Family mistook you for the protection thief",
+    "ui.calm": "A breather (risky events are less likely)",
+    "log.calm": "After one close call after another, you can catch your breath for a while.",
     "ui.request_done": "done",
     "ui.request_bonus": " (Jin's request +{n})",
     "request.job": "work as a {job} for {min} min",
