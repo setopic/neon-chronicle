@@ -16,6 +16,7 @@
     { "id": "union", "notes": [{ "id": "feud", "event": "feud_3" }] },
     { "id": "residents" },
     { "id": "life_course" },
+    { "id": "owners", "notes": [{ "id": "standard", "event": "owner_standard_2" }, { "id": "labor", "event": "owner_labor_2" }, { "id": "combat", "event": "owner_combat_2" }, { "id": "prototype", "event": "owner_prototype_2" }] },
     { "id": "self", "notes": [
       { "id": "contract", "fragment": "contract" },
       { "id": "hacker", "fragment": "name" },

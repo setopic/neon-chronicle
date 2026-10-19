@@ -315,6 +315,9 @@ func _can_start(event_id: String) -> bool:
 		return true
 	if met_characters.has(character) or next_character_event(character) != event_id:
 		return false
+	# 元の持ち主の話は、その持ち主の部品で組み立てた体で目覚めた周にだけ起きる（DOM-25）
+	if event.get("body", "") != "" and event["body"] != body:
+		return false
 	return event.get("fragment", "") == "" or fragments.has(event["fragment"])
 
 

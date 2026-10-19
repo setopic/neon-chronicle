@@ -57,6 +57,7 @@ tags: [index]
 - [ADR-0038 ザンダー・ファミリーと屋台組合の対立を、3段の勢力の話にする](./adr-0038-stall-street-feud.md)
 - [ADR-0039 仕事に区画を持たせ、傭兵の仕事には偽の身元を要る](./adr-0039-job-districts-and-identity.md)
 - [ADR-0040 体の種類ごとに元の持ち主を1人決め、その特性を持たせる](./adr-0040-body-former-owners.md)
+- [ADR-0041 体の元の持ち主の記憶を、体ごとの2段の話にする](./adr-0041-former-owner-memories.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

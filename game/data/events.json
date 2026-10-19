@@ -181,6 +181,86 @@
       ]
     },
     {
+      "id": "owner_standard_1",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_standard",
+      "body": "standard",
+      "choices": [
+        { "id": "follow", "xp": { "negotiation": 6 } },
+        { "id": "shake" }
+      ]
+    },
+    {
+      "id": "owner_standard_2",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_standard",
+      "body": "standard",
+      "choices": [
+        { "id": "remember", "xp": { "negotiation": 10 } },
+        { "id": "let_go" }
+      ]
+    },
+    {
+      "id": "owner_labor_1",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_labor",
+      "body": "labor",
+      "choices": [
+        { "id": "follow", "xp": { "combat": 6 } },
+        { "id": "shake" }
+      ]
+    },
+    {
+      "id": "owner_labor_2",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_labor",
+      "body": "labor",
+      "choices": [
+        { "id": "remember", "xp": { "combat": 10 } },
+        { "id": "let_go" }
+      ]
+    },
+    {
+      "id": "owner_combat_1",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_combat",
+      "body": "combat",
+      "choices": [
+        { "id": "follow", "xp": { "combat": 6 } },
+        { "id": "shake" }
+      ]
+    },
+    {
+      "id": "owner_combat_2",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_combat",
+      "body": "combat",
+      "choices": [
+        { "id": "remember", "xp": { "combat": 10 } },
+        { "id": "let_go" }
+      ]
+    },
+    {
+      "id": "owner_prototype_1",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_prototype",
+      "body": "prototype",
+      "choices": [
+        { "id": "follow", "xp": { "hacking": 6 } },
+        { "id": "shake" }
+      ]
+    },
+    {
+      "id": "owner_prototype_2",
+      "jobs": ["courier", "hacker", "mercenary"],
+      "story": "owner_prototype",
+      "body": "prototype",
+      "choices": [
+        { "id": "remember", "xp": { "hacking": 10 } },
+        { "id": "let_go" }
+      ]
+    },
+    {
       "id": "rei_1",
       "jobs": ["hacker"],
       "character": "rei",
