@@ -33,14 +33,15 @@ const CANAL_TOP := 214.0
 const CANAL_BOTTOM := 236.0
 ## 下層街の土地は、この高さから下にある
 const LOW_TOP := 244.0
-## 縄張りの境目のx座標。ヴァルデック義体とモンフォール警備の境は、ヴィラール橋へ下りる通りに沿う
-const BORDERS := [195.0, 390.0, 585.0]
+## 縄張りの境目のx座標。縄張りの広さは、社の力関係に合わせる（DOM-15）。
+## ヴァルデック義体とモンフォール警備の境は、ヴィラール橋へ下りる通りに沿う
+const BORDERS := [280.0, 440.0, 560.0]
 ## 区画の名前を置く位置（文字列の中心）。名前は map.<id>
 const LABELS := {
-	"yomi": Vector2(97, 48),
-	"waldeck": Vector2(292, 48),
-	"montfort": Vector2(487, 48),
-	"lindholm": Vector2(682, 48),
+	"yomi": Vector2(140, 48),
+	"waldeck": Vector2(355, 48),
+	"montfort": Vector2(500, 48),
+	"lindholm": Vector2(670, 48),
 	"back_alley": Vector2(205, 272),
 	"stalls": Vector2(520, 324),
 	"deep": Vector2(375, 410),
@@ -51,11 +52,11 @@ const NOTED := ["deep", "black_market"]
 ## 施設の印。名前は map.poi.<id>。印の右に名前を置く
 const POIS := {
 	"yomi_hq": Vector2(30, 102),
-	"power_plant": Vector2(125, 102),
+	"power_plant": Vector2(140, 102),
 	"substation": Vector2(120, 170),
-	"montfort_hq": Vector2(405, 102),
-	"food_plant": Vector2(600, 102),
-	"water_plant": Vector2(600, 128),
+	"montfort_hq": Vector2(455, 102),
+	"food_plant": Vector2(580, 102),
+	"water_plant": Vector2(580, 128),
 	"clinic": Vector2(150, 330),
 	"market_entrance": Vector2(60, 360),
 }
@@ -64,7 +65,7 @@ const CORE := Vector2(30, 126)
 ## 橋のx座標。高台の通りから排水路をまたいで、下層街へ下りる
 const BRIDGES := {
 	"olsen_bridge": 107.0,
-	"villard_bridge": 390.0,
+	"villard_bridge": 440.0,
 	"hagen_bridge": 672.0,
 }
 ## 道路。[幅の種類, 点の並び]。種類は main（表通り）・road（通り）・alley（路地）
@@ -72,10 +73,10 @@ const ROADS := [
 	["road", [Vector2(0, 76), Vector2(780, 76)]],
 	["main", [Vector2(0, 150), Vector2(780, 150)]],
 	["road", [Vector2(107, 20), Vector2(107, 150)]],
-	["road", [Vector2(290, 20), Vector2(290, 150)]],
-	["road", [Vector2(490, 20), Vector2(490, 150)]],
+	["road", [Vector2(210, 20), Vector2(210, 150)]],
+	["road", [Vector2(360, 20), Vector2(360, 150)]],
 	["road", [Vector2(672, 20), Vector2(672, 150)]],
-	["main", [Vector2(390, 20), Vector2(390, 300)]],
+	["main", [Vector2(440, 20), Vector2(440, 300)]],
 	["main", [Vector2(672, 150), Vector2(672, 300)]],
 	["road", [Vector2(107, 150), Vector2(107, 252)]],
 	["main", [Vector2(300, 300), Vector2(780, 300)]],
