@@ -110,6 +110,7 @@ graph LR
     ADR-0028["ADR-0028<br/>子どもは親の暮らしの中で育ち、下層街の死者の部品は闇医者が闇市場へ流す"]
     ADR-0029["ADR-0029<br/>ザンダー一家をザンダー・ファミリーと呼ぶ"]
     ADR-0030["ADR-0030<br/>被験体は借金の契約で集め、使い捨ての体は闇市場の部品で組み立てる"]
+    ADR-0031["ADR-0031<br/>日本のやくざや的屋に寄った語を、欧米の街でも通じる語に改める"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -176,6 +177,9 @@ graph LR
   ADR-0029 -.->|decides| DOM-19
   ADR-0030 -.->|decides| DOM-14
   ADR-0030 -.->|decides| DOM-20
+  ADR-0031 -.->|decides| DOM-14
+  ADR-0031 -.->|decides| DOM-15
+  ADR-0031 -.->|decides| DOM-19
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02

@@ -108,6 +108,7 @@ implemented_by:
 - (decides) [ADR-0028 子どもは親の暮らしの中で育ち、下層街の死者の部品は闇医者が闇市場へ流す](../50-adr/adr-0028-life-course-and-body-parts.md)
 - (decides) [ADR-0029 ザンダー一家をザンダー・ファミリーと呼ぶ](../50-adr/adr-0029-zander-family-name.md)
 - (decides) [ADR-0030 被験体は借金の契約で集め、使い捨ての体は闇市場の部品で組み立てる](../50-adr/adr-0030-test-subjects-and-bodies.md)
+- (decides) [ADR-0031 日本のやくざや的屋に寄った語を、欧米の街でも通じる語に改める](../50-adr/adr-0031-western-terms.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 
 <!-- graph:auto:end -->

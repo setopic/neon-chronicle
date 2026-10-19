@@ -47,6 +47,7 @@ tags: [index]
 - [ADR-0028 子どもは親の暮らしの中で育ち、下層街の死者の部品は闇医者が闇市場へ流す](./adr-0028-life-course-and-body-parts.md)
 - [ADR-0029 ザンダー一家をザンダー・ファミリーと呼ぶ](./adr-0029-zander-family-name.md)
 - [ADR-0030 被験体は借金の契約で集め、使い捨ての体は闇市場の部品で組み立てる](./adr-0030-test-subjects-and-bodies.md)
+- [ADR-0031 日本のやくざや的屋に寄った語を、欧米の街でも通じる語に改める](./adr-0031-western-terms.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
