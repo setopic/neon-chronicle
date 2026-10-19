@@ -40,6 +40,7 @@ tags: [index]
 - [DOM-22 勢力の評判](./dom-22-faction-reputation.md)
 - [DOM-23 屋台通りの対立](./dom-23-stall-street-feud.md)
 - [DOM-24 仕事の区画と身元](./dom-24-job-districts-and-identity.md)
+- [DOM-25 体の元の持ち主と特性](./dom-25-body-former-owners.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
@@ -313,5 +314,12 @@ python -m tools.graph new --type domain --id DOM-02 --title "..." --slug some-sl
 | --- | --- | --- |
 | 仕事の区画 | 仕事をする場所である区画。仕事ごとに1つ決まっている | |
 | 身元が要る仕事 | 橋の向こうの区画で働くので、偽の身元を持っているときだけ就ける仕事 | |
+
+### [DOM-25 体の元の持ち主と特性](./dom-25-body-former-owners.md)
+
+| 用語 | 意味 | 旧称 |
+| --- | --- | --- |
+| 元の持ち主 | 体の種類の神経と腕の部品を取った、下層街の死者。体の種類ごとに1人 | |
+| 特性 | 元の持ち主の生き方が体に残した癖。その体で目覚めた周に効果を持つ | |
 
 <!-- graph:terms:end -->

@@ -87,5 +87,6 @@ implemented_by:
 
 - (decides) [ADR-0030 被験体は借金の契約で集め、使い捨ての体は闇市場の部品で組み立てる](../50-adr/adr-0030-test-subjects-and-bodies.md)
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
+- (depends_on) [DOM-25 体の元の持ち主と特性](./dom-25-body-former-owners.md)
 
 <!-- graph:auto:end -->

@@ -152,7 +152,9 @@ func _tick(dt: float) -> void:
 ## 体の種類・インプラント・永続強化・スキルの効果を合計する（"income", "xp", "decay", "start_level"）。
 ## 永続強化だけが持つ効果は "xp_<スキル>", "points", "start_credits", "implant_cost" の4つ（ADR-0033）
 func effect(key: String) -> float:
+	# 体の種類の効果と、体の元の持ち主から残った特性の効果（DOM-25）
 	var total: float = GameData.bodies.get(body, {}).get("effects", {}).get(key, 0.0)
+	total += GameData.bodies.get(body, {}).get("trait_effects", {}).get(key, 0.0)
 	for id in implants:
 		total += GameData.implants.get(id, {}).get("effects", {}).get(key, 0.0)
 	for id in upgrades:

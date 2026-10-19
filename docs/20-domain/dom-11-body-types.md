@@ -107,5 +107,6 @@ implemented_by:
 - (decides) [ADR-0016 インプラントと体の種類の効果を画面の文に出す](../50-adr/adr-0016-show-effects-on-screen.md)
 - (decides) [ADR-0032 体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す](../50-adr/adr-0032-body-quality-and-memory-software.md)
 - (depends_on) [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
+- (depends_on) [DOM-25 体の元の持ち主と特性](./dom-25-body-former-owners.md)
 
 <!-- graph:auto:end -->

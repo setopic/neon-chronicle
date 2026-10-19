@@ -79,6 +79,7 @@ graph LR
     DOM-22["DOM-22<br/>勢力の評判"]
     DOM-23["DOM-23<br/>屋台通りの対立"]
     DOM-24["DOM-24<br/>仕事の区画と身元"]
+    DOM-25["DOM-25<br/>体の元の持ち主と特性"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -123,6 +124,7 @@ graph LR
     ADR-0037["ADR-0037<br/>4つの勢力に評判を持たせ、周をまたいで残す"]
     ADR-0038["ADR-0038<br/>ザンダー・ファミリーと屋台組合の対立を、3段の勢力の話にする"]
     ADR-0039["ADR-0039<br/>仕事に区画を持たせ、傭兵の仕事には偽の身元を要る"]
+    ADR-0040["ADR-0040<br/>体の種類ごとに元の持ち主を1人決め、その特性を持たせる"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -206,6 +208,7 @@ graph LR
   ADR-0038 -.->|decides| DOM-23
   ADR-0038 -.->|decides| DOM-14
   ADR-0039 -.->|decides| DOM-24
+  ADR-0040 -.->|decides| DOM-25
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -292,6 +295,8 @@ graph LR
   DOM-23 -->|depends_on| DOM-22
   DOM-24 -->|depends_on| DOM-16
   DOM-24 -->|depends_on| DOM-18
+  DOM-25 -->|depends_on| DOM-11
+  DOM-25 -->|depends_on| DOM-20
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04
