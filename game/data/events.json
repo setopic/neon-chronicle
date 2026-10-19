@@ -80,6 +80,15 @@
       ]
     },
     {
+      "id": "old_plaque",
+      "jobs": ["courier"],
+      "choices": [
+        { "id": "pry", "credits": 40, "durability": -5 },
+        { "id": "ask", "xp": { "negotiation": 6 } },
+        { "id": "leave" }
+      ]
+    },
+    {
       "id": "data_buyer",
       "jobs": ["hacker"],
       "choices": [

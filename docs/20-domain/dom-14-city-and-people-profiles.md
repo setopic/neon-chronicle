@@ -4,7 +4,7 @@ type: domain
 title: 街と人物の資料
 status: stable
 tags: [world, story]
-depends_on: [DOM-01, DOM-08, DOM-09, DOM-10, DOM-13, DOM-15]
+depends_on: [DOM-01, DOM-08, DOM-09, DOM-10, DOM-13, DOM-15, DOM-17]
 related: []
 implemented_by:
   - game/scripts/game_state.gd
@@ -42,6 +42,7 @@ implemented_by:
 | 資料 | 出るイベント | 追記の要る断片・出るイベント |
 | --- | --- | --- |
 | ネオン・シティ | | 「計画書」「中枢サーバー」 |
+| 街の歴史 | | |
 | 企業 | | |
 | リンドホルム食品 | | |
 | 企業区画 | | |
@@ -88,6 +89,7 @@ implemented_by:
 - [DOM-10 登場人物](./dom-10-characters.md)
 - [DOM-13 人物のイベント](./dom-13-character-events.md)
 - [DOM-15 街の場所と勢力](./dom-15-city-places-and-powers.md)
+- [DOM-17 街の歴史](./dom-17-city-history.md)
 
 このノードを参照しているノード
 
@@ -96,6 +98,7 @@ implemented_by:
 - (decides) [ADR-0019 衣食住は文だけで書き、食べ物は合成食の企業が握る](../50-adr/adr-0019-food-clothing-housing.md)
 - (decides) [ADR-0021 電気はヨミ・システムズ、水はリンドホルム食品が握り、街に公共の交通は置かない](../50-adr/adr-0021-city-infrastructure.md)
 - (decides) [ADR-0024 下層街に、ギャングのザンダー一家と住人の屋台組合を置く](../50-adr/adr-0024-lower-city-gang-and-union.md)
+- (decides) [ADR-0025 企業の時代より前の街を市とし、市の財政破綻で企業の時代が始まったことにする](../50-adr/adr-0025-city-history-before-corporations.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 
 <!-- graph:auto:end -->

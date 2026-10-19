@@ -71,6 +71,7 @@ graph LR
     DOM-14["DOM-14<br/>街と人物の資料"]
     DOM-15["DOM-15<br/>街の場所と勢力"]
     DOM-16["DOM-16<br/>街の地図"]
+    DOM-17["DOM-17<br/>街の歴史"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -100,6 +101,7 @@ graph LR
     ADR-0022["ADR-0022<br/>街の地図を「街と人物」の画面にタブで出し、中枢サーバーは断片が戻るまで伏せる"]
     ADR-0023["ADR-0023<br/>橋に人名を付け、地図を地形の分かる描き方にする"]
     ADR-0024["ADR-0024<br/>下層街に、ギャングのザンダー一家と住人の屋台組合を置く"]
+    ADR-0025["ADR-0025<br/>企業の時代より前の街を市とし、市の財政破綻で企業の時代が始まったことにする"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -149,6 +151,9 @@ graph LR
   ADR-0023 -.->|decides| DOM-16
   ADR-0024 -.->|decides| DOM-14
   ADR-0024 -.->|decides| DOM-15
+  ADR-0025 -.->|decides| DOM-14
+  ADR-0025 -.->|decides| DOM-15
+  ADR-0025 -.->|decides| DOM-17
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -197,6 +202,7 @@ graph LR
   DOM-14 -->|depends_on| DOM-10
   DOM-14 -->|depends_on| DOM-13
   DOM-14 -->|depends_on| DOM-15
+  DOM-14 -->|depends_on| DOM-17
   DOM-15 -->|depends_on| DOM-01
   DOM-15 -->|depends_on| DOM-06
   DOM-15 -->|depends_on| DOM-08
@@ -204,6 +210,8 @@ graph LR
   DOM-16 -->|depends_on| DOM-08
   DOM-16 -->|depends_on| DOM-14
   DOM-16 -->|depends_on| DOM-15
+  DOM-17 -->|depends_on| DOM-01
+  DOM-17 -->|depends_on| DOM-15
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04
