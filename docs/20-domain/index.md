@@ -31,6 +31,7 @@ tags: [index]
 - [DOM-13 人物のイベント](./dom-13-character-events.md)
 - [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 - [DOM-15 街の場所と勢力](./dom-15-city-places-and-powers.md)
+- [DOM-16 街の地図](./dom-16-city-map.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
@@ -210,5 +211,11 @@ python -m tools.graph new --type domain --id DOM-02 --title "..." --slug some-sl
 | 屋台通り | 下層街の区画の1つ。中の橋と南の橋を下りたところにあり、屋台が並ぶ | |
 | 裏通り | 下層街の区画の1つ。北の橋を下りたところにあり、裏通りの診療所と闇市場の入口がある | |
 | 下層街の奥 | 下層街の区画の1つ。どの橋からも遠く、小屋とコンテナが積み重なっている | |
+
+### [DOM-16 街の地図](./dom-16-city-map.md)
+
+| 用語 | 意味 | 旧称 |
+| --- | --- | --- |
+| 地図 | 区画と橋の配置を描いた図。「街と人物」の画面で、資料とタブで切り替えて見る | |
 
 <!-- graph:terms:end -->

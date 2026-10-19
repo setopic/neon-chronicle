@@ -70,6 +70,7 @@ graph LR
     DOM-13["DOM-13<br/>人物のイベント"]
     DOM-14["DOM-14<br/>街と人物の資料"]
     DOM-15["DOM-15<br/>街の場所と勢力"]
+    DOM-16["DOM-16<br/>街の地図"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -96,6 +97,7 @@ graph LR
     ADR-0019["ADR-0019<br/>衣食住は文だけで書き、食べ物は合成食の企業が握る"]
     ADR-0020["ADR-0020<br/>街を区画と3本の橋で分け、地図は設計文書の図に残す"]
     ADR-0021["ADR-0021<br/>電気はヨミ・システムズ、水はリンドホルム食品が握り、街に公共の交通は置かない"]
+    ADR-0022["ADR-0022<br/>街の地図を「街と人物」の画面にタブで出し、中枢サーバーは断片が戻るまで伏せる"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -138,6 +140,8 @@ graph LR
   ADR-0020 -.->|decides| DOM-15
   ADR-0021 -.->|decides| DOM-14
   ADR-0021 -.->|decides| DOM-15
+  ADR-0022 ==>|supersedes| ADR-0020
+  ADR-0022 -.->|decides| DOM-16
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -190,6 +194,9 @@ graph LR
   DOM-15 -->|depends_on| DOM-06
   DOM-15 -->|depends_on| DOM-08
   DOM-15 -->|depends_on| DOM-09
+  DOM-16 -->|depends_on| DOM-08
+  DOM-16 -->|depends_on| DOM-14
+  DOM-16 -->|depends_on| DOM-15
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04
@@ -209,7 +216,7 @@ graph LR
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
-  class ADR-0005 deprecated;
+  class ADR-0005,ADR-0020 deprecated;
 ```
 
 <!-- graph:diagram:end -->

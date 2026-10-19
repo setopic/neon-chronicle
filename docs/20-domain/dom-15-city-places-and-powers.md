@@ -161,5 +161,6 @@ flowchart TB
 - (decides) [ADR-0020 街を区画と3本の橋で分け、地図は設計文書の図に残す](../50-adr/adr-0020-city-districts-and-map.md)
 - (decides) [ADR-0021 電気はヨミ・システムズ、水はリンドホルム食品が握り、街に公共の交通は置かない](../50-adr/adr-0021-city-infrastructure.md)
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
+- (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 
 <!-- graph:auto:end -->

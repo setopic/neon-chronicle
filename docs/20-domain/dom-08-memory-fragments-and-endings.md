@@ -100,5 +100,6 @@ implemented_by:
 - (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 - (depends_on) [DOM-15 街の場所と勢力](./dom-15-city-places-and-powers.md)
+- (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 
 <!-- graph:auto:end -->

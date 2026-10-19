@@ -93,5 +93,6 @@ implemented_by:
 - (decides) [ADR-0018 街を複数の企業が分け合い、場所と住人をイベントと資料に出す](../50-adr/adr-0018-companies-places-and-residents.md)
 - (decides) [ADR-0019 衣食住は文だけで書き、食べ物は合成食の企業が握る](../50-adr/adr-0019-food-clothing-housing.md)
 - (decides) [ADR-0021 電気はヨミ・システムズ、水はリンドホルム食品が握り、街に公共の交通は置かない](../50-adr/adr-0021-city-infrastructure.md)
+- (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 
 <!-- graph:auto:end -->

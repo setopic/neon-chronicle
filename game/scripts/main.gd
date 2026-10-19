@@ -609,7 +609,13 @@ func _show_profiles() -> void:
 		lines.append(GameData.name_of("profiles", id))
 		lines.append("\n".join(paragraphs))
 		lines.append("")
-	_show_text(tr("ui.profiles"), "\n".join(lines), Vector2(700, 420), 16)
+	# 地図は資料と同じ画面に、タブで分けて置く。上のボタンをこれ以上増やすと、英語では1280の幅に収まらない（ADR-0022）
+	var tabs := TabContainer.new()
+	tabs.add_child(_text_body("\n".join(lines), CityMap.SIZE, 16))
+	tabs.add_child(CityMap.new())
+	tabs.set_tab_title(0, tr("ui.profile_text"))
+	tabs.set_tab_title(1, tr("ui.map"))
+	_show_dialog(tr("ui.profiles"), tabs)
 
 
 func _show_licenses() -> void:
@@ -617,16 +623,24 @@ func _show_licenses() -> void:
 
 
 func _show_text(title: String, body: String, min_size: Vector2, font_size: int) -> void:
-	var dialog := AcceptDialog.new()
-	dialog.title = title
-	dialog.ok_button_text = tr("ui.close")
+	_show_dialog(title, _text_body(body, min_size, font_size))
+
+
+func _text_body(body: String, min_size: Vector2, font_size: int) -> RichTextLabel:
 	var text := RichTextLabel.new()
 	text.bbcode_enabled = false
 	text.selection_enabled = true
 	text.custom_minimum_size = min_size
 	text.add_theme_font_size_override("normal_font_size", font_size)
 	text.text = body
-	dialog.add_child(text)
+	return text
+
+
+func _show_dialog(title: String, content: Control) -> void:
+	var dialog := AcceptDialog.new()
+	dialog.title = title
+	dialog.ok_button_text = tr("ui.close")
+	dialog.add_child(content)
 	dialog.visibility_changed.connect(func(): if not dialog.visible: dialog.queue_free())
 	add_child(dialog)
 	dialog.popup_centered()
@@ -772,6 +786,25 @@ func _make_theme() -> Theme:
 	dialog.bg_color = Color(0.05, 0.03, 0.1)
 	dialog.set_content_margin_all(10)
 	t.set_stylebox("panel", "AcceptDialog", dialog)
+	# 街と人物の画面の、資料と地図のタブ（ADR-0022）
+	var tab := StyleBoxFlat.new()
+	tab.bg_color = Color(0.12, 0.08, 0.2)
+	tab.border_color = Color(PINK, 0.5)
+	tab.set_border_width_all(1)
+	tab.set_corner_radius_all(4)
+	tab.set_content_margin_all(8)
+	var tab_selected := tab.duplicate()
+	tab_selected.bg_color = Color(0.35, 0.08, 0.3)
+	tab_selected.border_color = PINK
+	t.set_stylebox("tab_unselected", "TabContainer", tab)
+	t.set_stylebox("tab_hovered", "TabContainer", tab)
+	t.set_stylebox("tab_selected", "TabContainer", tab_selected)
+	var tab_panel := StyleBoxFlat.new()
+	tab_panel.bg_color = Color(0.05, 0.03, 0.1)
+	tab_panel.border_color = Color(CYAN, 0.35)
+	tab_panel.set_border_width_all(1)
+	tab_panel.set_content_margin_all(8)
+	t.set_stylebox("panel", "TabContainer", tab_panel)
 	var popup := StyleBoxFlat.new()
 	popup.bg_color = Color(0.07, 0.05, 0.13)
 	popup.border_color = Color(PINK, 0.5)
