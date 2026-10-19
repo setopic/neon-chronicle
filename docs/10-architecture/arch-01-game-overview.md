@@ -32,6 +32,7 @@ related: []
 | `game_state.gd`（`Game`） | 進行・転生・セーブとロード（`user://save.json`）を受け持つ。セーブはセーブした時刻を持ち、開いたときに閉じていた時間を進める（[ADR-0007](../50-adr/adr-0007-away-progress.md)） | 画面を描くこと |
 | `main.gd`・`city.gd` | 画面と、上部の3Dの街を描く。右上の「ライセンス」のボタンで、素材のライセンスを表示する | 進行の計算をすること |
 | `ui_style.gd`（`UiStyle`） | 画面の色・文字の大きさ・枠・動きと、GodotのThemeを持つ（[ADR-0052](../50-adr/adr-0052-ui-style-foundation.md)） | 画面の配置を決めること |
+| `job_scene.gd`（`JobScene`） | 就いている仕事の様子を、いまの1回の進み具合に合わせて描く（[ADR-0053](../50-adr/adr-0053-job-scene.md)） | 進行の計算をすること |
 | `game/credits.txt` | 使った外部の素材とそのライセンスの一覧を持つ（[ADR-0002](../50-adr/adr-0002-asset-licenses-in-game.md)） | Godotの第三者の部品を並べること。それは実行中にGodotから取る |
 
 ## 境界
@@ -68,6 +69,7 @@ related: []
 - (decides) [ADR-0017 画面の右上のボタンとダイアログの見た目をそろえる](../50-adr/adr-0017-header-and-dialog-look.md)
 - (decides) [ADR-0049 転生の画面とメインの画面を1280x720に収める](../50-adr/adr-0049-fit-screens-1280x720.md)
 - (decides) [ADR-0052 画面の見た目の方向と、その土台を決める](../50-adr/adr-0052-ui-style-foundation.md)
+- (decides) [ADR-0053 仕事の様子を、ログの左に線と点で描く](../50-adr/adr-0053-job-scene.md)
 - (depends_on) [UC-01 itch.ioでブラウザ版を公開する](../30-usecases/uc-01-itch-web-release.md)
 
 <!-- graph:auto:end -->

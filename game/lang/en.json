@@ -11,6 +11,8 @@
     "ui.body": "Body",
     "ui.implants": "Implants",
     "ui.log": "Log",
+    "ui.job_scene": "On the job",
+    "ui.job_scene_idle": "Pick a job to watch it here",
     "ui.level": "Lv {level}",
     "ui.job_income": "+{n} / sec",
     "ui.requires": "Requires: {items}",
