@@ -60,6 +60,7 @@ tags: [index]
 - [ADR-0041 体の元の持ち主の記憶を、体ごとの2段の話にする](./adr-0041-former-owner-memories.md)
 - [ADR-0042 体の種類ごとに容量を持たせ、インプラントを外せるようにする](./adr-0042-body-capacity.md)
 - [ADR-0043 ミオにも3段の人物のイベントを持たせる](./adr-0043-mio-character-events.md)
+- [ADR-0044 1つ前の周の選択を、次の周の跡のイベントに出す](./adr-0044-traces-of-last-life.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

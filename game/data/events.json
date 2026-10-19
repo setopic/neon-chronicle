@@ -149,6 +149,42 @@
       ]
     },
     {
+      "id": "grateful_stall",
+      "jobs": ["courier"],
+      "requires_trace": "medicine.deliver",
+      "choices": [
+        { "id": "accept", "durability": 8, "reputation": { "union": 1 } },
+        { "id": "decline", "xp": { "negotiation": 4 } }
+      ]
+    },
+    {
+      "id": "factory_payback",
+      "jobs": ["hacker"],
+      "requires_trace": "fake_id.remake",
+      "choices": [
+        { "id": "take", "credits": 60 },
+        { "id": "refuse", "reputation": { "union": 1 } }
+      ]
+    },
+    {
+      "id": "dark_street",
+      "jobs": ["hacker", "courier"],
+      "requires_trace": "power_tap.sell",
+      "choices": [
+        { "id": "rewire", "requires": { "hacking": 5 }, "durability": -4, "xp": { "hacking": 8 }, "reputation": { "union": 2 } },
+        { "id": "walk_past" }
+      ]
+    },
+    {
+      "id": "thief_hunt",
+      "jobs": ["courier"],
+      "requires_trace": "protection_run.pocket",
+      "choices": [
+        { "id": "bluff", "requires": { "negotiation": 5 }, "xp": { "negotiation": 8 } },
+        { "id": "run", "durability": -6 }
+      ]
+    },
+    {
       "id": "feud_1",
       "jobs": ["courier"],
       "story": "feud",

@@ -56,6 +56,7 @@ var request_done := false
 var challenge := ""  # その周の縛りのid。選ばなかった周は空。DOM-21
 var challenge_broken := false
 var identity := false  # その周に偽の身元を持っているか。周の終わりに失う。DOM-24
+var life_choices := {}  # その周に選んだ選択肢 {イベントのid: 選択肢のid}。DOM-27
 var met_characters: Array = []  # その周に人物のイベントが起きた人物。1つの周で進む話は、人物ごとに1段まで。DOM-13
 
 # --- 転生しても残る状態 ---
@@ -67,6 +68,7 @@ var last_challenge_bonus := 0  # last_points_gained のうち、縛りの上乗�
 var next_challenge := ""  # 転生の画面で選んでいる縛り。セーブには書かない
 var upgrades := {}
 var reputation := {}  # 勢力のidごとの評判。転生しても残る。DOM-22
+var last_life_choices := {}  # 1つ前の周に選んだ選択肢。前の周の跡のイベントの条件になる。DOM-27
 var chronicle: Array = []  # 終わった周の記録 [{life, body, job, age, earned, points, deed, end, ending}]
 var fragments: Array = []  # 戻った記憶の断片のid。DOM-08
 var character_choices := {}  # 人物のイベントで選んだ選択肢 {イベントのid: 選択肢のid}。話の進み具合を表す。DOM-13
@@ -336,6 +338,12 @@ func _start_event() -> void:
 ## 人物のイベントと勢力の話のイベントは、その話の次の段だけが、その周にまだ話が進んでいないときに起きる（DOM-13、DOM-23）
 func _can_start(event_id: String) -> bool:
 	var event: Dictionary = GameData.events[event_id]
+	# 前の周の跡のイベントは、1つ前の周にその選択肢を選んだときだけ起きる（DOM-27）
+	var trace: String = event.get("requires_trace", "")
+	if trace != "":
+		var parts := trace.split(".")
+		if parts.size() != 2 or last_life_choices.get(parts[0], "") != parts[1]:
+			return false
 	var character := story_line(event)
 	if character == "":
 		return true
@@ -432,6 +440,7 @@ func choose(choice_id: String) -> void:
 	# 人物のイベントと、資料の出るイベントは、選んだ選択肢を残す（DOM-13、DOM-14）
 	if story_line(GameData.events[event_id]) != "" or GameData.events[event_id].get("record", false):
 		character_choices[event_id] = choice_id
+	life_choices[event_id] = choice_id
 	_log("event.%s.%s.result" % [event_id, choice_id])
 	# エンディングの選択肢は、ほかの結果を持たず、その場で周を終える（DOM-08）
 	if choice.has("ending"):
@@ -511,6 +520,7 @@ func can_choose_body(body_id: String) -> bool:
 func _end_life(fatal_event := "", ending := "") -> void:
 	alive = false
 	pending_event = ""
+	last_life_choices = life_choices.duplicate()
 	last_points_gained = points_for_life()
 	var bonus: float = GameData.requests.get(request, {}).get("bonus", REQUEST_BONUS)
 	last_request_bonus = maxi(1, roundi(last_points_gained * bonus)) if request_done else 0
@@ -551,6 +561,7 @@ func _start_life(body_id := "", challenge_id := "") -> void:
 	request = ""
 	request_done = false
 	met_characters = []
+	life_choices = {}
 	challenge = challenge_id if GameData.challenges.has(challenge_id) and life_number > 1 else ""
 	challenge_broken = false
 	identity = false
@@ -782,7 +793,7 @@ func save_game() -> void:
 		"implants": implants, "job_time": job_time, "alive": alive, "body": body, "body_quality": body_quality, "life_xp": life_xp, "pending_event": pending_event,
 		"last_deed": last_deed, "request_offers": request_offers, "request": request, "request_done": request_done,
 		"challenge": challenge, "challenge_broken": challenge_broken, "identity": identity, "last_challenge_bonus": last_challenge_bonus, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
-		"last_points_gained": last_points_gained, "last_request_bonus": last_request_bonus, "upgrades": upgrades, "reputation": reputation,
+		"last_points_gained": last_points_gained, "last_request_bonus": last_request_bonus, "upgrades": upgrades, "reputation": reputation, "life_choices": life_choices, "last_life_choices": last_life_choices,
 		"chronicle": chronicle, "fragments": fragments, "last_fragments": last_fragments,
 		"character_choices": character_choices, "logs": logs,
 	}
@@ -839,6 +850,9 @@ func load_game() -> bool:
 	upgrades = _int_values(data.get("upgrades", {}))
 	# #84 より前のセーブには、評判が無い
 	reputation = _int_values(data.get("reputation", {}))
+	# #91 より前のセーブには、周ごとの選択が無い。前の周の跡のイベントは、次の周から起きうる
+	life_choices = data.get("life_choices", {})
+	last_life_choices = data.get("last_life_choices", {})
 	chronicle = data.get("chronicle", [])
 	for entry in chronicle:
 		if not entry.has("body"):
@@ -866,6 +880,7 @@ func reset_game() -> void:
 	next_challenge = ""
 	upgrades = {}
 	reputation = {}
+	last_life_choices = {}
 	chronicle = []
 	fragments = []
 	last_fragments = []

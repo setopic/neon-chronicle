@@ -84,5 +84,6 @@ implemented_by:
 - (decides) [ADR-0011 倒れた理由の句をイベントごとに書く](../50-adr/adr-0011-fall-phrase-per-event.md)
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 - (depends_on) [DOM-21 縛りの周](./dom-21-challenges.md)
+- (depends_on) [DOM-27 前の周の跡](./dom-27-traces-of-last-life.md)
 
 <!-- graph:auto:end -->

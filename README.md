@@ -81,6 +81,7 @@ graph LR
     DOM-24["DOM-24<br/>仕事の区画と身元"]
     DOM-25["DOM-25<br/>体の元の持ち主と特性"]
     DOM-26["DOM-26<br/>体の容量とインプラントの取り外し"]
+    DOM-27["DOM-27<br/>前の周の跡"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -129,6 +130,7 @@ graph LR
     ADR-0041["ADR-0041<br/>体の元の持ち主の記憶を、体ごとの2段の話にする"]
     ADR-0042["ADR-0042<br/>体の種類ごとに容量を持たせ、インプラントを外せるようにする"]
     ADR-0043["ADR-0043<br/>ミオにも3段の人物のイベントを持たせる"]
+    ADR-0044["ADR-0044<br/>1つ前の周の選択を、次の周の跡のイベントに出す"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -220,6 +222,7 @@ graph LR
   ADR-0043 -.->|decides| DOM-13
   ADR-0043 -.->|decides| DOM-10
   ADR-0043 -.->|decides| DOM-14
+  ADR-0044 -.->|decides| DOM-27
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -311,6 +314,8 @@ graph LR
   DOM-25 -->|depends_on| DOM-23
   DOM-26 -->|depends_on| DOM-04
   DOM-26 -->|depends_on| DOM-11
+  DOM-27 -->|depends_on| DOM-06
+  DOM-27 -->|depends_on| DOM-07
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04
