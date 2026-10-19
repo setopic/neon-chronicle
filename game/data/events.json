@@ -71,6 +71,15 @@
       ]
     },
     {
+      "id": "protection_run",
+      "jobs": ["courier"],
+      "choices": [
+        { "id": "deliver", "credits": 30 },
+        { "id": "return", "credits": -10, "xp": { "negotiation": 8 } },
+        { "id": "pocket", "credits": 90, "durability": -12 }
+      ]
+    },
+    {
       "id": "data_buyer",
       "jobs": ["hacker"],
       "choices": [

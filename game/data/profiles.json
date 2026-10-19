@@ -9,6 +9,8 @@
     { "id": "corp_district" },
     { "id": "lower_city" },
     { "id": "black_market" },
+    { "id": "zander" },
+    { "id": "union" },
     { "id": "self", "notes": [
       { "id": "contract", "fragment": "contract" },
       { "id": "hacker", "fragment": "name" },
