@@ -84,5 +84,6 @@ implemented_by:
 
 - (decides) [ADR-0040 体の種類ごとに元の持ち主を1人決め、その特性を持たせる](../50-adr/adr-0040-body-former-owners.md)
 - (decides) [ADR-0041 体の元の持ち主の記憶を、体ごとの2段の話にする](../50-adr/adr-0041-former-owner-memories.md)
+- (depends_on) [DOM-30 分岐図](./dom-30-branch-chart.md)
 
 <!-- graph:auto:end -->

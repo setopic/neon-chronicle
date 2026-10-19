@@ -747,8 +747,14 @@ func _show_profiles() -> void:
 	var tabs := TabContainer.new()
 	tabs.add_child(_text_body("\n".join(lines), CityMap.SIZE, 16))
 	tabs.add_child(CityMap.new())
+	# 分岐図は話とエンディングが増えると画面に収まらないので、スクロールの中に置く（DOM-30）
+	var chart_scroll := ScrollContainer.new()
+	chart_scroll.custom_minimum_size = CityMap.SIZE
+	chart_scroll.add_child(BranchChart.new())
+	tabs.add_child(chart_scroll)
 	tabs.set_tab_title(0, tr("ui.profile_text"))
 	tabs.set_tab_title(1, tr("ui.map"))
+	tabs.set_tab_title(2, tr("ui.chart"))
 	_show_dialog(tr("ui.profiles"), tabs)
 
 

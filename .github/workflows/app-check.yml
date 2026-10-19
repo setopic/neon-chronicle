@@ -68,3 +68,8 @@ jobs:
       - name: 人物のイベントが周をまたいで進むか確かめる
         working-directory: game
         run: timeout 120 ~/godot/godot --headless --path . --script res://ci/characters.gd
+
+      # 分岐図が、話とエンディングのデータから組み立てられるかを見る（DOM-30）。
+      - name: 分岐図を組み立てられるか確かめる
+        working-directory: game
+        run: timeout 120 ~/godot/godot --headless --path . --script res://ci/chart.gd

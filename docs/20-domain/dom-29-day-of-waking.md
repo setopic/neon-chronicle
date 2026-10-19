@@ -70,5 +70,6 @@ implemented_by:
 このノードを参照しているノード
 
 - (decides) [ADR-0046 レイとの約束と屋台組合の評判で開く、3つ目のエンディングを足す](../50-adr/adr-0046-third-ending.md)
+- (depends_on) [DOM-30 分岐図](./dom-30-branch-chart.md)
 
 <!-- graph:auto:end -->
