@@ -99,6 +99,9 @@ def main():
             key = f"job.{job.get('id')}.chronicle"
             if key not in base:
                 errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+            # 1回の長さが無いと、報酬が1秒ごとに入ってしまう（ADR-0051）
+            if not job.get("length", 0) > 0:
+                errors.append(f"{path.relative_to(GAME)}: 1回の長さ（length）が無い: job.{job.get('id')}")
         for event in data.get("events", []):
             choices = event.get("choices", [])
             if not any(not c.get("requires") and not c.get("requires_choice") for c in choices):
