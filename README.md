@@ -73,6 +73,7 @@ graph LR
     DOM-16["DOM-16<br/>街の地図"]
     DOM-17["DOM-17<br/>街の歴史"]
     DOM-18["DOM-18<br/>住民の階級と暮らし"]
+    DOM-19["DOM-19<br/>住民の生まれから死まで"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -105,6 +106,8 @@ graph LR
     ADR-0025["ADR-0025<br/>企業の時代より前の街を市とし、市の財政破綻で企業の時代が始まったことにする"]
     ADR-0026["ADR-0026<br/>屋台組合が、台帳でみかじめを割り振り、外から来た人に住む場所を割り振る"]
     ADR-0027["ADR-0027<br/>企業の階級と下層街の稼ぎを決め、身元で橋の行き来を分ける"]
+    ADR-0028["ADR-0028<br/>子どもは親の暮らしの中で育ち、下層街の死者の部品は闇医者が闇市場へ流す"]
+    ADR-0029["ADR-0029<br/>ザンダー一家をザンダー・ファミリーと呼ぶ"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -161,6 +164,14 @@ graph LR
   ADR-0027 -.->|decides| DOM-14
   ADR-0027 -.->|decides| DOM-15
   ADR-0027 -.->|decides| DOM-18
+  ADR-0028 -.->|decides| DOM-14
+  ADR-0028 -.->|decides| DOM-15
+  ADR-0028 -.->|decides| DOM-19
+  ADR-0029 ==>|supersedes| ADR-0024
+  ADR-0029 -.->|decides| DOM-14
+  ADR-0029 -.->|decides| DOM-15
+  ADR-0029 -.->|decides| DOM-18
+  ADR-0029 -.->|decides| DOM-19
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -211,6 +222,7 @@ graph LR
   DOM-14 -->|depends_on| DOM-15
   DOM-14 -->|depends_on| DOM-17
   DOM-14 -->|depends_on| DOM-18
+  DOM-14 -->|depends_on| DOM-19
   DOM-15 -->|depends_on| DOM-01
   DOM-15 -->|depends_on| DOM-06
   DOM-15 -->|depends_on| DOM-08
@@ -223,6 +235,9 @@ graph LR
   DOM-18 -->|depends_on| DOM-09
   DOM-18 -->|depends_on| DOM-15
   DOM-18 -->|depends_on| DOM-17
+  DOM-19 -->|depends_on| DOM-04
+  DOM-19 -->|depends_on| DOM-15
+  DOM-19 -->|depends_on| DOM-18
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04
@@ -242,7 +257,7 @@ graph LR
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
-  class ADR-0005,ADR-0020,ADR-0022 deprecated;
+  class ADR-0005,ADR-0020,ADR-0022,ADR-0024 deprecated;
 ```
 
 <!-- graph:diagram:end -->
