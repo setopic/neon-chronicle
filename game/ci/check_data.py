@@ -36,7 +36,7 @@ BASE_LOCALE = "en"
 KEY_PREFIX = {
     "jobs": "job", "skills": "skill", "implants": "implant", "upgrades": "upgrade", "events": "event",
     "fragments": "fragment", "endings": "ending", "bodies": "body", "profiles": "profile",
-    "challenges": "challenge",
+    "challenges": "challenge", "factions": "faction",
 }
 # game_state.gd の mio_line_key と同じ組
 MIO_REASONS = ("decay", "event")

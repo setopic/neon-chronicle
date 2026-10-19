@@ -1,0 +1,8 @@
+{
+  "factions": [
+    { "id": "zander" },
+    { "id": "union" },
+    { "id": "yomi" },
+    { "id": "valdeck" }
+  ]
+}
