@@ -2,7 +2,7 @@
 id: ADR-0012
 type: adr
 title: 転生のときに4種類の体から1つを選ぶ
-status: stable
+status: deprecated
 tags: [loop]
 decides:
   - DOM-11
@@ -13,7 +13,7 @@ related: []
 # 転生のときに4種類の体から1つを選ぶ
 
 - 日付: 2026-10-18
-- 状態: stable
+- 状態: deprecated（[ADR-0032](./adr-0032-body-quality-and-memory-software.md)が置き換えた）
 
 ## 背景
 
@@ -75,5 +75,9 @@ DOM-11を足し、体の種類の値を`game/data/bodies.json`に置く。言語
 `decides`: この決定が影響を与えるノード（ADR用）
 
 - [DOM-11 体の種類](../20-domain/dom-11-body-types.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0032 体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す](./adr-0032-body-quality-and-memory-software.md)
 
 <!-- graph:auto:end -->
