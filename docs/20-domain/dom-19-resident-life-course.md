@@ -102,5 +102,6 @@ implemented_by:
 - (decides) [ADR-0028 子どもは親の暮らしの中で育ち、下層街の死者の部品は闇医者が闇市場へ流す](../50-adr/adr-0028-life-course-and-body-parts.md)
 - (decides) [ADR-0029 ザンダー一家をザンダー・ファミリーと呼ぶ](../50-adr/adr-0029-zander-family-name.md)
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
+- (depends_on) [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
 
 <!-- graph:auto:end -->
