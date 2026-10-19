@@ -35,6 +35,14 @@ func _process(_delta: float) -> bool:
 	_expect(_chart.chosen("rei_2", {"id": "help"}), "選んだ選択肢を見分ける")
 	_expect(not _chart.seen("core_server"), "エンディングにたどり着くまで、結末の行は伏せる")
 	_expect(_chart.custom_minimum_size.x > 0.0 and _chart.custom_minimum_size.y > 0.0, "図の大きさが決まる")
+	# 話を選び直すと、その段から後の選択だけが消える（DOM-31）
+	_game.rewind_story("rei", "rei_2")
+	_expect(_game.character_choices.has("rei_1") and not _game.character_choices.has("rei_2"), "選び直した段から後の選択だけが消える")
+	# 排他の組の永続強化は、払った記憶ポイントをすべて戻して選び直せる
+	_game.memory_points = 0
+	_game.upgrades = {"focus_hacking": 2}
+	_game.refund_upgrade("focus_hacking")
+	_expect(_game.memory_points == 9 and _game.upgrade_taken_in_group("focus_combat") == "", "組の永続強化を選び直すと、払った記憶ポイントが戻る（%d）" % _game.memory_points)
 	print(labels)
 	DirAccess.remove_absolute(SAVE_PATH)
 	print("NG" if _failed else "OK: 分岐図を組み立てられる")

@@ -46,6 +46,7 @@ tags: [index]
 - [DOM-28 イベントの波](./dom-28-event-waves.md)
 - [DOM-29 目覚めの日](./dom-29-day-of-waking.md)
 - [DOM-30 分岐図](./dom-30-branch-chart.md)
+- [DOM-31 話の選び直し](./dom-31-choosing-again.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
@@ -364,5 +365,11 @@ python -m tools.graph new --type domain --id DOM-02 --title "..." --slug some-sl
 | 用語 | 意味 | 旧称 |
 | --- | --- | --- |
 | 分岐図 | 周をまたいで進む話の段とエンディングを、選択肢ごとに並べた図 | |
+
+### [DOM-31 話の選び直し](./dom-31-choosing-again.md)
+
+| 用語 | 意味 | 旧称 |
+| --- | --- | --- |
+| 選び直す | すでに選んだ話の段から、選択をやり直せるようにすること | |
 
 <!-- graph:terms:end -->

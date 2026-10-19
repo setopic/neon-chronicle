@@ -39,6 +39,7 @@ var _implant_buttons := {}
 var _rebirth_points_label: Label
 var _log_label: RichTextLabel
 var _upgrade_buttons := {}
+var _refund_buttons := {}
 var _choice_buttons := {}  # 選択肢のid -> ボタン
 var _story_closed_life := 0  # 戻った記憶の断片やエンディングの画面を閉じた周の番号。DOM-08
 
@@ -73,6 +74,7 @@ func _build() -> void:
 	_skill_rows.clear()
 	_implant_buttons.clear()
 	_upgrade_buttons.clear()
+	_refund_buttons.clear()
 	_request_buttons.clear()
 	_choice_buttons.clear()
 
@@ -330,6 +332,15 @@ func _build_rebirth() -> Control:
 		button.pressed.connect(Game.buy_upgrade.bind(id))
 		box.add_child(button)
 		_upgrade_buttons[id] = button
+	# 排他の組の永続強化は、払った記憶ポイントを戻して選び直せる。レベルを持つものにだけ出す（DOM-31）
+	for id in GameData.order["upgrades"]:
+		if GameData.upgrades[id].get("group", "") == "":
+			continue
+		var refund := Button.new()
+		refund.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		refund.pressed.connect(Game.refund_upgrade.bind(id))
+		box.add_child(refund)
+		_refund_buttons[id] = refund
 	_rebirth_points_label = _label("", PINK, 16)
 	box.add_child(_rebirth_points_label)
 
@@ -553,6 +564,10 @@ func _refresh() -> void:
 			parts.append(_requirement_text(choice.get("requires", {}), _reputation_items(choice.get("requires_reputation", {}))))
 			button.disabled = true
 		button.text = "    ".join(parts)
+	for id in _refund_buttons:
+		var refund: Button = _refund_buttons[id]
+		refund.visible = Game.upgrades.get(id, 0) > 0
+		refund.text = Loc.t("ui.upgrade_refund", {"upgrade": GameData.name_of("upgrades", id), "n": Game.upgrade_spent(id)})
 	if is_instance_valid(_rebirth_points_label):
 		_rebirth_points_label.text = Loc.t("ui.memory_points", {"n": Game.memory_points})
 
@@ -730,7 +745,7 @@ func _show_fragments() -> void:
 
 
 ## 街と人物の資料を読む。追記は、要る断片が戻るか出るイベントが起きるまで伏せる（DOM-14）
-func _show_profiles() -> void:
+func _show_profiles(tab := 0) -> void:
 	var lines := PackedStringArray()
 	for id in GameData.order["profiles"]:
 		var profile: Dictionary = GameData.profiles[id]
@@ -747,15 +762,51 @@ func _show_profiles() -> void:
 	var tabs := TabContainer.new()
 	tabs.add_child(_text_body("\n".join(lines), CityMap.SIZE, 16))
 	tabs.add_child(CityMap.new())
-	# 分岐図は話とエンディングが増えると画面に収まらないので、スクロールの中に置く（DOM-30）
-	var chart_scroll := ScrollContainer.new()
-	chart_scroll.custom_minimum_size = CityMap.SIZE
-	chart_scroll.add_child(BranchChart.new())
-	tabs.add_child(chart_scroll)
+	tabs.add_child(_chart_tab())
 	tabs.set_tab_title(0, tr("ui.profile_text"))
 	tabs.set_tab_title(1, tr("ui.map"))
 	tabs.set_tab_title(2, tr("ui.chart"))
+	tabs.current_tab = tab
 	_show_dialog(tr("ui.profiles"), tabs)
+
+
+## 分岐図のタブ。図の下に、選んだ段ごとに「ここから選び直す」ボタンを並べる（DOM-30、DOM-31）
+func _chart_tab() -> Control:
+	var box := VBoxContainer.new()
+	# 分岐図は話とエンディングが増えると画面に収まらないので、スクロールの中に置く
+	var chart_scroll := ScrollContainer.new()
+	chart_scroll.custom_minimum_size = CityMap.SIZE - Vector2(0, 110)
+	var chart := BranchChart.new()
+	chart_scroll.add_child(chart)
+	box.add_child(chart_scroll)
+	box.add_child(_label(tr("ui.rewind_note"), DIM, 13))
+	var flow := HFlowContainer.new()
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(CityMap.SIZE.x, 80)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	flow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(flow)
+	box.add_child(scroll)
+	for row in chart.rows():
+		for id in row["stages"]:
+			if not Game.character_choices.has(id):
+				continue
+			var button := Button.new()
+			button.text = Loc.t("ui.rewind", {"line": row["label"], "event": GameData.name_of("events", id)})
+			button.pressed.connect(_rewind.bind(Game.story_line(GameData.events[id]), id, box))
+			flow.add_child(button)
+	return box
+
+
+## 話を選び直したら、分岐図を開き直して、消えた選択を図から外す
+func _rewind(line: String, event_id: String, content: Control) -> void:
+	Game.rewind_story(line, event_id)
+	var dialog := content.get_parent()
+	while dialog != null and not dialog is AcceptDialog:
+		dialog = dialog.get_parent()
+	if dialog != null:
+		dialog.hide()
+	_show_profiles(2)
 
 
 func _show_licenses() -> void:

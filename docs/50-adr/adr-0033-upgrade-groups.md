@@ -2,7 +2,7 @@
 id: ADR-0033
 type: adr
 title: 永続強化を増やし、どちらか一方しか取れない組を作る
-status: stable
+status: deprecated
 tags: [loop]
 decides:
   - DOM-05
@@ -14,7 +14,7 @@ related: []
 # 永続強化を増やし、どちらか一方しか取れない組を作る
 
 - 日付: 2026-10-20
-- 状態: stable
+- 状態: deprecated（[ADR-0048](./adr-0048-no-point-of-no-return.md)が置き換えた）
 
 ## 背景
 
@@ -84,5 +84,9 @@ DOM-05の永続強化の属性に排他の組を足し、効果の種類に仕�
 
 - [DOM-05 転生と永続強化](../20-domain/dom-05-rebirth.md)
 - [DOM-09 意識の写しと目覚め](../20-domain/dom-09-consciousness-copy.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0048 話の段と永続強化の組を、いつでも選び直せるようにする](./adr-0048-no-point-of-no-return.md)
 
 <!-- graph:auto:end -->

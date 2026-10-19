@@ -1,6 +1,6 @@
 extends Node
 
-## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-14、DOM-21〜DOM-28。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
+## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-14、DOM-21〜DOM-31。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
 
 signal life_ended
 signal life_started
@@ -310,6 +310,40 @@ func upgrade_taken_in_group(id: String) -> String:
 		if other != id and upgrades[other] > 0 and GameData.upgrades.get(other, {}).get("group", "") == group:
 			return other
 	return ""
+
+
+## その永続強化にこれまで払った記憶ポイント。選び直すときに、この分を戻す（DOM-31）
+func upgrade_spent(id: String) -> int:
+	var data: Dictionary = GameData.upgrades.get(id, {})
+	var spent := 0
+	for level in upgrades.get(id, 0):
+		spent += int(data.get("cost", 1) * pow(data.get("cost_growth", 2.0), level))
+	return spent
+
+
+## 排他の組の永続強化を選び直す。払った記憶ポイントをすべて戻し、レベルを0にする（DOM-31）
+func refund_upgrade(id: String) -> void:
+	if GameData.upgrades.get(id, {}).get("group", "") == "" or upgrades.get(id, 0) <= 0:
+		return
+	var spent := upgrade_spent(id)
+	memory_points += spent
+	upgrades.erase(id)
+	_log("log.upgrade_refund", {"upgrade": id, "points": spent})
+
+
+## 話を、from_event の段から選び直せるようにする。その段と、それより後の段の選択を話の進み具合から消す。
+## 消した段は、次からまた起きうる。評判や経験など、選んだときに得たものはそのまま残す（DOM-31）
+func rewind_story(line: String, from_event: String) -> void:
+	var stages := []
+	for id in GameData.order["events"]:
+		if story_line(GameData.events[id]) == line:
+			stages.append(id)
+	var at := stages.find(from_event)
+	if at < 0 or not character_choices.has(from_event):
+		return
+	for i in range(at, stages.size()):
+		character_choices.erase(stages[i])
+	_log("log.rewind", {"event": from_event})
 
 
 func can_buy_upgrade(id: String) -> bool:
