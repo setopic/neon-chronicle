@@ -65,6 +65,7 @@ tags: [index]
 - [ADR-0046 レイとの約束と屋台組合の評判で開く、3つ目のエンディングを足す](./adr-0046-third-ending.md)
 - [ADR-0047 話とエンディングの分岐図を、街と人物の画面の3つ目のタブに出す](./adr-0047-branch-chart.md)
 - [ADR-0048 話の段と永続強化の組を、いつでも選び直せるようにする](./adr-0048-no-point-of-no-return.md)
+- [ADR-0049 転生の画面とメインの画面を1280x720に収める](./adr-0049-fit-screens-1280x720.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
