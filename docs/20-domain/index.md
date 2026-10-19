@@ -41,6 +41,7 @@ tags: [index]
 - [DOM-23 屋台通りの対立](./dom-23-stall-street-feud.md)
 - [DOM-24 仕事の区画と身元](./dom-24-job-districts-and-identity.md)
 - [DOM-25 体の元の持ち主と特性](./dom-25-body-former-owners.md)
+- [DOM-26 体の容量とインプラントの取り外し](./dom-26-body-capacity.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
@@ -321,5 +322,13 @@ python -m tools.graph new --type domain --id DOM-02 --title "..." --slug some-sl
 | --- | --- | --- |
 | 元の持ち主 | 体の種類の神経と腕の部品を取った、下層街の死者。体の種類ごとに1人 | |
 | 特性 | 元の持ち主の生き方が体に残した癖。その体で目覚めた周に効果を持つ | |
+
+### [DOM-26 体の容量とインプラントの取り外し](./dom-26-body-capacity.md)
+
+| 用語 | 意味 | 旧称 |
+| --- | --- | --- |
+| 体の容量 | 体の種類ごとの、組み込めるインプラントの大きさの合計の上限 | |
+| 大きさ | インプラントが体の容量のうちに使う量 | |
+| 外す | 組み込んだインプラントを、体から取り除くこと。代金は戻らない | |
 
 <!-- graph:terms:end -->

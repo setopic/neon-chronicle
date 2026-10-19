@@ -58,6 +58,7 @@ tags: [index]
 - [ADR-0039 仕事に区画を持たせ、傭兵の仕事には偽の身元を要る](./adr-0039-job-districts-and-identity.md)
 - [ADR-0040 体の種類ごとに元の持ち主を1人決め、その特性を持たせる](./adr-0040-body-former-owners.md)
 - [ADR-0041 体の元の持ち主の記憶を、体ごとの2段の話にする](./adr-0041-former-owner-memories.md)
+- [ADR-0042 体の種類ごとに容量を持たせ、インプラントを外せるようにする](./adr-0042-body-capacity.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

@@ -32,6 +32,7 @@ var _request_label: Label
 var _challenge_label: Label
 var _reputation_label: Label
 var _identity_button: Button
+var _capacity_label: Label
 var _request_buttons := {}
 var _implant_buttons := {}
 var _rebirth_points_label: Label
@@ -238,11 +239,13 @@ func _build_right() -> Control:
 	box.add_child(_reputation_label)
 
 	box.add_child(_section_title(tr("ui.implants")))
+	_capacity_label = _label("", DIM, 14)
+	box.add_child(_capacity_label)
 	for id in GameData.order["implants"]:
 		var button := Button.new()
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.tooltip_text = GameData.desc_of("implants", id)
-		button.pressed.connect(Game.buy_implant.bind(id))
+		button.pressed.connect(_press_implant.bind(id))
 		box.add_child(button)
 		_implant_buttons[id] = button
 	# 偽の身元は闇市場で買う。インプラントと同じくクレジットで買うので、同じ欄に置く（DOM-24）
@@ -375,7 +378,8 @@ func _build_rebirth() -> Control:
 			if Game.can_choose_body(id) else Loc.t("ui.body_locked", {"n": Game.format_number(Game.QUALITY_CREDITS * 2.0)})
 		# 元の持ち主から残った特性も、目覚める前に分かるように添える（DOM-25）
 		awaken.text = "%s\n%s\n%s\n%s" % [
-			Loc.t("ui.awaken", {"body": GameData.name_of("bodies", id)}), quality_text, GameData.desc_of("bodies", id),
+			Loc.t("ui.awaken", {"body": GameData.name_of("bodies", id)}), quality_text,
+			GameData.desc_of("bodies", id) + "  " + Loc.t("ui.capacity_short", {"max": int(GameData.bodies[id].get("capacity", 99))}),
 			tr("body.%s.trait" % id)]
 		awaken.disabled = not Game.can_choose_body(id)
 		awaken.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -502,6 +506,8 @@ func _refresh() -> void:
 			"state": tr("ui.challenge_broken" if Game.challenge_broken else "ui.challenge_keeping")})
 	for id in _request_buttons:
 		_request_buttons[id].visible = Game.alive and Game.request == ""
+	if is_instance_valid(_capacity_label):
+		_capacity_label.text = Loc.t("ui.capacity", {"load": Game.implant_load(), "max": Game.capacity()})
 	if is_instance_valid(_identity_button):
 		_identity_button.text = tr("ui.identity_owned") if Game.identity else Loc.t("ui.identity_buy", {"n": Game.format_number(Game.IDENTITY_COST)})
 		_identity_button.disabled = Game.identity or not Game.alive or Game.credits < Game.IDENTITY_COST
@@ -509,13 +515,17 @@ func _refresh() -> void:
 		var button: Button = _implant_buttons[id]
 		var data: Dictionary = GameData.implants[id]
 		# ツールチップは指で触ると見られないので、効果をボタンの文に出す（ADR-0016）
-		var parts := [GameData.name_of("implants", id), _effects_text(data.get("effects", {}))]
+		var parts := [GameData.name_of("implants", id), _effects_text(data.get("effects", {})),
+			Loc.t("ui.implant_size", {"n": int(data.get("size", 1))})]
 		if Game.implants.has(id):
+			# 組み込んだインプラントは、押すと外せる。外しても払ったクレジットは戻らない（DOM-26）
 			parts.append(tr("ui.implant_owned"))
-			button.disabled = true
+			button.disabled = not Game.alive
 		else:
 			parts.append(Loc.t("ui.cost_credits", {"n": Game.format_number(Game.implant_cost(id))}))
-			button.disabled = not Game.alive or Game.credits < Game.implant_cost(id)
+			if not Game.implant_fits(id):
+				parts.append(tr("ui.implant_no_room"))
+			button.disabled = not Game.alive or Game.credits < Game.implant_cost(id) or not Game.implant_fits(id)
 		if data.get("persistent", false):
 			parts.append(tr("ui.persistent"))
 		button.text = "    ".join(parts)
@@ -653,6 +663,14 @@ func _upgrade_group_text(id: String) -> String:
 		if other != id and GameData.upgrades[other].get("group", "") == group:
 			names.append(GameData.name_of("upgrades", other))
 	return "    " + Loc.t("ui.upgrade_group", {"names": tr("ui.list_sep").join(names)})
+
+
+## インプラントのボタン。組み込んでいなければ買い、組み込んでいれば外す
+func _press_implant(id: String) -> void:
+	if Game.implants.has(id):
+		Game.remove_implant(id)
+	else:
+		Game.buy_implant(id)
 
 
 ## 評判の条件（{勢力のid: 値}）を、選ぶ条件の文に並べる項目にする
