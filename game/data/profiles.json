@@ -6,6 +6,7 @@
       { "id": "core", "fragment": "core" }
     ] },
     { "id": "history" },
+    { "id": "engineers", "event": "old_plaque", "notes": [{ "id": "blueprints", "event": "city_blueprints" }, { "id": "substation", "event": "substation" }, { "id": "core", "fragment": "core" }] },
     { "id": "companies" },
     { "id": "food_company" },
     { "id": "corp_district" },

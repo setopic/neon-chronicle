@@ -82,6 +82,7 @@
     {
       "id": "old_plaque",
       "jobs": ["courier"],
+      "record": true,
       "choices": [
         { "id": "pry", "credits": 40, "durability": -5 },
         { "id": "ask", "xp": { "negotiation": 6 } },
@@ -100,9 +101,20 @@
     {
       "id": "substation",
       "jobs": ["mercenary"],
+      "record": true,
       "choices": [
         { "id": "cut", "credits": 40 },
         { "id": "restore", "durability": -10, "xp": { "combat": 10 } }
+      ]
+    },
+    {
+      "id": "city_blueprints",
+      "jobs": ["hacker"],
+      "record": true,
+      "choices": [
+        { "id": "sell", "credits": 60 },
+        { "id": "read", "requires": { "hacking": 3 }, "credits": 30, "xp": { "hacking": 10 } },
+        { "id": "wipe" }
       ]
     },
     {

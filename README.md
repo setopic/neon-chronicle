@@ -116,6 +116,7 @@ graph LR
     ADR-0033["ADR-0033<br/>永続強化を増やし、どちらか一方しか取れない組を作る"]
     ADR-0034["ADR-0034<br/>ジンの依頼を2つ並べ、受けるものを選ばせる"]
     ADR-0035["ADR-0035<br/>転生のときに縛りを1つ選び、守り通せば記憶ポイントを上乗せする"]
+    ADR-0036["ADR-0036<br/>橋を架けた技師たちの記録を、イベントと資料の追記で集める"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -194,6 +195,7 @@ graph LR
   ADR-0034 ==>|supersedes| ADR-0013
   ADR-0034 -.->|decides| DOM-12
   ADR-0035 -.->|decides| DOM-21
+  ADR-0036 -.->|decides| DOM-14
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
