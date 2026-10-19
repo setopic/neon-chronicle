@@ -109,5 +109,6 @@ implemented_by:
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 - (depends_on) [DOM-19 住民の生まれから死まで](./dom-19-resident-life-course.md)
 - (depends_on) [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
+- (depends_on) [DOM-24 仕事の区画と身元](./dom-24-job-districts-and-identity.md)
 
 <!-- graph:auto:end -->

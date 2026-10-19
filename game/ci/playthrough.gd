@@ -48,6 +48,7 @@ func _step() -> void:
 	_game.set_job(_pick_job())
 	for id in _data.order["implants"]:
 		_game.buy_implant(id)
+	_game.buy_identity()
 	_game._tick(_game.STEP)
 	_played += _game.STEP
 

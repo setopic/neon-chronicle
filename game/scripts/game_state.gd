@@ -1,6 +1,6 @@
 extends Node
 
-## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-14、DOM-21、DOM-22。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
+## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-14、DOM-21〜DOM-24。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
 
 signal life_ended
 signal life_started
@@ -25,6 +25,7 @@ const REQUEST_BONUS := 0.5  # 上乗せの割合を持たない依頼を果た�
 const POINTS_XP := 2.0  # 記憶ポイントの式で、その周で得た経験の合計を割る値。ADR-0032
 const QUALITY_MAX := 5  # 体の質の上限。ADR-0032
 const QUALITY_DECAY := 0.15  # 体の質1段階ごとに、基本の劣化を下げる割合
+const IDENTITY_COST := 300.0  # 闇市場で偽の身元を買う値段。DOM-24
 const REPUTATION_LIMIT := 10  # 評判の上限。下限はこれを負にした値。DOM-22
 const QUALITY_CREDITS := 1000.0  # 体の質の式で、前の周で稼いだクレジットを割る値
 ## ログやクロニクルの引数のうち、id から表示名に変える項目
@@ -54,6 +55,7 @@ var request := ""  # その周に受けた依頼のid。まだ受けていない
 var request_done := false
 var challenge := ""  # その周の縛りのid。選ばなかった周は空。DOM-21
 var challenge_broken := false
+var identity := false  # その周に偽の身元を持っているか。周の終わりに失う。DOM-24
 var met_characters: Array = []  # その周に人物のイベントが起きた人物。1つの周で進む話は、人物ごとに1段まで。DOM-13
 
 # --- 転生しても残る状態 ---
@@ -188,6 +190,9 @@ func can_take_job(job_id: String) -> bool:
 	var job: Dictionary = GameData.jobs.get(job_id, {})
 	if job.get("needs_all_fragments", false) and next_fragment() != "":
 		return false
+	# 橋の向こうの仕事は、橋を渡れる身元が無いと就けない（DOM-24）
+	if job.get("needs_identity", false) and not identity:
+		return false
 	return meets(job.get("requires", {}))
 
 
@@ -226,6 +231,15 @@ func _add_xp(skill: String, amount: float) -> void:
 
 
 # --- インプラントと永続強化 ---
+
+## 闇市場で偽の身元を買う。周の終わりまで持ち、次の周には持ち越さない（DOM-24）
+func buy_identity() -> void:
+	if not alive or identity or credits < IDENTITY_COST:
+		return
+	credits -= IDENTITY_COST
+	identity = true
+	_log("log.identity")
+
 
 ## インプラントの値段は、永続強化で下がっても、もとの半分を下回らない（ADR-0033）
 func implant_cost(id: String) -> float:
@@ -508,6 +522,7 @@ func _start_life(body_id := "", challenge_id := "") -> void:
 	met_characters = []
 	challenge = challenge_id if GameData.challenges.has(challenge_id) and life_number > 1 else ""
 	challenge_broken = false
+	identity = false
 	implants = implants.filter(func(id): return GameData.implants.get(id, {}).get("persistent", false))
 	credits = 0.0
 	life_earned = 0.0
@@ -735,7 +750,7 @@ func save_game() -> void:
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
 		"implants": implants, "job_time": job_time, "alive": alive, "body": body, "body_quality": body_quality, "life_xp": life_xp, "pending_event": pending_event,
 		"last_deed": last_deed, "request_offers": request_offers, "request": request, "request_done": request_done,
-		"challenge": challenge, "challenge_broken": challenge_broken, "last_challenge_bonus": last_challenge_bonus, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
+		"challenge": challenge, "challenge_broken": challenge_broken, "identity": identity, "last_challenge_bonus": last_challenge_bonus, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
 		"last_points_gained": last_points_gained, "last_request_bonus": last_request_bonus, "upgrades": upgrades, "reputation": reputation,
 		"chronicle": chronicle, "fragments": fragments, "last_fragments": last_fragments,
 		"character_choices": character_choices, "logs": logs,
@@ -787,6 +802,8 @@ func load_game() -> bool:
 	if not GameData.challenges.has(challenge):
 		challenge = ""
 	challenge_broken = data.get("challenge_broken", false)
+	# #86 より前のセーブの周には、身元が無い。傭兵に就いていたら、身元を持っていたものとして扱う
+	identity = data.get("identity", data.get("current_job", "") == "mercenary")
 	last_challenge_bonus = int(data.get("last_challenge_bonus", 0))
 	upgrades = _int_values(data.get("upgrades", {}))
 	# #84 より前のセーブには、評判が無い

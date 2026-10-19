@@ -73,5 +73,6 @@ implemented_by:
 
 - (decides) [ADR-0022 街の地図を「街と人物」の画面にタブで出し、中枢サーバーは断片が戻るまで伏せる](../50-adr/adr-0022-city-map-in-game.md)
 - (decides) [ADR-0023 橋に人名を付け、地図を地形の分かる描き方にする](../50-adr/adr-0023-bridge-names-and-terrain-map.md)
+- (depends_on) [DOM-24 仕事の区画と身元](./dom-24-job-districts-and-identity.md)
 
 <!-- graph:auto:end -->

@@ -78,6 +78,7 @@ graph LR
     DOM-21["DOM-21<br/>縛りの周"]
     DOM-22["DOM-22<br/>勢力の評判"]
     DOM-23["DOM-23<br/>屋台通りの対立"]
+    DOM-24["DOM-24<br/>仕事の区画と身元"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -121,6 +122,7 @@ graph LR
     ADR-0036["ADR-0036<br/>橋を架けた技師たちの記録を、イベントと資料の追記で集める"]
     ADR-0037["ADR-0037<br/>4つの勢力に評判を持たせ、周をまたいで残す"]
     ADR-0038["ADR-0038<br/>ザンダー・ファミリーと屋台組合の対立を、3段の勢力の話にする"]
+    ADR-0039["ADR-0039<br/>仕事に区画を持たせ、傭兵の仕事には偽の身元を要る"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -203,6 +205,7 @@ graph LR
   ADR-0037 -.->|decides| DOM-22
   ADR-0038 -.->|decides| DOM-23
   ADR-0038 -.->|decides| DOM-14
+  ADR-0039 -.->|decides| DOM-24
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -287,6 +290,8 @@ graph LR
   DOM-22 -->|depends_on| DOM-15
   DOM-23 -->|depends_on| DOM-13
   DOM-23 -->|depends_on| DOM-22
+  DOM-24 -->|depends_on| DOM-16
+  DOM-24 -->|depends_on| DOM-18
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04

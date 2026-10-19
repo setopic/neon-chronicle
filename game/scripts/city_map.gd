@@ -4,6 +4,7 @@ extends Control
 ## 街の地図。一般的な道路地図の描き方で描く。道路は縁取りした帯、街区は面、水は青、
 ## 崖は崖の記号、縄張りの境は点線、施設は印と名前で示す。DOM-15、DOM-16。
 ## 配置はDOM-15の図と同じにする。中枢サーバーは、記憶の断片「中枢サーバー」が戻るまで描かない。
+## いまの仕事の区画は、名前の色を変えて示す（DOM-24）。
 
 const PINK := Color(1.0, 0.2, 0.7)
 const CYAN := Color(0.2, 0.95, 1.0)
@@ -184,9 +185,12 @@ func _draw_labels(o: Vector2) -> void:
 		_poi(font, o + POIS[id], tr("map.poi.%s" % id))
 	if Game.fragments.has("core"):
 		_poi(font, o + CORE, tr("map.core"))
+	var here: String = GameData.jobs.get(Game.current_job, {}).get("district", "")
 	for id in LABELS:
 		var at: Vector2 = o + LABELS[id]
-		_text(font, at, tr("map." + id), 15, TEXT)
+		_text(font, at, tr("map." + id), 15, CYAN if id == here else TEXT)
+		if id == here:
+			_text(font, at + Vector2(0, -18), tr("map.here"), 12, CYAN)
 		if id in NOTED:
 			_text(font, at + Vector2(0, 19), tr("map.%s.note" % id), 13, NOTE)
 

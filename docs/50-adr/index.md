@@ -55,6 +55,7 @@ tags: [index]
 - [ADR-0036 橋を架けた技師たちの記録を、イベントと資料の追記で集める](./adr-0036-bridge-engineers-records.md)
 - [ADR-0037 4つの勢力に評判を持たせ、周をまたいで残す](./adr-0037-faction-reputation.md)
 - [ADR-0038 ザンダー・ファミリーと屋台組合の対立を、3段の勢力の話にする](./adr-0038-stall-street-feud.md)
+- [ADR-0039 仕事に区画を持たせ、傭兵の仕事には偽の身元を要る](./adr-0039-job-districts-and-identity.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
