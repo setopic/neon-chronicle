@@ -66,6 +66,7 @@ tags: [index]
 - [ADR-0047 話とエンディングの分岐図を、街と人物の画面の3つ目のタブに出す](./adr-0047-branch-chart.md)
 - [ADR-0048 話の段と永続強化の組を、いつでも選び直せるようにする](./adr-0048-no-point-of-no-return.md)
 - [ADR-0049 転生の画面とメインの画面を1280x720に収める](./adr-0049-fit-screens-1280x720.md)
+- [ADR-0050 話の選び直しを、エンディングにたどり着いてから使えるようにする](./adr-0050-choose-again-after-ending.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

@@ -630,6 +630,7 @@
     "chart.feud": "Stall street feud",
     "ui.upgrade_refund": "Choose again instead of {upgrade} (refund {n} memory points)",
     "log.upgrade_refund": "You removed {upgrade} and got {points} memory points back.",
+    "ui.rewind_locked": "Once you reach any ending, you can choose again from the stages you have chosen.",
     "ui.rewind_note": "You can choose again from any stage you have chosen. That stage can happen again. Reputation and XP are not undone.",
     "ui.rewind": "{line}: choose again from {event}",
     "log.rewind": "You decided to choose again from {event}.",

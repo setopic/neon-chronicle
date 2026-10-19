@@ -112,6 +112,7 @@ implemented_by:
 - (decides) [ADR-0032 体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す](../50-adr/adr-0032-body-quality-and-memory-software.md)
 - (decides) [ADR-0033 永続強化を増やし、どちらか一方しか取れない組を作る](../50-adr/adr-0033-upgrade-groups.md)
 - (decides) [ADR-0048 話の段と永続強化の組を、いつでも選び直せるようにする](../50-adr/adr-0048-no-point-of-no-return.md)
+- (decides) [ADR-0050 話の選び直しを、エンディングにたどり着いてから使えるようにする](../50-adr/adr-0050-choose-again-after-ending.md)
 - (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 - (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)

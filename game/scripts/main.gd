@@ -859,6 +859,10 @@ func _chart_tab() -> Control:
 	var chart := BranchChart.new()
 	chart_scroll.add_child(chart)
 	box.add_child(chart_scroll)
+	# 最初のエンディングまでは選び直せないので、ボタンを出さずに案内だけを出す（DOM-31、ADR-0050）
+	if not Game.can_rewind_story():
+		box.add_child(_label(tr("ui.rewind_locked"), DIM, 13))
+		return box
 	box.add_child(_label(tr("ui.rewind_note"), DIM, 13))
 	var flow := HFlowContainer.new()
 	var scroll := ScrollContainer.new()
