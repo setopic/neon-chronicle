@@ -406,6 +406,13 @@
     "map.canal": "排水路",
     "map.olsen_bridge": "オルセン橋",
     "map.villard_bridge": "ヴィラール橋",
-    "map.hagen_bridge": "ハーゲン橋"
+    "map.hagen_bridge": "ハーゲン橋",
+    "map.legend.building": "企業のビル",
+    "map.legend.shack": "小屋とコンテナ",
+    "map.legend.street": "表通り",
+    "map.legend.alley": "路地",
+    "map.legend.stall": "屋台",
+    "map.legend.cliff": "崖",
+    "map.legend.border": "縄張りの境"
   }
 }

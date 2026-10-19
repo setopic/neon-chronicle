@@ -33,7 +33,7 @@ const LABELS := {
 	"montfort": Vector2(487, 48),
 	"lindholm": Vector2(682, 48),
 	"back_alley": Vector2(200, 272),
-	"stalls": Vector2(560, 334),
+	"stalls": Vector2(470, 334),
 	"deep": Vector2(375, 410),
 	"black_market": Vector2(90, 410),
 }
@@ -61,6 +61,9 @@ const ALLEYS := [
 const MARKET := Rect2(15, 380, 150, 80)
 const MARKET_ENTRANCE := Vector2(60, 360)
 const CLINIC := Vector2(150, 330)
+## 凡例。記号ごとの名前は map.legend.<id>
+const LEGEND := Rect2(598, 318, 176, 122)
+const LEGEND_ITEMS := ["building", "shack", "street", "alley", "stall", "cliff", "border"]
 ## 裏通りの添え書き map.back_alley.note は、1行目を診療所の印、2行目を闇市場の入口の印に添える
 const MARKERS := [CLINIC, MARKET_ENTRANCE]
 
@@ -78,6 +81,7 @@ func _draw() -> void:
 	_draw_market(o)
 	_draw_bridges(o)
 	_draw_labels(o)
+	_draw_legend(o)
 
 
 func _draw_ground(o: Vector2) -> void:
@@ -122,7 +126,7 @@ func _draw_blocks(o: Vector2) -> void:
 	rng.seed = 11
 	for i in 260:
 		var p := Vector2(rng.randf_range(4, SIZE.x - 12), rng.randf_range(246, SIZE.y - 10))
-		if MARKET.grow(4).has_point(p) or _near_street(p):
+		if MARKET.grow(4).has_point(p) or LEGEND.grow(4).has_point(p) or _near_street(p):
 			continue
 		var r := Rect2(o + p, Vector2(rng.randi_range(5, 10), rng.randi_range(4, 8)))
 		draw_rect(r, Color(0.16, 0.1, 0.22))
@@ -181,6 +185,36 @@ func _draw_labels(o: Vector2) -> void:
 		_text(font, at, tr("map." + id), 15, TEXT)
 		for i in lines.size():
 			_text(font, at + Vector2(0, 20 + i * 18), lines[i], 13, NOTE)
+
+
+func _draw_legend(o: Vector2) -> void:
+	var font := get_theme_default_font()
+	var r := Rect2(o + LEGEND.position, LEGEND.size)
+	draw_rect(r, Color(SHADOW, 0.9))
+	draw_rect(r, Color(CYAN, 0.5), false, 1)
+	for i in LEGEND_ITEMS.size():
+		var id: String = LEGEND_ITEMS[i]
+		var at := r.position + Vector2(10, 16 + i * 15)
+		match id:
+			"building":
+				draw_rect(Rect2(at - Vector2(0, 5), Vector2(14, 10)), Color(0.2, 0.13, 0.36))
+				draw_rect(Rect2(at - Vector2(0, 5), Vector2(14, 10)), Color(CYAN, 0.5), false, 1)
+			"shack":
+				draw_rect(Rect2(at - Vector2(-3, 3), Vector2(8, 6)), Color(0.16, 0.1, 0.22))
+				draw_rect(Rect2(at - Vector2(-3, 3), Vector2(8, 6)), Color(PINK, 0.5), false, 1)
+			"street":
+				draw_line(at, at + Vector2(16, 0), Color(CYAN, 0.7), 4)
+			"alley":
+				draw_line(at, at + Vector2(16, 0), Color(CYAN, 0.45), 2)
+			"stall":
+				draw_rect(Rect2(at - Vector2(-4, 3), Vector2(7, 5)), Color(1.0, 0.75, 0.3, 0.8))
+			"cliff":
+				draw_line(at - Vector2(0, 4), at + Vector2(16, -4), PINK, 2)
+				for x in range(2, 16, 5):
+					draw_line(at + Vector2(x, -4), at + Vector2(x - 1, 5), Color(PINK, 0.6), 1)
+			"border":
+				_dashed(at, at + Vector2(16, 0), Color(PINK, 0.8))
+		_text(font, at + Vector2(24, 5), tr("map.legend.%s" % id), 12, NOTE, HORIZONTAL_ALIGNMENT_LEFT)
 
 
 ## 建物や線の上でも読めるよう、文字は縁取りしてから描く

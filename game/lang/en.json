@@ -406,6 +406,13 @@
     "map.canal": "Drainage canal",
     "map.olsen_bridge": "Olsen Bridge",
     "map.villard_bridge": "Villard Bridge",
-    "map.hagen_bridge": "Hagen Bridge"
+    "map.hagen_bridge": "Hagen Bridge",
+    "map.legend.building": "Corporate building",
+    "map.legend.shack": "Shacks and containers",
+    "map.legend.street": "Main street",
+    "map.legend.alley": "Alley",
+    "map.legend.stall": "Food stall",
+    "map.legend.cliff": "Cliff",
+    "map.legend.border": "Turf border"
   }
 }
