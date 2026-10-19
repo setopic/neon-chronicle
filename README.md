@@ -95,6 +95,7 @@ graph LR
     ADR-0018["ADR-0018<br/>街を複数の企業が分け合い、場所と住人をイベントと資料に出す"]
     ADR-0019["ADR-0019<br/>衣食住は文だけで書き、食べ物は合成食の企業が握る"]
     ADR-0020["ADR-0020<br/>街を区画と3本の橋で分け、地図は設計文書の図に残す"]
+    ADR-0021["ADR-0021<br/>電気はヨミ・システムズ、水はリンドホルム食品が握り、街に公共の交通は置かない"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -135,6 +136,8 @@ graph LR
   ADR-0019 -.->|decides| DOM-14
   ADR-0019 -.->|decides| DOM-15
   ADR-0020 -.->|decides| DOM-15
+  ADR-0021 -.->|decides| DOM-14
+  ADR-0021 -.->|decides| DOM-15
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02

@@ -88,6 +88,15 @@
       ]
     },
     {
+      "id": "power_tap",
+      "jobs": ["hacker"],
+      "choices": [
+        { "id": "hide", "requires": { "hacking": 4 }, "credits": 15, "durability": -6, "xp": { "hacking": 10 } },
+        { "id": "sell", "credits": 60 },
+        { "id": "refuse" }
+      ]
+    },
+    {
       "id": "rei_1",
       "jobs": ["hacker"],
       "character": "rei",
