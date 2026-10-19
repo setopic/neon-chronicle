@@ -30,7 +30,7 @@
       "needs_identity": true,
       "income": 20.0,
       "length": 15.0,
-      "minigame": "timing",
+      "minigame": "mercenary",
       "skill": "combat",
       "skill_bonus": 0.15,
       "danger": 2.0,

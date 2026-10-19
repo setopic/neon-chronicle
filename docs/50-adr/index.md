@@ -73,6 +73,7 @@ tags: [index]
 - [ADR-0054 仕事の1回を、ミニゲームで置き換えて遊べるようにする](./adr-0054-minigame-frame.md)
 - [ADR-0055 ハッカーの仕事のミニゲームを、符号の表を縦横にたどる遊びにする](./adr-0055-hacking-minigame.md)
 - [ADR-0056 運び屋の仕事のミニゲームを、追っ手をかわして升目を進む遊びにする](./adr-0056-courier-minigame.md)
+- [ADR-0057 傭兵の仕事のミニゲームを、窓に出る敵を撃つ遊びにする](./adr-0057-mercenary-minigame.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
