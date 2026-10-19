@@ -21,6 +21,7 @@ Godot 4.7.2 / GDScript。ブラウザ向けに Compatibility 描画とスレッ�
 | `scripts/main.gd` / `city.gd` | 画面と上部の3Dの街 |
 | `scripts/ui_style.gd` | 画面の色・文字の大きさ・枠・動きと Theme（ADR-0052） |
 | `scripts/job_scene.gd` | ログの左に描く、就いている仕事の様子（ADR-0053） |
+| `scripts/minigame.gd` | 仕事のミニゲームの共通の形と、各ミニゲーム（ADR-0054） |
 | `scripts/sound.gd` | 音楽と効果音を鳴らす |
 | `audio/` | 音楽と効果音の WAV と、それを合成する `make_sounds.py` |
 

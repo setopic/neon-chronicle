@@ -64,6 +64,11 @@ jobs:
         working-directory: game
         run: timeout 120 ~/godot/godot --headless --path . --script res://ci/away.gd
 
+      # ミニゲームで終えた1回の報酬が上乗せされ、放置の仕事と二重に入らないかを見る（ADR-0054）。
+      - name: ミニゲームの報酬が二重に入らないか確かめる
+        working-directory: game
+        run: timeout 120 ~/godot/godot --headless --path . --script res://ci/minigame.gd
+
       # 人物のイベントが周をまたいで決まった順に進み、前の選択で文と選択肢が変わるかを見る（DOM-13）。
       - name: 人物のイベントが周をまたいで進むか確かめる
         working-directory: game

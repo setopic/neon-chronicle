@@ -7,6 +7,7 @@ signal life_started
 signal log_added
 signal event_changed
 signal job_paid(amount: float)  # 仕事の1回を終えて報酬が入ったとき。ADR-0051
+signal minigame_changed  # ミニゲームを始めたとき、終えたとき、やめたとき。ADR-0054
 
 var save_path := "user://save.json"  # 通しの検査（ci/playthrough.gd）が別のファイルに差し替える
 const SAVE_VERSION := 1
@@ -62,6 +63,9 @@ var request_done := false
 var challenge := ""  # その周の縛りのid。選ばなかった周は空。DOM-21
 var challenge_broken := false
 var identity := false  # その周に偽の身元を持っているか。周の終わりに失う。DOM-24
+# ミニゲームを遊んでいる間は、周の時間を止める。セーブには残さず、開き直したら放置の仕事に戻る（ADR-0054）
+var minigame_active := false
+const MINIGAME_BONUS := 1.0  # 成功の度合いが1のとき、1回の報酬に上乗せする割合（ADR-0054）
 var tension := 0.0  # その周の緊張。耐久を減らす選択肢を選ぶと上がり、時間とともに下がる。DOM-28
 var life_choices := {}  # その周に選んだ選択肢 {イベントのid: 選択肢のid}。DOM-27
 var met_characters: Array = []  # その周に人物のイベントが起きた人物。1つの周で進む話は、人物ごとに1段まで。DOM-13
@@ -120,7 +124,7 @@ func _advance_away(seconds: float) -> void:
 
 ## 「イベントで止める」の設定で、時間が止まっているか（ADR-0004）
 func is_paused() -> bool:
-	return pending_event != "" and Loc.setting("pause_on_event", false)
+	return minigame_active or (pending_event != "" and Loc.setting("pause_on_event", false))
 
 
 func _notification(what: int) -> void:
@@ -157,14 +161,54 @@ func _tick(dt: float) -> void:
 
 
 ## 仕事の1回を終えたときに、その時点の稼ぎと経験の長さ分をまとめて入れる（ADR-0051）
-func _finish_job_round(job: Dictionary, length: float) -> void:
-	var pay := income_per_sec(current_job) * length
+## mult は、ミニゲームで終えた1回の上乗せ。放置で終えた1回は1（ADR-0054）
+func _finish_job_round(job: Dictionary, length: float, mult := 1.0) -> void:
+	var pay := income_per_sec(current_job) * length * mult
 	credits += pay
 	life_earned += pay
 	var xp: Dictionary = job.get("xp", {})
 	for skill in xp:
-		_add_xp(skill, xp[skill] * (xp_mult() + effect("xp_" + skill)) * length)
+		_add_xp(skill, xp[skill] * (xp_mult() + effect("xp_" + skill)) * length * mult)
 	job_paid.emit(pay)
+
+
+## 就いている仕事のミニゲームの種類。ミニゲームの無い仕事は空（ADR-0054）
+func minigame_of(job_id: String) -> String:
+	return GameData.jobs.get(job_id, {}).get("minigame", "")
+
+
+func can_play_minigame() -> bool:
+	return alive and pending_event == "" and not minigame_active and minigame_of(current_job) != ""
+
+
+## いまの1回を、ミニゲームで置き換えて始める。遊んでいる間は周の時間が止まる
+func start_minigame() -> void:
+	if not can_play_minigame():
+		return
+	minigame_active = true
+	minigame_changed.emit()
+
+
+## ミニゲームを終えた。score は成功の度合い（0〜1）。0でも放置で終えた1回と同じだけ入る
+func finish_minigame(score: float) -> void:
+	if not minigame_active:
+		return
+	minigame_active = false
+	var length := job_length(current_job)
+	# ジンの依頼が数える就いた時間も、放置で終えた1回と同じだけ進める
+	job_time[current_job] = job_time.get(current_job, 0.0) + length
+	job_progress = 0.0
+	_finish_job_round(GameData.jobs[current_job], length, 1.0 + MINIGAME_BONUS * clampf(score, 0.0, 1.0))
+	_check_request()
+	minigame_changed.emit()
+
+
+## ミニゲームをやめた。報酬は入らず、いまの1回の進み具合はそのまま残る
+func cancel_minigame() -> void:
+	if not minigame_active:
+		return
+	minigame_active = false
+	minigame_changed.emit()
 
 
 func job_length(job_id: String) -> float:

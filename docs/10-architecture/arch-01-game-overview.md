@@ -33,6 +33,7 @@ related: []
 | `main.gd`・`city.gd` | 画面と、上部の3Dの街を描く。右上の「ライセンス」のボタンで、素材のライセンスを表示する | 進行の計算をすること |
 | `ui_style.gd`（`UiStyle`） | 画面の色・文字の大きさ・枠・動きと、GodotのThemeを持つ（[ADR-0052](../50-adr/adr-0052-ui-style-foundation.md)） | 画面の配置を決めること |
 | `job_scene.gd`（`JobScene`） | 就いている仕事の様子を、いまの1回の進み具合に合わせて描く（[ADR-0053](../50-adr/adr-0053-job-scene.md)） | 進行の計算をすること |
+| `minigame.gd`（`Minigame`） | 仕事のミニゲームの共通の形を持ち、`jobs.json`の種類からミニゲームを作る（[ADR-0054](../50-adr/adr-0054-minigame-frame.md)） | 報酬を入れること。それは`Game`が受け持つ |
 | `game/credits.txt` | 使った外部の素材とそのライセンスの一覧を持つ（[ADR-0002](../50-adr/adr-0002-asset-licenses-in-game.md)） | Godotの第三者の部品を並べること。それは実行中にGodotから取る |
 
 ## 境界

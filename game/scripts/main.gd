@@ -43,6 +43,7 @@ var _log_label: RichTextLabel
 var _upgrade_buttons := {}
 var _refund_buttons := {}
 var _choice_buttons := {}  # 選択肢のid -> ボタン
+var _minigame_button: Button  # 就いている仕事の1回を、ミニゲームで終える。ADR-0054
 var _story_closed_life := 0  # 戻った記憶の断片やエンディングの画面を閉じた周の番号。DOM-08
 
 
@@ -61,6 +62,7 @@ func _ready() -> void:
 	Game.event_changed.connect(_build)
 	Game.log_added.connect(_refresh_log)
 	Game.job_paid.connect(_show_pay)
+	Game.minigame_changed.connect(_build)
 	_build()
 
 
@@ -84,6 +86,7 @@ func _build() -> void:
 	_refund_buttons.clear()
 	_request_buttons.clear()
 	_choice_buttons.clear()
+	_minigame_button = null
 
 	_content = Control.new()
 	_content.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -137,6 +140,8 @@ func _build() -> void:
 			_content.add_child(_build_rebirth())
 	elif Game.pending_event != "":
 		_content.add_child(_build_event())
+	elif Game.minigame_active:
+		_content.add_child(_build_minigame())
 	_refresh()
 	_refresh_log()
 
@@ -361,6 +366,10 @@ func _build_job_scene() -> Control:
 	var scene := JobScene.new()
 	scene.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(scene)
+	# ミニゲームは様子の欄から始める。遊ぶのは就いている仕事の1回なので、様子と同じ欄に置く（ADR-0054）
+	_minigame_button = _button(Loc.t("ui.minigame_play", {"n": roundi(1.0 + Game.MINIGAME_BONUS)}), Game.start_minigame)
+	_minigame_button.theme_type_variation = "CompactButton"
+	box.add_child(_minigame_button)
 	return panel
 
 
@@ -623,6 +632,35 @@ func _build_event() -> Control:
 	return dim
 
 
+## ミニゲームの画面。遊んでいる間は周の時間が止まる。やめると、この1回の報酬は入らない（ADR-0054）
+func _build_minigame() -> Control:
+	var dim := ColorRect.new()
+	dim.color = Color(UiStyle.BG, 0.85)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.add_child(center)
+	var kind := Game.minigame_of(Game.current_job)
+	var box := _panel(Loc.t("ui.minigame_title", {"job": GameData.name_of("jobs", Game.current_job)}))
+	var panel: Control = box.get_parent().get_parent()
+	panel.custom_minimum_size = Vector2(660, 0)
+	center.add_child(panel)
+	var help := _label(tr("minigame.%s.help" % kind), UiStyle.TEXT, UiStyle.SIZE_BODY)
+	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(help)
+	box.add_child(_label(Loc.t("ui.minigame_bonus", {"pct": roundi(Game.MINIGAME_BONUS * 100.0)}), DIM, UiStyle.SIZE_SMALL))
+	var skill: String = GameData.jobs[Game.current_job].get("skill", "")
+	var game := Minigame.create(kind, Game.skill_level.get(skill, 0))
+	if game != null:
+		game.finished.connect(Game.finish_minigame)
+		box.add_child(game)
+	var cancel := _button(tr("ui.minigame_cancel"), Game.cancel_minigame)
+	cancel.add_theme_color_override("font_color", DIM)
+	box.add_child(cancel)
+	UiStyle.fade_in(dim)
+	return dim
+
+
 # --- 更新 ---
 
 func _refresh() -> void:
@@ -652,6 +690,9 @@ func _refresh() -> void:
 		bar.visible = id == Game.current_job
 		bar.max_value = Game.job_length(id)
 		bar.value = Game.job_progress
+	if is_instance_valid(_minigame_button):
+		_minigame_button.visible = Game.minigame_of(Game.current_job) != ""
+		_minigame_button.disabled = not Game.can_play_minigame()
 	for id in _skill_rows:
 		var level: int = Game.skill_level.get(id, 0)
 		_skill_rows[id]["label"].text = "%s  %s" % [GameData.name_of("skills", id), Loc.t("ui.level", {"level": level})]
