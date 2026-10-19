@@ -112,6 +112,7 @@ graph LR
     ADR-0030["ADR-0030<br/>被験体は借金の契約で集め、使い捨ての体は闇市場の部品で組み立てる"]
     ADR-0031["ADR-0031<br/>日本のやくざや的屋に寄った語を、欧米の街でも通じる語に改める"]
     ADR-0032["ADR-0032<br/>体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す"]
+    ADR-0033["ADR-0033<br/>永続強化を増やし、どちらか一方しか取れない組を作る"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -185,6 +186,8 @@ graph LR
   ADR-0032 -.->|decides| DOM-05
   ADR-0032 -.->|decides| DOM-09
   ADR-0032 -.->|decides| DOM-11
+  ADR-0033 -.->|decides| DOM-05
+  ADR-0033 -.->|decides| DOM-09
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02

@@ -459,8 +459,8 @@ func _refresh() -> void:
 			parts.append(tr("ui.implant_owned"))
 			button.disabled = true
 		else:
-			parts.append(Loc.t("ui.cost_credits", {"n": Game.format_number(data.get("cost", 0))}))
-			button.disabled = not Game.alive or Game.credits < data.get("cost", 0)
+			parts.append(Loc.t("ui.cost_credits", {"n": Game.format_number(Game.implant_cost(id))}))
+			button.disabled = not Game.alive or Game.credits < Game.implant_cost(id)
 		if data.get("persistent", false):
 			parts.append(tr("ui.persistent"))
 		button.text = "    ".join(parts)
@@ -468,9 +468,9 @@ func _refresh() -> void:
 		var button: Button = _upgrade_buttons[id]
 		var level: int = Game.upgrades.get(id, 0)
 		var cost := tr("ui.max") if Game.upgrade_maxed(id) else Loc.t("ui.cost_points", {"n": Game.upgrade_cost(id)})
-		button.text = "%s  %s    %s    %s" % [
-			GameData.name_of("upgrades", id), Loc.t("ui.level", {"level": level}), cost, GameData.desc_of("upgrades", id)]
-		button.disabled = Game.upgrade_maxed(id) or Game.memory_points < Game.upgrade_cost(id)
+		button.text = "%s  %s    %s    %s%s" % [
+			GameData.name_of("upgrades", id), Loc.t("ui.level", {"level": level}), cost, GameData.desc_of("upgrades", id), _upgrade_group_text(id)]
+		button.disabled = not Game.can_buy_upgrade(id)
 	for choice in Game.event_choices():
 		var button: Button = _choice_buttons.get(choice["id"])
 		if button == null:
@@ -572,6 +572,21 @@ func _effects_text(effects: Dictionary, keep_zero := false) -> String:
 	if not is_zero_approx(start_level):
 		parts.append(Loc.t("ui.fx_start_level", {"n": _signed(start_level)}))
 	return tr("ui.list_sep").join(parts) if not parts.is_empty() else tr("ui.fx_none")
+
+
+## 排他の組の相手を添える。相手を取ったあとは、取ったものの名前を出す（ADR-0033）
+func _upgrade_group_text(id: String) -> String:
+	var taken: String = Game.upgrade_taken_in_group(id)
+	if taken != "":
+		return "    " + Loc.t("ui.upgrade_taken", {"name": GameData.name_of("upgrades", taken)})
+	var group: String = GameData.upgrades[id].get("group", "")
+	if group == "":
+		return ""
+	var names := []
+	for other in GameData.order["upgrades"]:
+		if other != id and GameData.upgrades[other].get("group", "") == group:
+			names.append(GameData.name_of("upgrades", other))
+	return "    " + Loc.t("ui.upgrade_group", {"names": tr("ui.list_sep").join(names)})
 
 
 func _signed(n: float) -> String:

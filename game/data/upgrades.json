@@ -2,6 +2,12 @@
   "upgrades": [
     { "id": "echo", "cost": 1, "cost_growth": 2, "max_level": 10, "effects_per_level": { "xp": 0.25 } },
     { "id": "contacts", "cost": 1, "cost_growth": 2, "max_level": 10, "effects_per_level": { "income": 0.25 } },
-    { "id": "talent", "cost": 3, "cost_growth": 3, "max_level": 5, "effects_per_level": { "start_level": 1 } }
+    { "id": "talent", "cost": 3, "cost_growth": 3, "max_level": 5, "effects_per_level": { "start_level": 1 } },
+    { "id": "focus_hacking", "cost": 3, "cost_growth": 2, "max_level": 5, "group": "focus", "effects_per_level": { "xp_hacking": 0.4 } },
+    { "id": "focus_combat", "cost": 3, "cost_growth": 2, "max_level": 5, "group": "focus", "effects_per_level": { "xp_combat": 0.4 } },
+    { "id": "focus_negotiation", "cost": 3, "cost_growth": 2, "max_level": 5, "group": "focus", "effects_per_level": { "xp_negotiation": 0.4 } },
+    { "id": "archive", "cost": 4, "cost_growth": 2, "max_level": 5, "group": "horizon", "effects_per_level": { "points": 0.1 } },
+    { "id": "advance", "cost": 2, "cost_growth": 2, "max_level": 5, "group": "horizon", "effects_per_level": { "start_credits": 150 } },
+    { "id": "haggling", "cost": 2, "cost_growth": 2, "max_level": 5, "effects_per_level": { "implant_cost": -0.1 } }
   ]
 }

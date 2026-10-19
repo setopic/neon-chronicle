@@ -124,7 +124,7 @@ func _tick(dt: float) -> void:
 		job_time[current_job] = job_time.get(current_job, 0.0) + dt
 		var xp: Dictionary = job.get("xp", {})
 		for skill in xp:
-			_add_xp(skill, xp[skill] * xp_mult() * dt)
+			_add_xp(skill, xp[skill] * (xp_mult() + effect("xp_" + skill)) * dt)
 		danger = job.get("danger", 1.0)
 		if pending_event == "" and randf() < danger * dt / EVENT_INTERVAL:
 			_start_event()
@@ -140,7 +140,8 @@ func _tick(dt: float) -> void:
 
 # --- 効果の計算 ---
 
-## 体の種類・インプラント・永続強化・スキルの効果を合計する（"income", "xp", "decay", "start_level"）
+## 体の種類・インプラント・永続強化・スキルの効果を合計する（"income", "xp", "decay", "start_level"）。
+## 永続強化だけが持つ効果は "xp_<スキル>", "points", "start_credits", "implant_cost" の4つ（ADR-0033）
 func effect(key: String) -> float:
 	var total: float = GameData.bodies.get(body, {}).get("effects", {}).get(key, 0.0)
 	for id in implants:
@@ -217,8 +218,13 @@ func _add_xp(skill: String, amount: float) -> void:
 
 # --- インプラントと永続強化 ---
 
+## インプラントの値段は、永続強化で下がっても、もとの半分を下回らない（ADR-0033）
+func implant_cost(id: String) -> float:
+	return GameData.implants.get(id, {}).get("cost", 0.0) * maxf(0.5, 1.0 + effect("implant_cost"))
+
+
 func buy_implant(id: String) -> void:
-	var cost: float = GameData.implants.get(id, {}).get("cost", 0.0)
+	var cost := implant_cost(id)
 	if not alive or implants.has(id) or credits < cost:
 		return
 	credits -= cost
@@ -235,8 +241,23 @@ func upgrade_maxed(id: String) -> bool:
 	return upgrades.get(id, 0) >= GameData.upgrades.get(id, {}).get("max_level", 99)
 
 
+## 同じ排他の組で、すでにレベルを持っている別の永続強化のid。無ければ空。組の選択は取り直せない（ADR-0033）
+func upgrade_taken_in_group(id: String) -> String:
+	var group: String = GameData.upgrades.get(id, {}).get("group", "")
+	if group == "":
+		return ""
+	for other in upgrades:
+		if other != id and upgrades[other] > 0 and GameData.upgrades.get(other, {}).get("group", "") == group:
+			return other
+	return ""
+
+
+func can_buy_upgrade(id: String) -> bool:
+	return not upgrade_maxed(id) and memory_points >= upgrade_cost(id) and upgrade_taken_in_group(id) == ""
+
+
 func buy_upgrade(id: String) -> void:
-	if upgrade_maxed(id) or memory_points < upgrade_cost(id):
+	if not can_buy_upgrade(id):
 		return
 	memory_points -= upgrade_cost(id)
 	upgrades[id] = upgrades.get(id, 0) + 1
@@ -355,7 +376,8 @@ func points_for_life() -> int:
 	var levels := 0
 	for skill in skill_level:
 		levels += skill_level[skill]
-	return maxi(1, int(sqrt(life_xp / POINTS_XP)) + levels / 3)
+	# 依頼の上乗せは、この値をもとに _end_life で足す（ADR-0033）
+	return maxi(1, int((int(sqrt(life_xp / POINTS_XP)) + levels / 3) * (1.0 + effect("points"))))
 
 
 # --- 体の質 ---
@@ -441,6 +463,7 @@ func _start_life(body_id := "") -> void:
 	alive = true
 	body = body_id if body_id != "" else first_body()
 	body_quality = next_quality(body)
+	credits = effect("start_credits")
 	var start_level := int(effect("start_level"))
 	for skill in GameData.skills:
 		skill_level[skill] = start_level
