@@ -49,6 +49,7 @@ tags: [index]
 - [ADR-0030 被験体は借金の契約で集め、使い捨ての体は闇市場の部品で組み立てる](./adr-0030-test-subjects-and-bodies.md)
 - [ADR-0031 日本のやくざや的屋に寄った語を、欧米の街でも通じる語に改める](./adr-0031-western-terms.md)
 - [ADR-0032 体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す](./adr-0032-body-quality-and-memory-software.md)
+- [ADR-0033 永続強化を増やし、どちらか一方しか取れない組を作る](./adr-0033-upgrade-groups.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

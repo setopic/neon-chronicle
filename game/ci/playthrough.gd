@@ -105,7 +105,7 @@ func _buy_upgrades() -> void:
 	while bought:
 		bought = false
 		for id in _data.order["upgrades"]:
-			if not _game.upgrade_maxed(id) and _game.memory_points >= _game.upgrade_cost(id):
+			if _game.can_buy_upgrade(id):
 				_game.buy_upgrade(id)
 				bought = true
 
