@@ -117,5 +117,6 @@ implemented_by:
 - (depends_on) [DOM-11 体の種類](./dom-11-body-types.md)
 - (depends_on) [DOM-12 ジンの依頼](./dom-12-jin-requests.md)
 - (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)
+- (depends_on) [DOM-21 縛りの周](./dom-21-challenges.md)
 
 <!-- graph:auto:end -->

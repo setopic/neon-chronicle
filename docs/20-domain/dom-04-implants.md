@@ -69,5 +69,6 @@ implemented_by:
 - (depends_on) [DOM-05 転生と永続強化](./dom-05-rebirth.md)
 - (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
 - (depends_on) [DOM-19 住民の生まれから死まで](./dom-19-resident-life-course.md)
+- (depends_on) [DOM-21 縛りの周](./dom-21-challenges.md)
 
 <!-- graph:auto:end -->

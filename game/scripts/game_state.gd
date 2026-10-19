@@ -1,6 +1,6 @@
 extends Node
 
-## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-14。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
+## ゲームの進行状態。DOM-02〜DOM-08、DOM-10〜DOM-14、DOM-21。1人生の状態と、転生しても残る状態を持ち、セーブとロードも行う。
 
 signal life_ended
 signal life_started
@@ -29,7 +29,7 @@ const QUALITY_CREDITS := 1000.0  # 体の質の式で、前の周で稼いだク
 ## ログやクロニクルの引数のうち、id から表示名に変える項目
 const NAME_ARGS := {
 	"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades", "event": "events",
-	"fragment": "fragments", "ending": "endings", "body": "bodies",
+	"fragment": "fragments", "ending": "endings", "body": "bodies", "challenge": "challenges",
 }
 
 # --- 1人生の状態 ---
@@ -51,6 +51,8 @@ var last_deed := ""  # 最後に選んだ選択肢（"<イベント>.<選択肢>
 var request_offers: Array = []  # その周に並べたジンの依頼のid。0〜2個。DOM-12
 var request := ""  # その周に受けた依頼のid。まだ受けていないときは空
 var request_done := false
+var challenge := ""  # その周の縛りのid。選ばなかった周は空。DOM-21
+var challenge_broken := false
 var met_characters: Array = []  # その周に人物のイベントが起きた人物。1つの周で進む話は、人物ごとに1段まで。DOM-13
 
 # --- 転生しても残る状態 ---
@@ -58,6 +60,8 @@ var life_number := 1
 var memory_points := 0
 var last_points_gained := 0
 var last_request_bonus := 0  # last_points_gained のうち、ジンの依頼の上乗せの分
+var last_challenge_bonus := 0  # last_points_gained のうち、縛りの上乗せの分
+var next_challenge := ""  # 転生の画面で選んでいる縛り。セーブには書かない
 var upgrades := {}
 var chronicle: Array = []  # 終わった周の記録 [{life, body, job, age, earned, points, deed, end, ending}]
 var fragments: Array = []  # 戻った記憶の断片のid。DOM-08
@@ -196,6 +200,8 @@ func meets(requires: Dictionary) -> bool:
 func set_job(job_id: String) -> void:
 	if not alive or pending_event != "" or job_id == current_job or not can_take_job(job_id):
 		return
+	if current_job != "":
+		break_challenge("job")
 	current_job = job_id
 	_log("log.job", {"job": job_id})
 
@@ -231,6 +237,7 @@ func buy_implant(id: String) -> void:
 	credits -= cost
 	implants.append(id)
 	_log("log.implant", {"implant": id})
+	break_challenge("implant")
 
 
 func upgrade_cost(id: String) -> int:
@@ -319,6 +326,14 @@ func event_choices() -> Array:
 		return parts.size() == 2 and character_choices.get(parts[0], "") == parts[1])
 
 
+## 待っているイベントに、選ぶ条件があって、いま選べる選択肢があるか
+func _has_open_conditioned_choice() -> bool:
+	for c in event_choices():
+		if not c.get("requires", {}).is_empty() and meets(c["requires"]):
+			return true
+	return false
+
+
 ## 選択肢のクレジットの増減。いまの稼ぎの何秒分かで書いてある
 func choice_credits(choice: Dictionary) -> float:
 	return income_per_sec(current_job) * choice.get("credits", 0.0)
@@ -333,6 +348,9 @@ func choose(choice_id: String) -> void:
 			choice = c
 	if choice.is_empty() or not meets(choice.get("requires", {})):
 		return
+	# 選ぶ条件のある選択肢を選べるのに、選ぶ条件の無い選択肢を選んだら、縛りを破ったことになる（DOM-21）
+	if choice.get("requires", {}).is_empty() and _has_open_conditioned_choice():
+		break_challenge("choice")
 	var event_id := pending_event
 	pending_event = ""
 	if GameData.events[event_id].get("character", "") != "":
@@ -418,12 +436,14 @@ func _end_life(fatal_event := "", ending := "") -> void:
 	last_points_gained = points_for_life()
 	var bonus: float = GameData.requests.get(request, {}).get("bonus", REQUEST_BONUS)
 	last_request_bonus = maxi(1, roundi(last_points_gained * bonus)) if request_done else 0
-	last_points_gained += last_request_bonus
+	var kept := challenge if challenge != "" and not challenge_broken else ""
+	last_challenge_bonus = maxi(1, roundi(last_points_gained * GameData.challenges.get(kept, {}).get("bonus", 0.0))) if kept != "" else 0
+	last_points_gained += last_request_bonus + last_challenge_bonus
 	memory_points += last_points_gained
 	chronicle.append({
 		"life": life_number, "body": body, "job": main_job(), "age": age,
 		"earned": life_earned, "points": last_points_gained,
-		"deed": last_deed, "end": fatal_event, "ending": ending,
+		"deed": last_deed, "end": fatal_event, "ending": ending, "challenge": kept,
 	})
 	_log("log.ending" if ending != "" else "log.death", {"points": last_points_gained})
 	_recall_fragments()
@@ -436,7 +456,8 @@ func rebirth(body_id: String) -> void:
 	if alive or not can_choose_body(body_id):
 		return
 	life_number += 1
-	_start_life(body_id)
+	_start_life(body_id, next_challenge)
+	next_challenge = ""
 	save_game()
 
 
@@ -445,12 +466,15 @@ func first_body() -> String:
 	return GameData.order["bodies"][0] if not GameData.order["bodies"].is_empty() else ""
 
 
-func _start_life(body_id := "") -> void:
+## challenge_id はその周の縛り。第1周には縛りが無い（DOM-21）
+func _start_life(body_id := "", challenge_id := "") -> void:
 	# 依頼は前の周の終わりのスキルのレベルで決めるので、スキルを戻す前に選ぶ。第1周には前の周が無い
 	request_offers = pick_requests(skill_level if life_number > 1 else {})
 	request = ""
 	request_done = false
 	met_characters = []
+	challenge = challenge_id if GameData.challenges.has(challenge_id) and life_number > 1 else ""
+	challenge_broken = false
 	implants = implants.filter(func(id): return GameData.implants.get(id, {}).get("persistent", false))
 	credits = 0.0
 	life_earned = 0.0
@@ -474,6 +498,8 @@ func _start_life(body_id := "") -> void:
 	_log("log.awaken_first" if life_number == 1 else "log.awaken", {"life": life_number, "body": body})
 	for id in request_offers:
 		_log("request.%s.offer" % id, request_args(id))
+	if challenge != "":
+		_log("log.challenge", {"challenge": challenge})
 	life_started.emit()
 
 
@@ -542,8 +568,26 @@ func story_of(entry: Dictionary) -> String:
 		end_part = tr("ending.%s.chronicle" % ending)
 	var deed: String = entry.get("deed", "")
 	if deed == "":
-		return Loc.t("chronicle.story_short", {"job": job_part, "end": end_part})
-	return Loc.t("chronicle.story", {"job": job_part, "deed": tr("event.%s.chronicle" % deed), "end": end_part})
+		return Loc.t("chronicle.story_short", {"job": job_part, "end": end_part}) + _challenge_part(entry)
+	return Loc.t("chronicle.story", {"job": job_part, "deed": tr("event.%s.chronicle" % deed), "end": end_part}) + _challenge_part(entry)
+
+
+## 守った縛りを物語文の後ろに足す句。#82 より前の記録と、縛りの無い周は空（DOM-21）
+func _challenge_part(entry: Dictionary) -> String:
+	var kept: String = entry.get("challenge", "")
+	if not GameData.challenges.has(kept):
+		return ""
+	return Loc.t("chronicle.challenge", {"challenge": GameData.name_of("challenges", kept)})
+
+
+# --- 縛り ---
+
+## その周の縛りの守る条件が rule なら、縛りを破ったことにする。破ったら周の終わりまで戻らない（DOM-21）
+func break_challenge(rule: String) -> void:
+	if challenge == "" or challenge_broken or GameData.challenges.get(challenge, {}).get("rule", "") != rule:
+		return
+	challenge_broken = true
+	_log("log.challenge_broken", {"challenge": challenge})
 
 
 ## クロニクルに残った選択肢の種類。いまのデータに無いもの（外したMODの選択肢）は数えない
@@ -657,7 +701,8 @@ func save_game() -> void:
 		"credits": credits, "life_earned": life_earned, "durability": durability, "age": age,
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
 		"implants": implants, "job_time": job_time, "alive": alive, "body": body, "body_quality": body_quality, "life_xp": life_xp, "pending_event": pending_event,
-		"last_deed": last_deed, "request_offers": request_offers, "request": request, "request_done": request_done, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
+		"last_deed": last_deed, "request_offers": request_offers, "request": request, "request_done": request_done,
+		"challenge": challenge, "challenge_broken": challenge_broken, "last_challenge_bonus": last_challenge_bonus, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
 		"last_points_gained": last_points_gained, "last_request_bonus": last_request_bonus, "upgrades": upgrades,
 		"chronicle": chronicle, "fragments": fragments, "last_fragments": last_fragments,
 		"character_choices": character_choices, "logs": logs,
@@ -704,6 +749,12 @@ func load_game() -> bool:
 	memory_points = int(data.get("memory_points", 0))
 	last_points_gained = int(data.get("last_points_gained", 0))
 	last_request_bonus = int(data.get("last_request_bonus", 0))
+	# #82 より前のセーブの周には、縛りが無い
+	challenge = data.get("challenge", "")
+	if not GameData.challenges.has(challenge):
+		challenge = ""
+	challenge_broken = data.get("challenge_broken", false)
+	last_challenge_bonus = int(data.get("last_challenge_bonus", 0))
 	upgrades = _int_values(data.get("upgrades", {}))
 	chronicle = data.get("chronicle", [])
 	for entry in chronicle:
@@ -728,6 +779,8 @@ func reset_game() -> void:
 	memory_points = 0
 	last_points_gained = 0
 	last_request_bonus = 0
+	last_challenge_bonus = 0
+	next_challenge = ""
 	upgrades = {}
 	chronicle = []
 	fragments = []
