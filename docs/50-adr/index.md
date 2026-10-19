@@ -42,6 +42,7 @@ tags: [index]
 - [ADR-0023 橋に人名を付け、地図を地形の分かる描き方にする](./adr-0023-bridge-names-and-terrain-map.md)
 - [ADR-0024 下層街に、ギャングのザンダー一家と住人の屋台組合を置く](./adr-0024-lower-city-gang-and-union.md)
 - [ADR-0025 企業の時代より前の街を市とし、市の財政破綻で企業の時代が始まったことにする](./adr-0025-city-history-before-corporations.md)
+- [ADR-0026 屋台組合が、台帳でみかじめを割り振り、外から来た人に住む場所を割り振る](./adr-0026-union-ledger-and-housing.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

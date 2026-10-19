@@ -102,6 +102,7 @@ graph LR
     ADR-0023["ADR-0023<br/>橋に人名を付け、地図を地形の分かる描き方にする"]
     ADR-0024["ADR-0024<br/>下層街に、ギャングのザンダー一家と住人の屋台組合を置く"]
     ADR-0025["ADR-0025<br/>企業の時代より前の街を市とし、市の財政破綻で企業の時代が始まったことにする"]
+    ADR-0026["ADR-0026<br/>屋台組合が、台帳でみかじめを割り振り、外から来た人に住む場所を割り振る"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -154,6 +155,7 @@ graph LR
   ADR-0025 -.->|decides| DOM-14
   ADR-0025 -.->|decides| DOM-15
   ADR-0025 -.->|decides| DOM-17
+  ADR-0026 -.->|decides| DOM-15
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
