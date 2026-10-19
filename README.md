@@ -139,6 +139,7 @@ graph LR
     ADR-0046["ADR-0046<br/>レイとの約束と屋台組合の評判で開く、3つ目のエンディングを足す"]
     ADR-0047["ADR-0047<br/>話とエンディングの分岐図を、街と人物の画面の3つ目のタブに出す"]
     ADR-0048["ADR-0048<br/>話の段と永続強化の組を、いつでも選び直せるようにする"]
+    ADR-0049["ADR-0049<br/>転生の画面とメインの画面を1280x720に収める"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -241,6 +242,7 @@ graph LR
   ADR-0048 ==>|supersedes| ADR-0033
   ADR-0048 -.->|decides| DOM-31
   ADR-0048 -.->|decides| DOM-05
+  ADR-0049 -.->|decides| ARCH-01
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02

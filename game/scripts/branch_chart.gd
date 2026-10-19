@@ -13,7 +13,7 @@ const BOX := Color("232634")
 const BOX_EDGE := Color("4c4f62")
 const LINE := Color("666a80")
 const LABEL_W := 150.0
-const BOX_W := 200.0
+const BOX_W := 210.0  # 英語でいちばん長い段の名前が、左右の余白を除いた幅に収まる幅
 const GAP := 40.0
 const TITLE_H := 24.0
 const CHOICE_H := 20.0
@@ -94,7 +94,8 @@ func _draw() -> void:
 	var links := []  # [[条件の選択肢のキー, 開く選択肢の位置]]
 	for row in _rows:
 		var h := _row_height(row)
-		draw_string(font, Vector2(0, y + TITLE_H - 6), row["label"], HORIZONTAL_ALIGNMENT_LEFT, LABEL_W - 8, FONT_SIZE + 1, PINK)
+		# 英語の「Former owner of the Prototype body」は1行に収まらないので、名前の欄の幅で折り返す
+		draw_multiline_string(font, Vector2(0, y + TITLE_H - 6), row["label"], HORIZONTAL_ALIGNMENT_LEFT, LABEL_W - 8, FONT_SIZE + 1, -1, PINK)
 		var x := LABEL_W
 		var stages: Array = row["stages"]
 		for i in stages.size():

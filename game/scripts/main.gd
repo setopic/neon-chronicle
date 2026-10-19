@@ -92,11 +92,18 @@ func _build() -> void:
 	margin.add_child(root)
 
 	root.add_child(_build_header())
-	# 仕事やインプラントが増えても画面の高さを超えないよう、中段だけをスクロールさせ、ログの高さを守る
-	var middle_scroll := ScrollContainer.new()
-	middle_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	middle_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	root.add_child(middle_scroll)
+	# インプラントの列は、ログの横まで下に伸ばす。仕事と体の状態の列の下にログを置き、ログの高さを守る
+	var lower := HBoxContainer.new()
+	lower.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	lower.add_theme_constant_override("separation", 10)
+	root.add_child(lower)
+	var main_column := VBoxContainer.new()
+	main_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	main_column.size_flags_stretch_ratio = 2.6
+	main_column.add_theme_constant_override("separation", 10)
+	lower.add_child(main_column)
+	# 中身が増えても画面の高さを超えないよう、列ごとにスクロールさせる
+	var middle_scroll := _scroll(main_column)
 	var middle := HBoxContainer.new()
 	middle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	middle.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -104,7 +111,10 @@ func _build() -> void:
 	middle_scroll.add_child(middle)
 	middle.add_child(_build_left())
 	middle.add_child(_build_right())
-	root.add_child(_build_log())
+	main_column.add_child(_build_log())
+	var implants_scroll := _scroll(lower)
+	implants_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	implants_scroll.add_child(_build_implants())
 
 	if not Game.alive:
 		var last: Dictionary = Game.chronicle.back() if not Game.chronicle.is_empty() else {}
@@ -117,6 +127,14 @@ func _build() -> void:
 		_content.add_child(_build_event())
 	_refresh()
 	_refresh_log()
+
+
+func _scroll(parent: Control) -> ScrollContainer:
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	parent.add_child(scroll)
+	return scroll
 
 
 func _build_header() -> Control:
@@ -175,10 +193,16 @@ func _build_header() -> Control:
 
 func _build_left() -> Control:
 	var box := _panel(tr("ui.jobs"))
+	# 仕事の列は高さに余りがあるので、狭くして折り返させ、体の状態の列に幅を回す
+	box.get_parent().get_parent().size_flags_stretch_ratio = 0.6
+	box.add_theme_constant_override("separation", 4)
 	for id in GameData.order["jobs"]:
 		var button := Button.new()
 		button.toggle_mode = true
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		# 中段は3つの列に分けたので、必要な条件のような長い文は列の幅で折り返す
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.theme_type_variation = "CompactButton"
 		button.tooltip_text = GameData.desc_of("jobs", id)
 		button.pressed.connect(Game.set_job.bind(id))
 		box.add_child(button)
@@ -205,12 +229,15 @@ func _build_left() -> Control:
 
 func _build_right() -> Control:
 	var box := _panel(tr("ui.body"))
+	# 周の始まりには依頼のボタン・縛り・評判が並ぶので、行の間を詰めて列の高さに収める
+	box.add_theme_constant_override("separation", 3)
 	_durability_bar = ProgressBar.new()
 	_durability_bar.max_value = Game.MAX_DURABILITY
 	_durability_bar.show_percentage = false
 	_durability_bar.custom_minimum_size = Vector2(0, 16)
 	box.add_child(_durability_bar)
 	_body_label = _label("", DIM, 15)
+	_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_body_label)
 	# 体の種類の効果は転生の画面でしか見えなかったので、周の間も出す。合計は出どころを分けずに1行にする（ADR-0016）
 	_body_effects_label = _label(Loc.t("ui.body_effects", {
@@ -229,6 +256,7 @@ func _build_right() -> Control:
 		var button := Button.new()
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.theme_type_variation = "CompactButton"
 		button.text = Loc.t("ui.request_offer", {"goal": _request_goal(id),
 			"n": roundi(GameData.requests[id].get("bonus", Game.REQUEST_BONUS) * 100.0)})
 		button.pressed.connect(Game.accept_request.bind(id))
@@ -243,20 +271,29 @@ func _build_right() -> Control:
 	_reputation_label = _label("", DIM, 14)
 	_reputation_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_reputation_label)
+	return box.get_parent().get_parent()
 
-	box.add_child(_section_title(tr("ui.implants")))
+
+## インプラントと偽の身元。体の状態の欄に積むと中段が画面の高さを超えるので、3つ目の列に分ける
+func _build_implants() -> Control:
+	var box := _panel(tr("ui.implants"))
+	box.get_parent().get_parent().size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_capacity_label = _label("", DIM, 14)
 	box.add_child(_capacity_label)
 	for id in GameData.order["implants"]:
 		var button := Button.new()
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.tooltip_text = GameData.desc_of("implants", id)
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.theme_type_variation = "CompactButton"
 		button.pressed.connect(_press_implant.bind(id))
 		box.add_child(button)
 		_implant_buttons[id] = button
 	# 偽の身元は闇市場で買う。インプラントと同じくクレジットで買うので、同じ欄に置く（DOM-24）
 	_identity_button = Button.new()
 	_identity_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_identity_button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_identity_button.theme_type_variation = "CompactButton"
 	_identity_button.pressed.connect(Game.buy_identity)
 	box.add_child(_identity_button)
 
@@ -529,10 +566,10 @@ func _refresh() -> void:
 		var button: Button = _job_buttons[id]
 		var name := GameData.name_of("jobs", id)
 		if Game.can_take_job(id):
-			button.text = "%s    %s" % [name, Loc.t("ui.job_income", {"n": "%.1f" % Game.income_per_sec(id)})]
+			button.text = "%s  %s" % [name, Loc.t("ui.job_income", {"n": "%.1f" % Game.income_per_sec(id)})]
 			button.disabled = not Game.alive
 		else:
-			button.text = "%s    %s" % [name, _job_requirement_text(id)]
+			button.text = "%s  %s" % [name, _job_requirement_text(id)]
 			button.disabled = true
 		button.set_pressed_no_signal(id == Game.current_job)
 	for id in _skill_rows:
@@ -587,7 +624,7 @@ func _refresh() -> void:
 			button.disabled = not Game.alive or Game.credits < Game.implant_cost(id) or not Game.implant_fits(id)
 		if data.get("persistent", false):
 			parts.append(tr("ui.persistent"))
-		button.text = "    ".join(parts)
+		button.text = "  ".join(parts)
 	for id in _upgrade_buttons:
 		var button: Button = _upgrade_buttons[id]
 		var level: int = Game.upgrades.get(id, 0)
@@ -980,7 +1017,7 @@ func _make_theme() -> Theme:
 		t.set_stylebox("pressed", type, pressed)
 		t.set_stylebox("hover_pressed", type, pressed)
 		t.set_stylebox("disabled", type, disabled)
-	# 転生の画面の永続強化のボタン。数が多いので、上下の余白と文字を詰めて1280x720に収める
+	# 転生の画面の永続強化と、仕事・ジンの依頼・インプラントのボタン。数が多いので、上下の余白と文字を詰めて1280x720に収める
 	t.set_type_variation("CompactButton", "Button")
 	t.set_font_size("font_size", "CompactButton", 14)
 	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
