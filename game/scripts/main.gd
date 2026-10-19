@@ -54,7 +54,10 @@ func _ready() -> void:
 	add_child(bg)
 	Loc.language_changed.connect(_build)
 	Game.life_ended.connect(_build)
-	Game.life_started.connect(_build)
+	# 周の始まりは、メインの画面ごと浮かび上がらせて、目覚めたことを見せる（ADR-0052）
+	Game.life_started.connect(func():
+		_build()
+		UiStyle.fade_in(_content))
 	Game.event_changed.connect(_build)
 	Game.log_added.connect(_refresh_log)
 	Game.job_paid.connect(_show_pay)
@@ -361,7 +364,7 @@ func _build_log() -> Control:
 
 func _build_rebirth() -> Control:
 	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.75)
+	dim.color = Color(UiStyle.BG, 0.88)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	# 画面が低いと「新しい体で目覚める」が下にはみ出すので、パネルごと縦にスクロールできるようにする
 	var outer := ScrollContainer.new()
@@ -387,16 +390,16 @@ func _build_rebirth() -> Control:
 	var left: VBoxContainer = bottom[0]
 	var right: VBoxContainer = bottom[1]
 
-	var summary := _label(Game.format_entry({"key": "ui.rebirth_summary", "args": last}), Color.WHITE, 17)
+	var summary := _label(Game.format_entry({"key": "ui.rebirth_summary", "args": last}), UiStyle.TEXT, UiStyle.SIZE_LEAD)
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	intro.add_child(summary)
 	if not last.is_empty():
-		var story := _label(Game.story_of(last), CYAN, 17)
+		var story := _label(Game.story_of(last), CYAN, UiStyle.SIZE_LEAD)
 		story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		intro.add_child(story)
 		# エンディングのあとは物語が終わっているので、診療所の場面を出さない
 		if last.get("ending", "") == "":
-			var mio := _label(tr(Game.mio_line_key(last)), Color.WHITE, 16)
+			var mio := _label(tr(Game.mio_line_key(last)), UiStyle.TEXT, UiStyle.SIZE_BODY)
 			mio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			intro.add_child(mio)
 	var gained := Loc.t("ui.points_gained", {"n": Game.last_points_gained})
@@ -404,21 +407,21 @@ func _build_rebirth() -> Control:
 		gained += Loc.t("ui.request_bonus", {"n": Game.last_request_bonus})
 	if Game.last_challenge_bonus > 0:
 		gained += Loc.t("ui.challenge_bonus", {"n": Game.last_challenge_bonus})
-	intro.add_child(_label(gained, PINK, 20))
-	intro.add_child(_label(_fragment_progress(), DIM, 14))
+	intro.add_child(_label(gained, PINK, UiStyle.SIZE_STAT))
+	intro.add_child(_label(_fragment_progress(), DIM, UiStyle.SIZE_SMALL))
 
 	# 説明は見出しと同じ行に置き、画面の高さに収める
 	var heading := HBoxContainer.new()
 	heading.add_theme_constant_override("separation", 14)
 	left.add_child(heading)
 	heading.add_child(_section_title(tr("ui.upgrades")))
-	var note := _label(tr("ui.upgrades_note"), DIM, 14)
+	var note := _label(tr("ui.upgrades_note"), DIM, UiStyle.SIZE_SMALL)
 	note.size_flags_vertical = Control.SIZE_SHRINK_END
 	note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	heading.add_child(note)
 	# 残りの記憶ポイントも見出しの行に置き、ボタンの列の下に行を足さない
-	_rebirth_points_label = _label("", PINK, 16)
+	_rebirth_points_label = _label("", PINK, UiStyle.SIZE_BODY)
 	_rebirth_points_label.size_flags_vertical = Control.SIZE_SHRINK_END
 	heading.add_child(_rebirth_points_label)
 	for id in GameData.order["upgrades"]:
@@ -428,6 +431,7 @@ func _build_rebirth() -> Control:
 		# 列の幅に収まらない説明は折り返す。折り返さないと、最も長い行がパネルの幅を決める
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.theme_type_variation = "CompactButton"
+		UiStyle.add_hover(button)
 		button.pressed.connect(Game.buy_upgrade.bind(id))
 		left.add_child(button)
 		_upgrade_buttons[id] = button
@@ -439,6 +443,7 @@ func _build_rebirth() -> Control:
 		refund.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		refund.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		refund.theme_type_variation = "CompactButton"
+		UiStyle.add_hover(refund)
 		refund.pressed.connect(Game.refund_upgrade.bind(id))
 		left.add_child(refund)
 		_refund_buttons[id] = refund
@@ -446,7 +451,7 @@ func _build_rebirth() -> Control:
 	history.add_child(_section_title(tr("ui.chronicle")))
 	history.add_child(_label(Loc.t("ui.chronicle_bonus", {
 		"n": Game.chronicle_deeds(), "pct": int(round(Game.deed_bonus() * 100.0)),
-	}), PINK, 14))
+	}), PINK, UiStyle.SIZE_SMALL))
 	# 物語文は1件で2〜3行になるので、全件をスクロールで見せ、最新の記録を下に出しておく
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(0, 70)
@@ -457,10 +462,10 @@ func _build_rebirth() -> Control:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 	for entry in Game.chronicle:
-		var story := _label(Loc.t("ui.chronicle_story", {"life": int(entry.get("life", 0)), "story": Game.story_of(entry)}), Color.WHITE, 14)
+		var story := _label(Loc.t("ui.chronicle_story", {"life": int(entry.get("life", 0)), "story": Game.story_of(entry)}), UiStyle.TEXT, UiStyle.SIZE_SMALL)
 		story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		list.add_child(story)
-		var stats := _label(Game.format_entry({"key": "ui.chronicle_stats", "args": entry}), DIM, 12)
+		var stats := _label(Game.format_entry({"key": "ui.chronicle_stats", "args": entry}), DIM, UiStyle.SIZE_TINY)
 		stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		list.add_child(stats)
 	list.resized.connect(func(): scroll.scroll_vertical = int(list.size.y))
@@ -471,7 +476,7 @@ func _build_rebirth() -> Control:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
 		right.add_child(row)
-		row.add_child(_label(tr("ui.challenge_choice"), DIM, 14))
+		row.add_child(_label(tr("ui.challenge_choice"), DIM, UiStyle.SIZE_SMALL))
 		var picker := OptionButton.new()
 		picker.add_item(tr("ui.challenge_none"))
 		for id in GameData.order["challenges"]:
@@ -485,13 +490,13 @@ func _build_rebirth() -> Control:
 		picker.select(GameData.order["challenges"].find(Game.next_challenge) + 1)
 		picker.item_selected.connect(_pick_challenge)
 		row.add_child(picker)
-	var body_choice := _label(tr("ui.body_choice"), DIM, 14)
+	var body_choice := _label(tr("ui.body_choice"), DIM, UiStyle.SIZE_SMALL)
 	body_choice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	right.add_child(body_choice)
 	var bodies := GridContainer.new()
 	bodies.columns = 2
 	bodies.add_theme_constant_override("h_separation", 8)
-	bodies.add_theme_constant_override("v_separation", 8)
+	bodies.add_theme_constant_override("v_separation", 6)
 	right.add_child(bodies)
 	for id in GameData.order["bodies"]:
 		var awaken := Button.new()
@@ -505,12 +510,15 @@ func _build_rebirth() -> Control:
 			GameData.desc_of("bodies", id) + "  " + Loc.t("ui.capacity_short", {"max": int(GameData.bodies[id].get("capacity", 99))}),
 			tr("body.%s.trait" % id)]
 		awaken.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		awaken.add_theme_font_size_override("font_size", 14)
+		# 説明が4行あり、右の列の高さを決めるので、ほかのボタンより1段小さい文字にする
+		awaken.add_theme_font_size_override("font_size", UiStyle.SIZE_NOTE)
 		awaken.disabled = not Game.can_choose_body(id)
 		awaken.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		awaken.add_theme_color_override("font_color", CYAN)
+		UiStyle.add_hover(awaken)
 		awaken.pressed.connect(Game.rebirth.bind(id))
 		bodies.add_child(awaken)
+	UiStyle.fade_in(dim)
 	return dim
 
 
@@ -534,7 +542,7 @@ func _rebirth_columns(box: VBoxContainer) -> Array:
 ## 断片がすべて戻ってから就く仕事でしかエンディングにならないので、両方が同じ周に出ることは無い
 func _build_story(ending: String) -> Control:
 	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.9)
+	dim.color = Color(UiStyle.BG, 0.94)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -545,34 +553,36 @@ func _build_story(ending: String) -> Control:
 	panel.custom_minimum_size = Vector2(700, 0)
 	center.add_child(panel)
 	if ending != "":
-		var text := _label(GameData.desc_of("endings", ending), Color.WHITE, 18)
+		var text := _label(GameData.desc_of("endings", ending), UiStyle.TEXT, UiStyle.SIZE_HEADING)
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		box.add_child(text)
 		box.add_child(_label(Loc.t("ui.endings_reached", {
 			"n": Game.endings_reached().size(), "max": GameData.order["endings"].size(),
-		}), PINK, 15))
+		}), PINK, UiStyle.SIZE_TEXT))
 	for id in Game.last_fragments:
-		box.add_child(_label(GameData.name_of("fragments", id), PINK, 20))
-		var text := _label(GameData.desc_of("fragments", id), Color.WHITE, 18)
+		box.add_child(_label(GameData.name_of("fragments", id), PINK, UiStyle.SIZE_STAT))
+		var text := _label(GameData.desc_of("fragments", id), UiStyle.TEXT, UiStyle.SIZE_HEADING)
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		box.add_child(text)
 	if ending == "":
-		box.add_child(_label(_fragment_progress(), DIM, 15))
+		box.add_child(_label(_fragment_progress(), DIM, UiStyle.SIZE_TEXT))
 	var close := Button.new()
 	close.text = tr("ui.story_continue")
 	close.custom_minimum_size = Vector2(0, 44)
 	close.add_theme_color_override("font_color", CYAN)
+	UiStyle.add_hover(close)
 	close.pressed.connect(func():
 		_story_closed_life = Game.life_number
 		_build())
 	box.add_child(close)
+	UiStyle.fade_in(dim)
 	return dim
 
 
 ## 待っているイベントと選択肢。時間を止めない設定では、選ぶ間も後ろで進行が続く（DOM-06）
 func _build_event() -> Control:
 	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.5)
+	dim.color = Color(UiStyle.BG, 0.6)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -582,16 +592,18 @@ func _build_event() -> Control:
 	var panel: Control = box.get_parent().get_parent()
 	panel.custom_minimum_size = Vector2(620, 0)
 	center.add_child(panel)
-	var text := _label(Game.event_desc(Game.pending_event), Color.WHITE, 17)
+	var text := _label(Game.event_desc(Game.pending_event), UiStyle.TEXT, UiStyle.SIZE_LEAD)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(text)
 	for choice in Game.event_choices():
 		var button := Button.new()
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.custom_minimum_size = Vector2(0, 40)
+		UiStyle.add_hover(button)
 		button.pressed.connect(Game.choose.bind(choice["id"]))
 		box.add_child(button)
 		_choice_buttons[choice["id"]] = button
+	UiStyle.fade_in(dim)
 	return dim
 
 
@@ -884,7 +896,7 @@ func _show_fragments() -> void:
 		lines.append(GameData.name_of("fragments", id))
 		lines.append(GameData.desc_of("fragments", id))
 		lines.append("")
-	_show_text(tr("ui.fragments"), "\n".join(lines), Vector2(700, 420), 16)
+	_show_text(tr("ui.fragments"), "\n".join(lines), Vector2(700, 420), UiStyle.SIZE_BODY)
 
 
 ## 街と人物の資料を読む。追記は、要る断片が戻るか出るイベントが起きるまで伏せる（DOM-14）
@@ -903,7 +915,7 @@ func _show_profiles(tab := 0) -> void:
 		lines.append("")
 	# 地図は資料と同じ画面に、タブで分けて置く。上のボタンをこれ以上増やすと、英語では1280の幅に収まらない（ADR-0022）
 	var tabs := TabContainer.new()
-	tabs.add_child(_text_body("\n".join(lines), CityMap.SIZE, 16))
+	tabs.add_child(_text_body("\n".join(lines), CityMap.SIZE, UiStyle.SIZE_BODY))
 	tabs.add_child(CityMap.new())
 	tabs.add_child(_chart_tab())
 	tabs.set_tab_title(0, tr("ui.profile_text"))
@@ -924,9 +936,9 @@ func _chart_tab() -> Control:
 	box.add_child(chart_scroll)
 	# 最初のエンディングまでは選び直せないので、ボタンを出さずに案内だけを出す（DOM-31、ADR-0050）
 	if not Game.can_rewind_story():
-		box.add_child(_label(tr("ui.rewind_locked"), DIM, 13))
+		box.add_child(_label(tr("ui.rewind_locked"), DIM, UiStyle.SIZE_NOTE))
 		return box
-	box.add_child(_label(tr("ui.rewind_note"), DIM, 13))
+	box.add_child(_label(tr("ui.rewind_note"), DIM, UiStyle.SIZE_NOTE))
 	var flow := HFlowContainer.new()
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(CityMap.SIZE.x, 80)
@@ -957,7 +969,7 @@ func _rewind(line: String, event_id: String, content: Control) -> void:
 
 
 func _show_licenses() -> void:
-	_show_text(tr("ui.licenses"), license_text(), Vector2(900, 520), 14)
+	_show_text(tr("ui.licenses"), license_text(), Vector2(900, 520), UiStyle.SIZE_SMALL)
 
 
 func _show_text(title: String, body: String, min_size: Vector2, font_size: int) -> void:
@@ -970,6 +982,7 @@ func _text_body(body: String, min_size: Vector2, font_size: int) -> RichTextLabe
 	text.selection_enabled = true
 	text.custom_minimum_size = min_size
 	text.add_theme_font_size_override("normal_font_size", font_size)
+	text.add_theme_color_override("default_color", UiStyle.TEXT)
 	text.text = body
 	return text
 
