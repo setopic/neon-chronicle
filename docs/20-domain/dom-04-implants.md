@@ -68,5 +68,6 @@ implemented_by:
 - (decides) [ADR-0016 インプラントと体の種類の効果を画面の文に出す](../50-adr/adr-0016-show-effects-on-screen.md)
 - (depends_on) [DOM-05 転生と永続強化](./dom-05-rebirth.md)
 - (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
+- (depends_on) [DOM-19 住民の生まれから死まで](./dom-19-resident-life-course.md)
 
 <!-- graph:auto:end -->

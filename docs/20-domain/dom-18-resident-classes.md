@@ -106,5 +106,6 @@ implemented_by:
 
 - (decides) [ADR-0027 企業の階級と下層街の稼ぎを決め、身元で橋の行き来を分ける](../50-adr/adr-0027-resident-classes-and-identity.md)
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
+- (depends_on) [DOM-19 住民の生まれから死まで](./dom-19-resident-life-course.md)
 
 <!-- graph:auto:end -->

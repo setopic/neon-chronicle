@@ -4,7 +4,7 @@ type: domain
 title: 街と人物の資料
 status: stable
 tags: [world, story]
-depends_on: [DOM-01, DOM-08, DOM-09, DOM-10, DOM-13, DOM-15, DOM-17, DOM-18]
+depends_on: [DOM-01, DOM-08, DOM-09, DOM-10, DOM-13, DOM-15, DOM-17, DOM-18, DOM-19]
 related: []
 implemented_by:
   - game/scripts/game_state.gd
@@ -51,6 +51,7 @@ implemented_by:
 | ザンダー一家 | | |
 | 屋台組合 | | |
 | [住民の暮らし](./dom-18-resident-classes.md) | | |
+| [生まれから死まで](./dom-19-resident-life-course.md) | | |
 | 自分（主人公） | | 「契約書」「名前」「計画書」「中枢サーバー」 |
 | ミオ | | 「白い部屋」「計画書」 |
 | ジン | | 「名前」 |
@@ -92,6 +93,7 @@ implemented_by:
 - [DOM-15 街の場所と勢力](./dom-15-city-places-and-powers.md)
 - [DOM-17 街の歴史](./dom-17-city-history.md)
 - [DOM-18 住民の階級と暮らし](./dom-18-resident-classes.md)
+- [DOM-19 住民の生まれから死まで](./dom-19-resident-life-course.md)
 
 このノードを参照しているノード
 
@@ -102,6 +104,7 @@ implemented_by:
 - (decides) [ADR-0024 下層街に、ギャングのザンダー一家と住人の屋台組合を置く](../50-adr/adr-0024-lower-city-gang-and-union.md)
 - (decides) [ADR-0025 企業の時代より前の街を市とし、市の財政破綻で企業の時代が始まったことにする](../50-adr/adr-0025-city-history-before-corporations.md)
 - (decides) [ADR-0027 企業の階級と下層街の稼ぎを決め、身元で橋の行き来を分ける](../50-adr/adr-0027-resident-classes-and-identity.md)
+- (decides) [ADR-0028 子どもは親の暮らしの中で育ち、下層街の死者の部品は闇医者が闇市場へ流す](../50-adr/adr-0028-life-course-and-body-parts.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 
 <!-- graph:auto:end -->

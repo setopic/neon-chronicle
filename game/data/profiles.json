@@ -13,6 +13,7 @@
     { "id": "zander" },
     { "id": "union" },
     { "id": "residents" },
+    { "id": "life_course" },
     { "id": "self", "notes": [
       { "id": "contract", "fragment": "contract" },
       { "id": "hacker", "fragment": "name" },

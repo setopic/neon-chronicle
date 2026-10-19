@@ -124,6 +124,15 @@
       ]
     },
     {
+      "id": "debt_body",
+      "jobs": ["mercenary"],
+      "choices": [
+        { "id": "hand_over", "credits": 40 },
+        { "id": "leave", "requires": { "negotiation": 3 }, "durability": -6, "xp": { "negotiation": 8 } },
+        { "id": "refuse" }
+      ]
+    },
+    {
       "id": "rei_1",
       "jobs": ["hacker"],
       "character": "rei",
