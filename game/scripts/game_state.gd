@@ -407,14 +407,18 @@ func event_desc(event_id: String) -> String:
 	return tr("event.%s.desc.%s" % [event_id, character_choices.get(by, "")])
 
 
-## 待っているイベントの選択肢。前の選択の条件を満たさない選択肢は、選び直せないので出さない（DOM-13）
+## 待っているイベントの選択肢。前の選択の条件と話の条件を満たさない選択肢は、選び直せないので出さない（DOM-13、DOM-08）
 func event_choices() -> Array:
 	return GameData.events.get(pending_event, {}).get("choices", []).filter(func(c):
-		var after: String = c.get("requires_choice", "")
-		if after == "":
-			return true
-		var parts := after.split(".")
-		return parts.size() == 2 and character_choices.get(parts[0], "") == parts[1])
+		return _story_met(c.get("requires_choice", "")) and _story_met(c.get("requires_story", "")))
+
+
+## 「イベントのid.選択肢のid」の条件を、話の進み具合が満たしているか。条件が空なら満たしている
+func _story_met(after: String) -> bool:
+	if after == "":
+		return true
+	var parts := after.split(".")
+	return parts.size() == 2 and character_choices.get(parts[0], "") == parts[1]
 
 
 ## 待っているイベントに、選ぶ条件があって、いま選べる選択肢があるか

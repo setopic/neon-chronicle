@@ -392,7 +392,8 @@
       "jobs": ["core_breach"],
       "choices": [
         { "id": "reclaim", "ending": "reclaim" },
-        { "id": "remain", "ending": "remain" }
+        { "id": "remain", "ending": "remain" },
+        { "id": "awaken", "ending": "awaken", "requires_story": "rei_3.promise", "requires_reputation": { "union": 5 } }
       ]
     }
   ]

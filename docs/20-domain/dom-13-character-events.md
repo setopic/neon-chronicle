@@ -102,5 +102,6 @@ implemented_by:
 - (decides) [ADR-0043 ミオにも3段の人物のイベントを持たせる](../50-adr/adr-0043-mio-character-events.md)
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 - (depends_on) [DOM-23 屋台通りの対立](./dom-23-stall-street-feud.md)
+- (depends_on) [DOM-29 目覚めの日](./dom-29-day-of-waking.md)
 
 <!-- graph:auto:end -->
