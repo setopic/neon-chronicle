@@ -54,6 +54,8 @@ const POIS := {
 	"yomi_hq": Vector2(30, 102),
 	"power_plant": Vector2(140, 102),
 	"substation": Vector2(120, 170),
+	"waldeck_hq": Vector2(295, 102),
+	"prosthetics_factory": Vector2(295, 128),
 	"montfort_hq": Vector2(455, 102),
 	"food_plant": Vector2(580, 102),
 	"water_plant": Vector2(580, 128),
