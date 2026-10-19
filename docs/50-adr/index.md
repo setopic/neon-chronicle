@@ -71,6 +71,7 @@ tags: [index]
 - [ADR-0052 画面の見た目の方向と、その土台を決める](./adr-0052-ui-style-foundation.md)
 - [ADR-0053 仕事の様子を、ログの左に線と点で描く](./adr-0053-job-scene.md)
 - [ADR-0054 仕事の1回を、ミニゲームで置き換えて遊べるようにする](./adr-0054-minigame-frame.md)
+- [ADR-0055 ハッカーの仕事のミニゲームを、符号の表を縦横にたどる遊びにする](./adr-0055-hacking-minigame.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

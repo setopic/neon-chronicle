@@ -50,10 +50,25 @@ func _process(_delta: float) -> bool:
 	_expect(absf(_game.job_progress - 2.0) < 0.01, "やめたら進み具合はそのまま残る")
 	_expect(not _game.minigame_active, "やめたら放置の仕事に戻る")
 
+	_check_hacking()
+
 	DirAccess.remove_absolute(SAVE_PATH)
 	print("NG" if _failed else "OK: ミニゲームの報酬は二重に入らない")
 	quit(1 if _failed else 0)
 	return true
+
+
+## ハッキングのミニゲームは、作った道をたどればちょうどの回数でそろい、度合いが1になる（ADR-0055）
+func _check_hacking() -> void:
+	for i in 20:
+		var game: HackingGame = Minigame.create("hacking", 0)
+		root.add_child(game)
+		var scores := []
+		game.finished.connect(func(score): scores.append(score))
+		for cell in game.path:
+			game._pick(cell)
+		_expect(scores == [1.0], "ハッキングの表は、作った道でそろう（%s）" % [scores])
+		game.free()
 
 
 func _expect(ok: bool, what: String) -> void:
