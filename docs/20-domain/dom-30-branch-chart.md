@@ -66,5 +66,6 @@ implemented_by:
 このノードを参照しているノード
 
 - (decides) [ADR-0047 話とエンディングの分岐図を、街と人物の画面の3つ目のタブに出す](../50-adr/adr-0047-branch-chart.md)
+- (depends_on) [DOM-31 話の選び直し](./dom-31-choosing-again.md)
 
 <!-- graph:auto:end -->
