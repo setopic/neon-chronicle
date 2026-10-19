@@ -4,6 +4,10 @@
       { "id": "project", "fragment": "project" },
       { "id": "core", "fragment": "core" }
     ] },
+    { "id": "companies" },
+    { "id": "corp_district" },
+    { "id": "lower_city" },
+    { "id": "black_market" },
     { "id": "self", "notes": [
       { "id": "contract", "fragment": "contract" },
       { "id": "hacker", "fragment": "name" },

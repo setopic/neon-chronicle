@@ -34,6 +34,7 @@ tags: [index]
 - [ADR-0015 街と人物の資料を上のボタンから開き、記憶の断片が戻るまで追記を伏せる](./adr-0015-profiles-revealed-by-fragments.md)
 - [ADR-0016 インプラントと体の種類の効果を画面の文に出す](./adr-0016-show-effects-on-screen.md)
 - [ADR-0017 画面の右上のボタンとダイアログの見た目をそろえる](./adr-0017-header-and-dialog-look.md)
+- [ADR-0018 街を複数の企業が分け合い、場所と住人をイベントと資料に出す](./adr-0018-companies-places-and-residents.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

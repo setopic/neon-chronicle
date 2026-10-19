@@ -69,6 +69,7 @@ graph LR
     DOM-12["DOM-12<br/>ジンの依頼"]
     DOM-13["DOM-13<br/>人物のイベント"]
     DOM-14["DOM-14<br/>街と人物の資料"]
+    DOM-15["DOM-15<br/>街の場所と勢力"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -91,6 +92,7 @@ graph LR
     ADR-0015["ADR-0015<br/>街と人物の資料を上のボタンから開き、記憶の断片が戻るまで追記を伏せる"]
     ADR-0016["ADR-0016<br/>インプラントと体の種類の効果を画面の文に出す"]
     ADR-0017["ADR-0017<br/>画面の右上のボタンとダイアログの見た目をそろえる"]
+    ADR-0018["ADR-0018<br/>街を複数の企業が分け合い、場所と住人をイベントと資料に出す"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -125,6 +127,9 @@ graph LR
   ADR-0016 -.->|decides| DOM-04
   ADR-0016 -.->|decides| DOM-11
   ADR-0017 -.->|decides| ARCH-01
+  ADR-0018 -.->|decides| DOM-01
+  ADR-0018 -.->|decides| DOM-14
+  ADR-0018 -.->|decides| DOM-15
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -172,6 +177,11 @@ graph LR
   DOM-14 -->|depends_on| DOM-09
   DOM-14 -->|depends_on| DOM-10
   DOM-14 -->|depends_on| DOM-13
+  DOM-14 -->|depends_on| DOM-15
+  DOM-15 -->|depends_on| DOM-01
+  DOM-15 -->|depends_on| DOM-06
+  DOM-15 -->|depends_on| DOM-08
+  DOM-15 -->|depends_on| DOM-09
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04

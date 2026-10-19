@@ -100,5 +100,6 @@ implemented_by:
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 - (depends_on) [DOM-10 登場人物](./dom-10-characters.md)
 - (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)
+- (depends_on) [DOM-15 街の場所と勢力](./dom-15-city-places-and-powers.md)
 
 <!-- graph:auto:end -->

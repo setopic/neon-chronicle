@@ -53,6 +53,32 @@
       ]
     },
     {
+      "id": "medicine",
+      "jobs": ["courier"],
+      "choices": [
+        { "id": "deliver", "credits": 10, "durability": -3, "xp": { "negotiation": 6 } },
+        { "id": "resell", "credits": 60 },
+        { "id": "refuse" }
+      ]
+    },
+    {
+      "id": "data_buyer",
+      "jobs": ["hacker"],
+      "choices": [
+        { "id": "sell", "credits": 30 },
+        { "id": "shop", "requires": { "negotiation": 4 }, "credits": 80, "xp": { "negotiation": 8 } },
+        { "id": "leak", "xp": { "hacking": 10 } }
+      ]
+    },
+    {
+      "id": "substation",
+      "jobs": ["mercenary"],
+      "choices": [
+        { "id": "cut", "credits": 40 },
+        { "id": "restore", "durability": -10, "xp": { "combat": 10 } }
+      ]
+    },
+    {
       "id": "rei_1",
       "jobs": ["hacker"],
       "character": "rei",
