@@ -5,6 +5,7 @@
       { "id": "core", "fragment": "core" }
     ] },
     { "id": "companies" },
+    { "id": "food_company" },
     { "id": "corp_district" },
     { "id": "lower_city" },
     { "id": "black_market" },

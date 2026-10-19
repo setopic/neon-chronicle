@@ -62,6 +62,15 @@
       ]
     },
     {
+      "id": "ration_run",
+      "jobs": ["courier"],
+      "choices": [
+        { "id": "push", "credits": 30, "durability": -4 },
+        { "id": "share", "credits": -15, "xp": { "negotiation": 6 } },
+        { "id": "detour", "credits": 10 }
+      ]
+    },
+    {
       "id": "data_buyer",
       "jobs": ["hacker"],
       "choices": [
