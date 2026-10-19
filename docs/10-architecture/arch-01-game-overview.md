@@ -65,6 +65,7 @@ related: []
 - (decides) [ADR-0007 閉じていた時間を、開いたときにまとめて進める](../50-adr/adr-0007-away-progress.md)
 - (decides) [ADR-0008 音楽と効果音をスクリプトで作り、最初の操作から鳴らす](../50-adr/adr-0008-audio.md)
 - (decides) [ADR-0017 画面の右上のボタンとダイアログの見た目をそろえる](../50-adr/adr-0017-header-and-dialog-look.md)
+- (decides) [ADR-0049 転生の画面とメインの画面を1280x720に収める](../50-adr/adr-0049-fit-screens-1280x720.md)
 - (depends_on) [UC-01 itch.ioでブラウザ版を公開する](../30-usecases/uc-01-itch-web-release.md)
 
 <!-- graph:auto:end -->
