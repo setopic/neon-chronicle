@@ -50,6 +50,7 @@ tags: [index]
 - [ADR-0031 日本のやくざや的屋に寄った語を、欧米の街でも通じる語に改める](./adr-0031-western-terms.md)
 - [ADR-0032 体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す](./adr-0032-body-quality-and-memory-software.md)
 - [ADR-0033 永続強化を増やし、どちらか一方しか取れない組を作る](./adr-0033-upgrade-groups.md)
+- [ADR-0034 ジンの依頼を2つ並べ、受けるものを選ばせる](./adr-0034-choose-jin-request.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

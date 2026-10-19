@@ -29,6 +29,7 @@ var _body_label: Label
 var _body_effects_label: Label
 var _effect_total_label: Label
 var _request_label: Label
+var _request_buttons := {}
 var _implant_buttons := {}
 var _rebirth_points_label: Label
 var _log_label: RichTextLabel
@@ -67,6 +68,7 @@ func _build() -> void:
 	_skill_rows.clear()
 	_implant_buttons.clear()
 	_upgrade_buttons.clear()
+	_request_buttons.clear()
 	_choice_buttons.clear()
 
 	_content = Control.new()
@@ -212,10 +214,19 @@ func _build_right() -> Control:
 	_effect_total_label = _label("", DIM, 14)
 	_effect_total_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_effect_total_label)
-	# ジンの依頼は、その周の目標なので、周の状態を出す欄に置く（ADR-0013）
+	# ジンの依頼は、その周の目標なので、周の状態を出す欄に置く。受けるまでは、並べた依頼ごとにボタンを出す（ADR-0034）
 	_request_label = _label("", PINK, 15)
 	_request_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_request_label)
+	for id in Game.request_offers:
+		var button := Button.new()
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.text = Loc.t("ui.request_offer", {"goal": _request_goal(id),
+			"n": roundi(GameData.requests[id].get("bonus", Game.REQUEST_BONUS) * 100.0)})
+		button.pressed.connect(Game.accept_request.bind(id))
+		box.add_child(button)
+		_request_buttons[id] = button
 
 	box.add_child(_section_title(tr("ui.implants")))
 	for id in GameData.order["implants"]:
@@ -450,6 +461,8 @@ func _refresh() -> void:
 	}, true)})
 	_request_label.text = _request_text()
 	_request_label.visible = _request_label.text != ""
+	for id in _request_buttons:
+		_request_buttons[id].visible = Game.alive and Game.request == ""
 	for id in _implant_buttons:
 		var button: Button = _implant_buttons[id]
 		var data: Dictionary = GameData.implants[id]
@@ -506,16 +519,22 @@ func _job_requirement_text(job_id: String) -> String:
 	return _requirement_text(job.get("requires", {}), items)
 
 
-## ジンの依頼の中身と進み具合。依頼の無い周は空
-func _request_text() -> String:
-	if Game.request == "":
-		return ""
-	var args := Game.request_args(Game.request)
-	var goal := Loc.t("request.job" if args.has("job") else "request.skill", {
+## 依頼の中身（「運び屋として2分働く」）
+func _request_goal(id: String) -> String:
+	var args := Game.request_args(id)
+	return Loc.t("request.job" if args.has("job") else "request.skill", {
 		"job": GameData.name_of("jobs", args.get("job", "")),
 		"skill": GameData.name_of("skills", args.get("skill", "")),
 		"min": args.get("min", 0), "level": args.get("level", 0),
 	})
+
+
+## 受けたジンの依頼の中身と進み具合。まだ受けていない周は空
+func _request_text() -> String:
+	if Game.request == "":
+		return ""
+	var args := Game.request_args(Game.request)
+	var goal := _request_goal(Game.request)
 	var progress := tr("ui.request_done")
 	if not Game.request_done:
 		var p := Game.request_progress()

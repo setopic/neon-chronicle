@@ -113,6 +113,7 @@ graph LR
     ADR-0031["ADR-0031<br/>日本のやくざや的屋に寄った語を、欧米の街でも通じる語に改める"]
     ADR-0032["ADR-0032<br/>体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す"]
     ADR-0033["ADR-0033<br/>永続強化を増やし、どちらか一方しか取れない組を作る"]
+    ADR-0034["ADR-0034<br/>ジンの依頼を2つ並べ、受けるものを選ばせる"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -188,6 +189,8 @@ graph LR
   ADR-0032 -.->|decides| DOM-11
   ADR-0033 -.->|decides| DOM-05
   ADR-0033 -.->|decides| DOM-09
+  ADR-0034 ==>|supersedes| ADR-0013
+  ADR-0034 -.->|decides| DOM-12
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -282,7 +285,7 @@ graph LR
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
-  class ADR-0005,ADR-0012,ADR-0020,ADR-0022,ADR-0024 deprecated;
+  class ADR-0005,ADR-0012,ADR-0013,ADR-0020,ADR-0022,ADR-0024 deprecated;
 ```
 
 <!-- graph:diagram:end -->

@@ -360,6 +360,8 @@
     "log.ending": "物語の終わりにたどり着いた。記憶ポイント +{points}",
     "log.away": "閉じていた{age}の分だけ時間が進んだ。",
     "ui.request": "ジンの依頼：{goal}（{progress}）",
+    "ui.request_offer": "ジンの依頼を受ける：{goal}（記憶ポイントの上乗せ {n}%）",
+    "log.request_accepted": "ジンの依頼を受けた。",
     "ui.request_done": "果たした",
     "ui.request_bonus": "（ジンの依頼 +{n}）",
     "request.job": "{job}として{min}分働く",

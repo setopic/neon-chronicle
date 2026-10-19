@@ -1,10 +1,10 @@
 {
   "requests": [
-    { "id": "courier_shift", "job": "courier", "seconds": 120 },
-    { "id": "negotiation_up", "skill": "negotiation", "level": 4 },
-    { "id": "hacker_shift", "job": "hacker", "seconds": 120, "requires": { "negotiation": 3 } },
-    { "id": "hacking_up", "skill": "hacking", "level": 8, "requires": { "negotiation": 3 } },
-    { "id": "mercenary_shift", "job": "mercenary", "seconds": 120, "requires": { "combat": 6 } },
-    { "id": "combat_up", "skill": "combat", "level": 10, "requires": { "combat": 6 } }
+    { "id": "courier_shift", "job": "courier", "seconds": 120, "bonus": 0.4 },
+    { "id": "negotiation_up", "skill": "negotiation", "level": 4, "bonus": 0.7 },
+    { "id": "hacker_shift", "job": "hacker", "seconds": 120, "requires": { "negotiation": 3 }, "bonus": 0.4 },
+    { "id": "hacking_up", "skill": "hacking", "level": 8, "requires": { "negotiation": 3 }, "bonus": 0.7 },
+    { "id": "mercenary_shift", "job": "mercenary", "seconds": 120, "requires": { "combat": 6 }, "bonus": 0.4 },
+    { "id": "combat_up", "skill": "combat", "level": 10, "requires": { "combat": 6 }, "bonus": 0.7 }
   ]
 }

@@ -360,6 +360,8 @@
     "log.ending": "You reached the end of the story. Memory points +{points}",
     "log.away": "{age} passed while you were away.",
     "ui.request": "Jin's request: {goal} ({progress})",
+    "ui.request_offer": "Take Jin's request: {goal} (memory point bonus {n}%)",
+    "log.request_accepted": "You took Jin's request.",
     "ui.request_done": "done",
     "ui.request_bonus": " (Jin's request +{n})",
     "request.job": "work as a {job} for {min} min",
