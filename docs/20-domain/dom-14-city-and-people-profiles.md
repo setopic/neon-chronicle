@@ -48,7 +48,7 @@ implemented_by:
 | 企業区画 | | |
 | 下層街 | | |
 | 闇市場 | | |
-| ザンダー一家 | | |
+| ザンダー・ファミリー | | |
 | 屋台組合 | | |
 | [住民の暮らし](./dom-18-resident-classes.md) | | |
 | [生まれから死まで](./dom-19-resident-life-course.md) | | |
@@ -105,6 +105,7 @@ implemented_by:
 - (decides) [ADR-0025 企業の時代より前の街を市とし、市の財政破綻で企業の時代が始まったことにする](../50-adr/adr-0025-city-history-before-corporations.md)
 - (decides) [ADR-0027 企業の階級と下層街の稼ぎを決め、身元で橋の行き来を分ける](../50-adr/adr-0027-resident-classes-and-identity.md)
 - (decides) [ADR-0028 子どもは親の暮らしの中で育ち、下層街の死者の部品は闇医者が闇市場へ流す](../50-adr/adr-0028-life-course-and-body-parts.md)
+- (decides) [ADR-0029 ザンダー一家をザンダー・ファミリーと呼ぶ](../50-adr/adr-0029-zander-family-name.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 
 <!-- graph:auto:end -->

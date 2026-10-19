@@ -2,7 +2,7 @@
 id: ADR-0024
 type: adr
 title: 下層街に、ギャングのザンダー一家と住人の屋台組合を置く
-status: stable
+status: deprecated
 tags: [world]
 decides:
   - DOM-14
@@ -14,7 +14,7 @@ related: []
 # 下層街に、ギャングのザンダー一家と住人の屋台組合を置く
 
 - 日付: 2026-10-19
-- 状態: stable
+- 状態: deprecated（[ADR-0029](./adr-0029-zander-family-name.md)が置き換えた）
 
 ## 背景
 
@@ -85,5 +85,9 @@ related: []
 
 - [DOM-14 街と人物の資料](../20-domain/dom-14-city-and-people-profiles.md)
 - [DOM-15 街の場所と勢力](../20-domain/dom-15-city-places-and-powers.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0029 ザンダー一家をザンダー・ファミリーと呼ぶ](./adr-0029-zander-family-name.md)
 
 <!-- graph:auto:end -->
