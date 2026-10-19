@@ -54,6 +54,7 @@ tags: [index]
 - [ADR-0035 転生のときに縛りを1つ選び、守り通せば記憶ポイントを上乗せする](./adr-0035-challenges.md)
 - [ADR-0036 橋を架けた技師たちの記録を、イベントと資料の追記で集める](./adr-0036-bridge-engineers-records.md)
 - [ADR-0037 4つの勢力に評判を持たせ、周をまたいで残す](./adr-0037-faction-reputation.md)
+- [ADR-0038 ザンダー・ファミリーと屋台組合の対立を、3段の勢力の話にする](./adr-0038-stall-street-feud.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

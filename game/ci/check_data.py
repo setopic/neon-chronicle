@@ -119,8 +119,9 @@ def main():
         seen = []
         for event in data.get("events", []):
             where = f"{path.relative_to(GAME)}: event.{event.get('id')}"
-            character = event.get("character")
-            earlier = {e.get("id") for e in seen if character and e.get("character") == character}
+            # 人物のイベントと勢力の話のイベントは、同じ形で段を進める（DOM-13、DOM-23）
+            character = event.get("character", event.get("story"))
+            earlier = {e.get("id") for e in seen if character and e.get("character", e.get("story")) == character}
             seen.append(event)
             if "fragment" in event and event["fragment"] not in fragments:
                 errors.append(f"{where}: 無い断片を指している: {event['fragment']}")

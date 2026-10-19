@@ -12,8 +12,8 @@
     { "id": "corp_district" },
     { "id": "lower_city" },
     { "id": "black_market" },
-    { "id": "zander" },
-    { "id": "union" },
+    { "id": "zander", "notes": [{ "id": "feud", "event": "feud_3" }] },
+    { "id": "union", "notes": [{ "id": "feud", "event": "feud_3" }] },
     { "id": "residents" },
     { "id": "life_course" },
     { "id": "self", "notes": [

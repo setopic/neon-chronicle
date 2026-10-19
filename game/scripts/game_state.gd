@@ -284,17 +284,17 @@ func _start_event() -> void:
 	if candidates.is_empty():
 		return
 	pending_event = candidates.pick_random()
-	var character: String = GameData.events[pending_event].get("character", "")
+	var character := story_line(GameData.events[pending_event])
 	if character != "":
 		met_characters.append(character)
 	_log("log.event", {"event": pending_event})
 	event_changed.emit()
 
 
-## 人物のイベントは、その人物の次の段だけが、その周にまだ話が進んでいないときに起きる（DOM-13）
+## 人物のイベントと勢力の話のイベントは、その話の次の段だけが、その周にまだ話が進んでいないときに起きる（DOM-13、DOM-23）
 func _can_start(event_id: String) -> bool:
 	var event: Dictionary = GameData.events[event_id]
-	var character: String = event.get("character", "")
+	var character := story_line(event)
 	if character == "":
 		return true
 	if met_characters.has(character) or next_character_event(character) != event_id:
@@ -302,12 +302,18 @@ func _can_start(event_id: String) -> bool:
 	return event.get("fragment", "") == "" or fragments.has(event["fragment"])
 
 
-## その人物の、まだ起きていない最初のイベント。data に並んだ順が話の順である。話が終わっていれば空
+## その話の、まだ起きていない最初のイベント。data に並んだ順が話の順である。話が終わっていれば空
 func next_character_event(character: String) -> String:
 	for id in GameData.order["events"]:
-		if GameData.events[id].get("character", "") == character and not character_choices.has(id):
+		if story_line(GameData.events[id]) == character and not character_choices.has(id):
 			return id
 	return ""
+
+
+## イベントが段の1つになっている話。人物のイベントは人物のid、勢力の話のイベントは話のid。どちらでもなければ空。
+## 人物と勢力の話は、1周に1段までという進み方が同じなので、同じ仕組みで進める（DOM-23）
+func story_line(event: Dictionary) -> String:
+	return event.get("character", event.get("story", ""))
 
 
 ## 待っているイベントの説明。前の段で選んだ選択肢ごとに文を書き分けたイベントは、その文を使う（DOM-13）
@@ -379,7 +385,7 @@ func choose(choice_id: String) -> void:
 	var event_id := pending_event
 	pending_event = ""
 	# 人物のイベントと、資料の出るイベントは、選んだ選択肢を残す（DOM-13、DOM-14）
-	if GameData.events[event_id].get("character", "") != "" or GameData.events[event_id].get("record", false):
+	if story_line(GameData.events[event_id]) != "" or GameData.events[event_id].get("record", false):
 		character_choices[event_id] = choice_id
 	_log("event.%s.%s.result" % [event_id, choice_id])
 	# エンディングの選択肢は、ほかの結果を持たず、その場で周を終える（DOM-08）

@@ -86,5 +86,6 @@ implemented_by:
 このノードを参照しているノード
 
 - (decides) [ADR-0037 4つの勢力に評判を持たせ、周をまたいで残す](../50-adr/adr-0037-faction-reputation.md)
+- (depends_on) [DOM-23 屋台通りの対立](./dom-23-stall-street-feud.md)
 
 <!-- graph:auto:end -->

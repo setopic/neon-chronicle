@@ -149,6 +149,38 @@
       ]
     },
     {
+      "id": "feud_1",
+      "jobs": ["courier"],
+      "story": "feud",
+      "choices": [
+        { "id": "keep", "durability": -5, "xp": { "negotiation": 6 }, "reputation": { "union": 1, "zander": -1 } },
+        { "id": "hand", "credits": 40, "reputation": { "zander": 1, "union": -1 } }
+      ]
+    },
+    {
+      "id": "feud_2",
+      "jobs": ["mercenary", "courier"],
+      "story": "feud",
+      "desc_by": "feud_1",
+      "choices": [
+        { "id": "side_union", "requires_reputation": { "union": 3 }, "durability": -8, "xp": { "combat": 12 }, "reputation": { "union": 2, "zander": -2 } },
+        { "id": "side_zander", "requires_reputation": { "zander": 3 }, "credits": 80, "reputation": { "zander": 2, "union": -2 } },
+        { "id": "stay_out" }
+      ]
+    },
+    {
+      "id": "feud_3",
+      "jobs": ["mercenary", "courier"],
+      "story": "feud",
+      "desc_by": "feud_2",
+      "choices": [
+        { "id": "union_end", "requires_choice": "feud_2.side_union", "credits": 60, "reputation": { "union": 2 } },
+        { "id": "zander_end", "requires_choice": "feud_2.side_zander", "credits": 120, "reputation": { "zander": 2 } },
+        { "id": "truce", "requires": { "negotiation": 6 }, "xp": { "negotiation": 15 }, "reputation": { "union": 1, "zander": 1 } },
+        { "id": "walk_away" }
+      ]
+    },
+    {
       "id": "rei_1",
       "jobs": ["hacker"],
       "character": "rei",
