@@ -6,6 +6,7 @@ signal life_ended
 signal life_started
 signal log_added
 signal event_changed
+signal job_paid(amount: float)  # 仕事の1回を終えて報酬が入ったとき。ADR-0051
 
 var save_path := "user://save.json"  # 通しの検査（ci/playthrough.gd）が別のファイルに差し替える
 const SAVE_VERSION := 1
@@ -48,6 +49,7 @@ var skill_xp := {}
 var skill_level := {}
 var implants: Array = []
 var job_time := {}
+var job_progress := 0.0  # 就いている仕事のいまの1回で、進んだ秒数。ADR-0051
 var alive := true
 var body := ""  # その周の体の種類のid。DOM-11
 var body_quality := 0  # その周の体の質。ADR-0032
@@ -134,13 +136,12 @@ func _tick(dt: float) -> void:
 	var danger := 1.0
 	if GameData.jobs.has(current_job):
 		var job: Dictionary = GameData.jobs[current_job]
-		var income := income_per_sec(current_job) * dt
-		credits += income
-		life_earned += income
 		job_time[current_job] = job_time.get(current_job, 0.0) + dt
-		var xp: Dictionary = job.get("xp", {})
-		for skill in xp:
-			_add_xp(skill, xp[skill] * (xp_mult() + effect("xp_" + skill)) * dt)
+		job_progress += dt
+		var length := job_length(current_job)
+		if job_progress >= length:
+			job_progress -= length
+			_finish_job_round(job, length)
 		danger = job.get("danger", 1.0)
 		tension = maxf(0.0, tension - TENSION_FADE * dt)
 		if pending_event == "" and randf() < danger * dt / EVENT_INTERVAL * event_rate():
@@ -153,6 +154,21 @@ func _tick(dt: float) -> void:
 	if durability <= 0.0:
 		durability = 0.0
 		_end_life()
+
+
+## 仕事の1回を終えたときに、その時点の稼ぎと経験の長さ分をまとめて入れる（ADR-0051）
+func _finish_job_round(job: Dictionary, length: float) -> void:
+	var pay := income_per_sec(current_job) * length
+	credits += pay
+	life_earned += pay
+	var xp: Dictionary = job.get("xp", {})
+	for skill in xp:
+		_add_xp(skill, xp[skill] * (xp_mult() + effect("xp_" + skill)) * length)
+	job_paid.emit(pay)
+
+
+func job_length(job_id: String) -> float:
+	return GameData.jobs.get(job_id, {}).get("length", 1.0)
 
 
 # --- 効果の計算 ---
@@ -220,6 +236,7 @@ func set_job(job_id: String) -> void:
 	if current_job != "":
 		break_challenge("job")
 	current_job = job_id
+	job_progress = 0.0  # 途中の1回の分は入らない（ADR-0051）
 	_log("log.job", {"job": job_id})
 
 
@@ -652,6 +669,7 @@ func _start_life(body_id := "", challenge_id := "") -> void:
 	durability = MAX_DURABILITY
 	age = 0.0
 	current_job = ""
+	job_progress = 0.0
 	pending_event = ""
 	last_deed = ""
 	job_time = {}
@@ -870,7 +888,7 @@ func save_game() -> void:
 		"version": SAVE_VERSION, "saved_at": Time.get_unix_time_from_system(),
 		"credits": credits, "life_earned": life_earned, "durability": durability, "age": age,
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
-		"implants": implants, "job_time": job_time, "alive": alive, "body": body, "body_quality": body_quality, "life_xp": life_xp, "pending_event": pending_event,
+		"implants": implants, "job_time": job_time, "job_progress": job_progress, "alive": alive, "body": body, "body_quality": body_quality, "life_xp": life_xp, "pending_event": pending_event,
 		"last_deed": last_deed, "request_offers": request_offers, "request": request, "request_done": request_done,
 		"challenge": challenge, "challenge_broken": challenge_broken, "identity": identity, "tension": tension, "last_challenge_bonus": last_challenge_bonus, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
 		"last_points_gained": last_points_gained, "last_request_bonus": last_request_bonus, "upgrades": upgrades, "reputation": reputation, "life_choices": life_choices, "last_life_choices": last_life_choices,
@@ -897,6 +915,8 @@ func load_game() -> bool:
 	skill_level = _int_values(data.get("skill_level", {}))
 	implants = data.get("implants", [])
 	job_time = data.get("job_time", {})
+	# #117 より前のセーブは、仕事の進み具合を持たない。0から始める
+	job_progress = float(data.get("job_progress", 0.0))
 	alive = data.get("alive", true)
 	# #36 より前の体は、どれも効果の無い最初の体だった
 	body = data.get("body", first_body())

@@ -22,7 +22,10 @@ var _content: Control
 var _refresh_timer := 0.0
 # 毎回更新する部品
 var _stats_label: Label
+var _pay_label: Label  # クレジットの横に、仕事の1回の報酬を短く出す。ADR-0051
+var _rest_stats_label: Label
 var _job_buttons := {}
+var _job_bars := {}  # 仕事のid -> いまの1回の進み具合のバー
 var _skill_rows := {}  # id -> {label, bar}
 var _durability_bar: ProgressBar
 var _body_label: Label
@@ -55,6 +58,7 @@ func _ready() -> void:
 	Game.life_started.connect(_build)
 	Game.event_changed.connect(_build)
 	Game.log_added.connect(_refresh_log)
+	Game.job_paid.connect(_show_pay)
 	_build()
 
 
@@ -71,6 +75,7 @@ func _build() -> void:
 	if _content:
 		_content.queue_free()
 	_job_buttons.clear()
+	_job_bars.clear()
 	_skill_rows.clear()
 	_implant_buttons.clear()
 	_upgrade_buttons.clear()
@@ -156,8 +161,18 @@ func _build_header() -> Control:
 	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(titles)
 	titles.add_child(_label(tr("ui.title"), PINK, 36))
+	var stats := HBoxContainer.new()
+	stats.add_theme_constant_override("separation", 0)
+	titles.add_child(stats)
 	_stats_label = _label("", CYAN, 20)
-	titles.add_child(_stats_label)
+	stats.add_child(_stats_label)
+	_pay_label = _label("", PINK, 20)
+	_pay_label.modulate.a = 0.0
+	# 幅を先に取っておき、報酬が出るたびに後ろの稼ぎと記憶ポイントが動かないようにする
+	_pay_label.custom_minimum_size = Vector2(80, 0)
+	stats.add_child(_pay_label)
+	_rest_stats_label = _label("", CYAN, 20)
+	stats.add_child(_rest_stats_label)
 
 	# ボタンは設定と読み物の2段に分ける。1段に並べると、英語では1280の幅に収まらない（ADR-0017）
 	var tools := VBoxContainer.new()
@@ -207,6 +222,11 @@ func _build_left() -> Control:
 		button.pressed.connect(Game.set_job.bind(id))
 		box.add_child(button)
 		_job_buttons[id] = button
+		var bar := ProgressBar.new()
+		bar.show_percentage = false
+		bar.custom_minimum_size = Vector2(0, 6)
+		box.add_child(bar)
+		_job_bars[id] = bar
 
 	box.add_child(_section_title(tr("ui.skills")))
 	for id in GameData.order["skills"]:
@@ -555,9 +575,11 @@ func _refresh() -> void:
 	if _stats_label == null:
 		return
 	var income := Game.income_per_sec(Game.current_job)
-	_stats_label.text = "%s    %s    %s    %s" % [
+	_stats_label.text = "%s    %s" % [
 		Loc.t("ui.life", {"n": Game.life_number}),
 		Loc.t("ui.credits", {"n": Game.format_number(Game.credits)}),
+	]
+	_rest_stats_label.text = "    %s    %s" % [
 		Loc.t("ui.income", {"n": "%.1f" % income}),
 		# 体の欄に効果の行を足した分、記憶ポイントは周の状態と並べて上に出す（ADR-0016）
 		Loc.t("ui.memory_points", {"n": Game.memory_points}),
@@ -572,6 +594,10 @@ func _refresh() -> void:
 			button.text = "%s  %s" % [name, _job_requirement_text(id)]
 			button.disabled = true
 		button.set_pressed_no_signal(id == Game.current_job)
+		var bar: ProgressBar = _job_bars[id]
+		bar.visible = id == Game.current_job
+		bar.max_value = Game.job_length(id)
+		bar.value = Game.job_progress
 	for id in _skill_rows:
 		var level: int = Game.skill_level.get(id, 0)
 		_skill_rows[id]["label"].text = "%s  %s" % [GameData.name_of("skills", id), Loc.t("ui.level", {"level": level})]
@@ -659,6 +685,17 @@ func _refresh_log() -> void:
 	for entry in Game.logs.slice(-30):
 		lines.append(Game.format_entry(entry))
 	_log_label.text = "\n".join(lines)
+
+
+## 仕事の1回の報酬を、クレジットの横に出して消す。1回ごとのログは残さない（ADR-0051）
+func _show_pay(amount: float) -> void:
+	if not is_instance_valid(_pay_label):
+		return
+	_pay_label.text = " +" + Game.format_number(amount)
+	_pay_label.modulate.a = 1.0
+	var tween := _pay_label.create_tween()
+	tween.tween_interval(0.6)
+	tween.tween_property(_pay_label, "modulate:a", 0.0, 0.9)
 
 
 func _job_requirement_text(job_id: String) -> String:

@@ -1,6 +1,6 @@
 extends SceneTree
 
-## 閉じていた時間の分だけ進むかを確かめる。ADR-0007。
+## 閉じていた時間の分だけ進むかを確かめる。ADR-0007、ADR-0051。
 ## セーブの時刻を過去にずらしてロードし、1フレーム分だけ進めて結果を見る。
 ## セーブは別のファイルに書くので、手元のセーブは消えない。
 ##
@@ -23,6 +23,12 @@ func _process(_delta: float) -> bool:
 	_expect(_game.alive, "100秒では周は終わらない")
 	_expect(_game.logs.back().get("key") == "log.away", "閉じていた時間がログに残る")
 
+	# 運び屋の1回は5秒。3秒進んだ1回を残して4秒閉じたら、1回分の報酬が入り、2秒進んだ1回が残る（ADR-0051）
+	_reopen_after(4.0, {"current_job": "courier", "job_progress": 3.0})
+	var pay: float = _game.income_per_sec("courier") * _game.job_length("courier")
+	_expect(absf(_game.credits - pay) < 0.01, "閉じている間に終えた1回の報酬が入る（%.2f / %.2f）" % [_game.credits, pay])
+	_expect(absf(_game.job_progress - 2.0) < 0.3, "途中の1回は続きから進む（%.2f）" % _game.job_progress)
+
 	_reopen_after(30.0 * 24.0 * 3600.0)
 	_expect(not _game.alive, "長く閉じていたら、周が終わる")
 	_expect(_game.chronicle.size() == 1, "終わった周がクロニクルに残る")
@@ -37,10 +43,11 @@ func _process(_delta: float) -> bool:
 	return true
 
 
-## 新しい周を始め、seconds 秒前にセーブしたことにしてロードし、1フレーム進める
-func _reopen_after(seconds: float) -> void:
+## 新しい周を始め、changes をセーブに書き足し、seconds 秒前にセーブしたことにしてロードし、1フレーム進める
+func _reopen_after(seconds: float, changes := {}) -> void:
 	_game.reset_game()
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SAVE_PATH))
+	data.merge(changes, true)
 	data["saved_at"] = Time.get_unix_time_from_system() - seconds
 	FileAccess.open(SAVE_PATH, FileAccess.WRITE).store_string(JSON.stringify(data))
 	_game.load_game()
