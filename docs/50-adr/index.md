@@ -68,6 +68,7 @@ tags: [index]
 - [ADR-0049 転生の画面とメインの画面を1280x720に収める](./adr-0049-fit-screens-1280x720.md)
 - [ADR-0050 話の選び直しを、エンディングにたどり着いてから使えるようにする](./adr-0050-choose-again-after-ending.md)
 - [ADR-0051 仕事を、終わったら報酬が入る形にする](./adr-0051-job-pays-on-completion.md)
+- [ADR-0052 画面の見た目の方向と、その土台を決める](./adr-0052-ui-style-foundation.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

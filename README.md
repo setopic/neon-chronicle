@@ -142,6 +142,7 @@ graph LR
     ADR-0049["ADR-0049<br/>転生の画面とメインの画面を1280x720に収める"]
     ADR-0050["ADR-0050<br/>話の選び直しを、エンディングにたどり着いてから使えるようにする"]
     ADR-0051["ADR-0051<br/>仕事を、終わったら報酬が入る形にする"]
+    ADR-0052["ADR-0052<br/>画面の見た目の方向と、その土台を決める"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -249,6 +250,7 @@ graph LR
   ADR-0050 -.->|decides| DOM-31
   ADR-0050 -.->|decides| DOM-05
   ADR-0051 -.->|decides| DOM-03
+  ADR-0052 -.->|decides| ARCH-01
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
