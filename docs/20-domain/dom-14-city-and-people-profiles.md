@@ -4,7 +4,7 @@ type: domain
 title: 街と人物の資料
 status: stable
 tags: [world, story]
-depends_on: [DOM-01, DOM-08, DOM-09, DOM-10, DOM-13, DOM-15, DOM-17, DOM-18, DOM-19]
+depends_on: [DOM-01, DOM-08, DOM-09, DOM-10, DOM-13, DOM-15, DOM-17, DOM-18, DOM-19, DOM-20]
 related: []
 implemented_by:
   - game/scripts/game_state.gd
@@ -41,7 +41,7 @@ implemented_by:
 
 | 資料 | 出るイベント | 追記の要る断片・出るイベント |
 | --- | --- | --- |
-| ネオン・シティ | | 「計画書」「中枢サーバー」 |
+| ネオン・シティ | | 「計画書」「中枢サーバー」。[被験体の出どころ](./dom-20-test-subjects-origin.md)の追記は「計画書」で出る |
 | 街の歴史 | | |
 | 企業 | | |
 | リンドホルム食品 | | |
@@ -55,7 +55,7 @@ implemented_by:
 | 自分（主人公） | | 「契約書」「名前」「計画書」「中枢サーバー」 |
 | ミオ | | 「白い部屋」「計画書」 |
 | ジン | | 「名前」 |
-| レイ | レイの1段目 | レイの2段目 |
+| レイ | レイの1段目 | レイの2段目。[被験体の出どころ](./dom-20-test-subjects-origin.md)の追記と、名簿の追記の2つ |
 
 ## 不変条件
 
@@ -94,6 +94,7 @@ implemented_by:
 - [DOM-17 街の歴史](./dom-17-city-history.md)
 - [DOM-18 住民の階級と暮らし](./dom-18-resident-classes.md)
 - [DOM-19 住民の生まれから死まで](./dom-19-resident-life-course.md)
+- [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
 
 このノードを参照しているノード
 
@@ -106,6 +107,7 @@ implemented_by:
 - (decides) [ADR-0027 企業の階級と下層街の稼ぎを決め、身元で橋の行き来を分ける](../50-adr/adr-0027-resident-classes-and-identity.md)
 - (decides) [ADR-0028 子どもは親の暮らしの中で育ち、下層街の死者の部品は闇医者が闇市場へ流す](../50-adr/adr-0028-life-course-and-body-parts.md)
 - (decides) [ADR-0029 ザンダー一家をザンダー・ファミリーと呼ぶ](../50-adr/adr-0029-zander-family-name.md)
+- (decides) [ADR-0030 被験体は借金の契約で集め、使い捨ての体は闇市場の部品で組み立てる](../50-adr/adr-0030-test-subjects-and-bodies.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 
 <!-- graph:auto:end -->

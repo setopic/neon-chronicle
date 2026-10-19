@@ -101,5 +101,6 @@ implemented_by:
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 - (depends_on) [DOM-15 街の場所と勢力](./dom-15-city-places-and-powers.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
+- (depends_on) [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
 
 <!-- graph:auto:end -->

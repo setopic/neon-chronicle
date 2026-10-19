@@ -2,6 +2,7 @@
   "profiles": [
     { "id": "city", "notes": [
       { "id": "project", "fragment": "project" },
+      { "id": "subjects", "fragment": "project" },
       { "id": "core", "fragment": "core" }
     ] },
     { "id": "history" },
@@ -28,6 +29,7 @@
       { "id": "old_friend", "fragment": "name" }
     ] },
     { "id": "rei", "event": "rei_1", "notes": [
+      { "id": "origin", "event": "rei_2" },
       { "id": "list", "event": "rei_2" }
     ] }
   ]

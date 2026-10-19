@@ -84,5 +84,6 @@ related: []
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 - (depends_on) [DOM-15 街の場所と勢力](./dom-15-city-places-and-powers.md)
 - (depends_on) [DOM-18 住民の階級と暮らし](./dom-18-resident-classes.md)
+- (depends_on) [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
 
 <!-- graph:auto:end -->

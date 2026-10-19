@@ -74,6 +74,7 @@ graph LR
     DOM-17["DOM-17<br/>街の歴史"]
     DOM-18["DOM-18<br/>住民の階級と暮らし"]
     DOM-19["DOM-19<br/>住民の生まれから死まで"]
+    DOM-20["DOM-20<br/>被験体の出どころ"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -108,6 +109,7 @@ graph LR
     ADR-0027["ADR-0027<br/>企業の階級と下層街の稼ぎを決め、身元で橋の行き来を分ける"]
     ADR-0028["ADR-0028<br/>子どもは親の暮らしの中で育ち、下層街の死者の部品は闇医者が闇市場へ流す"]
     ADR-0029["ADR-0029<br/>ザンダー一家をザンダー・ファミリーと呼ぶ"]
+    ADR-0030["ADR-0030<br/>被験体は借金の契約で集め、使い捨ての体は闇市場の部品で組み立てる"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -172,6 +174,8 @@ graph LR
   ADR-0029 -.->|decides| DOM-15
   ADR-0029 -.->|decides| DOM-18
   ADR-0029 -.->|decides| DOM-19
+  ADR-0030 -.->|decides| DOM-14
+  ADR-0030 -.->|decides| DOM-20
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -223,6 +227,7 @@ graph LR
   DOM-14 -->|depends_on| DOM-17
   DOM-14 -->|depends_on| DOM-18
   DOM-14 -->|depends_on| DOM-19
+  DOM-14 -->|depends_on| DOM-20
   DOM-15 -->|depends_on| DOM-01
   DOM-15 -->|depends_on| DOM-06
   DOM-15 -->|depends_on| DOM-08
@@ -238,6 +243,13 @@ graph LR
   DOM-19 -->|depends_on| DOM-04
   DOM-19 -->|depends_on| DOM-15
   DOM-19 -->|depends_on| DOM-18
+  DOM-20 -->|depends_on| DOM-08
+  DOM-20 -->|depends_on| DOM-09
+  DOM-20 -->|depends_on| DOM-10
+  DOM-20 -->|depends_on| DOM-11
+  DOM-20 -->|depends_on| DOM-15
+  DOM-20 -->|depends_on| DOM-18
+  DOM-20 -->|depends_on| DOM-19
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04

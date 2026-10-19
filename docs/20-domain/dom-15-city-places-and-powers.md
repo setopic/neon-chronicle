@@ -193,5 +193,6 @@ flowchart TB
 - (depends_on) [DOM-17 街の歴史](./dom-17-city-history.md)
 - (depends_on) [DOM-18 住民の階級と暮らし](./dom-18-resident-classes.md)
 - (depends_on) [DOM-19 住民の生まれから死まで](./dom-19-resident-life-course.md)
+- (depends_on) [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
 
 <!-- graph:auto:end -->

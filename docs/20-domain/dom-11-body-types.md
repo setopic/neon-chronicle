@@ -86,5 +86,6 @@ implemented_by:
 
 - (decides) [ADR-0012 転生のときに4種類の体から1つを選ぶ](../50-adr/adr-0012-choose-body-on-rebirth.md)
 - (decides) [ADR-0016 インプラントと体の種類の効果を画面の文に出す](../50-adr/adr-0016-show-effects-on-screen.md)
+- (depends_on) [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
 
 <!-- graph:auto:end -->
