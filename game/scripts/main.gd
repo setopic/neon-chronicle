@@ -5,12 +5,11 @@ extends Control
 
 const City := preload("res://scripts/city.gd")
 
-const PINK := Color(1.0, 0.25, 0.75)
-const CYAN := Color(0.2, 0.95, 1.0)
-const DIM := Color(0.6, 0.6, 0.75)
-const DANGER := Color(1.0, 0.3, 0.3)
-const BG := Color(0.03, 0.02, 0.07)
-const PANEL_BG := Color(0.07, 0.05, 0.13, 0.94)
+# 色は見た目の土台（UiStyle）から取る。ADR-0052
+const PINK := UiStyle.PINK
+const CYAN := UiStyle.CYAN
+const DIM := UiStyle.DIM
+const DANGER := UiStyle.DANGER
 const REFRESH_INTERVAL := 0.1
 # 割合で増減させる効果の種類と、その文のキー。並びが画面に出る順になる（DOM-03）
 const FX_KEYS := {"income": "ui.fx_income", "xp": "ui.fx_xp", "decay": "ui.fx_decay"}
@@ -48,9 +47,9 @@ var _story_closed_life := 0  # 戻った記憶の断片やエンディングの�
 
 
 func _ready() -> void:
-	theme = _make_theme()
+	theme = UiStyle.make_theme()
 	var bg := ColorRect.new()
-	bg.color = BG
+	bg.color = UiStyle.BG
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 	Loc.language_changed.connect(_build)
@@ -148,6 +147,16 @@ func _build_header() -> Control:
 	var city := City.new()
 	city.set_anchors_preset(Control.PRESET_FULL_RECT)
 	header.add_child(city)
+	var scanlines := UiStyle.Scanlines.new()
+	scanlines.set_anchors_preset(Control.PRESET_FULL_RECT)
+	header.add_child(scanlines)
+	# 帯の下の縁に線を引き、街と下の欄を分ける
+	var edge := ColorRect.new()
+	edge.color = Color(UiStyle.CYAN, 0.6)
+	edge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	edge.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	edge.offset_top = -2
+	header.add_child(edge)
 
 	var overlay := MarginContainer.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -157,21 +166,32 @@ func _build_header() -> Control:
 	var row := HBoxContainer.new()
 	overlay.add_child(row)
 
+	# 題と状態は、街の上に重ねた板に載せて、街の明かりに紛れないようにする
+	var plate := PanelContainer.new()
+	plate.theme_type_variation = "HudPlate"
+	plate.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	plate.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(plate)
 	var titles := VBoxContainer.new()
-	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(titles)
-	titles.add_child(_label(tr("ui.title"), PINK, 36))
+	titles.add_theme_constant_override("separation", 0)
+	plate.add_child(titles)
+	var title := _label(tr("ui.title"), PINK, UiStyle.SIZE_TITLE)
+	title.add_theme_font_override("font", UiStyle.title_font())
+	titles.add_child(title)
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(spacer)
 	var stats := HBoxContainer.new()
 	stats.add_theme_constant_override("separation", 0)
 	titles.add_child(stats)
-	_stats_label = _label("", CYAN, 20)
+	_stats_label = _label("", CYAN, UiStyle.SIZE_STAT)
 	stats.add_child(_stats_label)
-	_pay_label = _label("", PINK, 20)
+	_pay_label = _label("", PINK, UiStyle.SIZE_STAT)
 	_pay_label.modulate.a = 0.0
 	# 幅を先に取っておき、報酬が出るたびに後ろの稼ぎと記憶ポイントが動かないようにする
 	_pay_label.custom_minimum_size = Vector2(80, 0)
 	stats.add_child(_pay_label)
-	_rest_stats_label = _label("", CYAN, 20)
+	_rest_stats_label = _label("", CYAN, UiStyle.SIZE_STAT)
 	stats.add_child(_rest_stats_label)
 
 	# ボタンは設定と読み物の2段に分ける。1段に並べると、英語では1280の幅に収まらない（ADR-0017）
@@ -188,6 +208,7 @@ func _build_header() -> Control:
 		if locale == Loc.current():
 			language.select(language.item_count - 1)
 	language.item_selected.connect(func(i): Loc.set_language(language.get_item_metadata(i)))
+	UiStyle.add_hover(language)
 	settings.add_child(language)
 	settings.add_child(_toggle(tr("ui.pause_on_event"), Loc.setting("pause_on_event", false),
 		func(on): Loc.set_setting("pause_on_event", on)))
@@ -989,6 +1010,7 @@ func _button(text: String, pressed: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
 	button.pressed.connect(pressed)
+	UiStyle.add_hover(button)
 	return button
 
 
@@ -998,6 +1020,7 @@ func _toggle(text: String, on: bool, changed: Callable) -> Button:
 	button.text = text
 	button.button_pressed = on
 	button.toggled.connect(changed)
+	UiStyle.add_hover(button)
 	return button
 
 
@@ -1026,109 +1049,3 @@ func _label(text: String, color: Color, font_size: int) -> Label:
 	label.add_theme_color_override("font_color", color)
 	label.add_theme_font_size_override("font_size", font_size)
 	return label
-
-
-func _make_theme() -> Theme:
-	var t := Theme.new()
-	t.default_font_size = 16
-	var panel := StyleBoxFlat.new()
-	panel.bg_color = PANEL_BG
-	panel.border_color = Color(CYAN, 0.35)
-	panel.set_border_width_all(1)
-	panel.set_corner_radius_all(6)
-	t.set_stylebox("panel", "PanelContainer", panel)
-
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = Color(0.12, 0.08, 0.2)
-	normal.border_color = Color(PINK, 0.5)
-	normal.set_border_width_all(1)
-	normal.set_corner_radius_all(4)
-	normal.set_content_margin_all(8)
-	var hover := normal.duplicate()
-	hover.bg_color = Color(0.2, 0.1, 0.3)
-	var pressed := normal.duplicate()
-	pressed.bg_color = Color(0.35, 0.08, 0.3)
-	pressed.border_color = PINK
-	var disabled := normal.duplicate()
-	disabled.bg_color = Color(0.08, 0.07, 0.11)
-	disabled.border_color = Color(0.3, 0.3, 0.4, 0.4)
-	for type in ["Button", "OptionButton"]:
-		t.set_stylebox("normal", type, normal)
-		t.set_stylebox("hover", type, hover)
-		t.set_stylebox("pressed", type, pressed)
-		t.set_stylebox("hover_pressed", type, pressed)
-		t.set_stylebox("disabled", type, disabled)
-	# 転生の画面の永続強化と、仕事・ジンの依頼・インプラントのボタン。数が多いので、上下の余白と文字を詰めて1280x720に収める
-	t.set_type_variation("CompactButton", "Button")
-	t.set_font_size("font_size", "CompactButton", 14)
-	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
-		var compact: StyleBoxFlat = t.get_stylebox(state, "Button").duplicate()
-		compact.content_margin_top = 4
-		compact.content_margin_bottom = 4
-		t.set_stylebox(state, "CompactButton", compact)
-	t.set_color("font_disabled_color", "Button", Color(0.5, 0.5, 0.6))
-	# キーボードで選んでいるボタンの枠。標準の白い枠は、ほかの色から浮く
-	var focus := StyleBoxFlat.new()
-	focus.draw_center = false
-	focus.border_color = CYAN
-	focus.set_border_width_all(1)
-	focus.set_corner_radius_all(4)
-	t.set_stylebox("focus", "Button", focus)
-	t.set_stylebox("focus", "OptionButton", focus)
-
-	var bar_bg := StyleBoxFlat.new()
-	bar_bg.bg_color = Color(0.1, 0.08, 0.16)
-	bar_bg.set_corner_radius_all(3)
-	var bar_fill := StyleBoxFlat.new()
-	bar_fill.bg_color = CYAN
-	bar_fill.set_corner_radius_all(3)
-	t.set_stylebox("background", "ProgressBar", bar_bg)
-	t.set_stylebox("fill", "ProgressBar", bar_fill)
-
-	# 記憶・街と人物・ライセンス・最初からの画面も、灰色の標準の見た目ではなくパネルと同じ色にする（ADR-0017）
-	var frame := StyleBoxFlat.new()
-	frame.bg_color = Color(0.05, 0.03, 0.1)
-	frame.border_color = CYAN
-	frame.set_border_width_all(1)
-	frame.set_corner_radius_all(6)
-	frame.expand_margin_left = 8
-	frame.expand_margin_right = 8
-	frame.expand_margin_bottom = 8
-	frame.expand_margin_top = 40
-	t.set_stylebox("embedded_border", "Window", frame)
-	var unfocused := frame.duplicate()
-	unfocused.border_color = Color(CYAN, 0.35)
-	t.set_stylebox("embedded_unfocused_border", "Window", unfocused)
-	t.set_constant("title_height", "Window", 40)
-	t.set_font_size("title_font_size", "Window", 18)
-	t.set_color("title_color", "Window", CYAN)
-	var dialog := StyleBoxFlat.new()
-	dialog.bg_color = Color(0.05, 0.03, 0.1)
-	dialog.set_content_margin_all(10)
-	t.set_stylebox("panel", "AcceptDialog", dialog)
-	# 街と人物の画面の、資料と地図のタブ（ADR-0022）
-	var tab := StyleBoxFlat.new()
-	tab.bg_color = Color(0.12, 0.08, 0.2)
-	tab.border_color = Color(PINK, 0.5)
-	tab.set_border_width_all(1)
-	tab.set_corner_radius_all(4)
-	tab.set_content_margin_all(8)
-	var tab_selected := tab.duplicate()
-	tab_selected.bg_color = Color(0.35, 0.08, 0.3)
-	tab_selected.border_color = PINK
-	t.set_stylebox("tab_unselected", "TabContainer", tab)
-	t.set_stylebox("tab_hovered", "TabContainer", tab)
-	t.set_stylebox("tab_selected", "TabContainer", tab_selected)
-	var tab_panel := StyleBoxFlat.new()
-	tab_panel.bg_color = Color(0.05, 0.03, 0.1)
-	tab_panel.border_color = Color(CYAN, 0.35)
-	tab_panel.set_border_width_all(1)
-	tab_panel.set_content_margin_all(8)
-	t.set_stylebox("panel", "TabContainer", tab_panel)
-	var popup := StyleBoxFlat.new()
-	popup.bg_color = Color(0.07, 0.05, 0.13)
-	popup.border_color = Color(PINK, 0.5)
-	popup.set_border_width_all(1)
-	popup.set_content_margin_all(6)
-	t.set_stylebox("panel", "PopupMenu", popup)
-	return t
