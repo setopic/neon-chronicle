@@ -102,6 +102,10 @@ def main():
             # 1回の長さが無いと、報酬が1秒ごとに入ってしまう（ADR-0051）
             if not job.get("length", 0) > 0:
                 errors.append(f"{path.relative_to(GAME)}: 1回の長さ（length）が無い: job.{job.get('id')}")
+            # ミニゲームの遊び方の説明が無いと、始めたときに何をすればよいか分からない（ADR-0054）
+            kind = job.get("minigame", "")
+            if kind and f"minigame.{kind}.help" not in base:
+                errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: minigame.{kind}.help")
         for event in data.get("events", []):
             choices = event.get("choices", [])
             if not any(not c.get("requires") and not c.get("requires_choice") for c in choices):
