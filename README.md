@@ -99,6 +99,7 @@ graph LR
     ADR-0021["ADR-0021<br/>電気はヨミ・システムズ、水はリンドホルム食品が握り、街に公共の交通は置かない"]
     ADR-0022["ADR-0022<br/>街の地図を「街と人物」の画面にタブで出し、中枢サーバーは断片が戻るまで伏せる"]
     ADR-0023["ADR-0023<br/>橋に人名を付け、地図を地形の分かる描き方にする"]
+    ADR-0024["ADR-0024<br/>下層街に、ギャングのザンダー一家と住人の屋台組合を置く"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -146,6 +147,8 @@ graph LR
   ADR-0023 ==>|supersedes| ADR-0022
   ADR-0023 -.->|decides| DOM-15
   ADR-0023 -.->|decides| DOM-16
+  ADR-0024 -.->|decides| DOM-14
+  ADR-0024 -.->|decides| DOM-15
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02

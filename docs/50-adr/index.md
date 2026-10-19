@@ -40,6 +40,7 @@ tags: [index]
 - [ADR-0021 電気はヨミ・システムズ、水はリンドホルム食品が握り、街に公共の交通は置かない](./adr-0021-city-infrastructure.md)
 - [ADR-0022 街の地図を「街と人物」の画面にタブで出し、中枢サーバーは断片が戻るまで伏せる](./adr-0022-city-map-in-game.md)
 - [ADR-0023 橋に人名を付け、地図を地形の分かる描き方にする](./adr-0023-bridge-names-and-terrain-map.md)
+- [ADR-0024 下層街に、ギャングのザンダー一家と住人の屋台組合を置く](./adr-0024-lower-city-gang-and-union.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

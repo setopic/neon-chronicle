@@ -47,6 +47,8 @@ implemented_by:
 | 企業区画 | | |
 | 下層街 | | |
 | 闇市場 | | |
+| ザンダー一家 | | |
+| 屋台組合 | | |
 | 自分（主人公） | | 「契約書」「名前」「計画書」「中枢サーバー」 |
 | ミオ | | 「白い部屋」「計画書」 |
 | ジン | | 「名前」 |
@@ -93,6 +95,7 @@ implemented_by:
 - (decides) [ADR-0018 街を複数の企業が分け合い、場所と住人をイベントと資料に出す](../50-adr/adr-0018-companies-places-and-residents.md)
 - (decides) [ADR-0019 衣食住は文だけで書き、食べ物は合成食の企業が握る](../50-adr/adr-0019-food-clothing-housing.md)
 - (decides) [ADR-0021 電気はヨミ・システムズ、水はリンドホルム食品が握り、街に公共の交通は置かない](../50-adr/adr-0021-city-infrastructure.md)
+- (decides) [ADR-0024 下層街に、ギャングのザンダー一家と住人の屋台組合を置く](../50-adr/adr-0024-lower-city-gang-and-union.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 
 <!-- graph:auto:end -->
