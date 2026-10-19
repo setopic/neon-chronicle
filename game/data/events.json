@@ -115,6 +115,15 @@
       ]
     },
     {
+      "id": "fake_id",
+      "jobs": ["hacker"],
+      "choices": [
+        { "id": "remake", "requires": { "hacking": 3 }, "credits": 10, "durability": -4, "xp": { "hacking": 8 } },
+        { "id": "overcharge", "credits": 50 },
+        { "id": "refuse" }
+      ]
+    },
+    {
       "id": "rei_1",
       "jobs": ["hacker"],
       "character": "rei",

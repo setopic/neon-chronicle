@@ -23,7 +23,7 @@ implemented_by:
 
 | 場所 | どんなところか | 出る仕事とイベント |
 | --- | --- | --- |
-| 下層街 | 企業区画の高層ビルの下に広がる、日の当たらない街。[裏通りの診療所](./dom-09-consciousness-copy.md)も、運び屋の走る路地もここにある | 運び屋、「路地の通行料」「薬の配達」「合成食の荷運び」「盗電の線」「古い銘板」 |
+| 下層街 | 企業区画の高層ビルの下に広がる、日の当たらない街。[裏通りの診療所](./dom-09-consciousness-copy.md)も、運び屋の走る路地もここにある | 運び屋、「路地の通行料」「薬の配達」「合成食の荷運び」「盗電の線」「古い銘板」「偽の身元」 |
 | 闇市場 | 下層街の地下にある市場。盗んだデータ、体の部品、インプラントが売り買いされる。企業の買い手も、身元を隠して出入りする | ハッカー（盗んだデータを売る先）、「闇市場の買い手」 |
 | 企業区画 | 企業の高層ビルが並ぶ区画。社ごとに縄張りが分かれ、それぞれの企業の私兵が守っている。下層街とは3本の橋でつながる | 傭兵、「待ち伏せ」「ジンの忠告」「変電所の奪い合い」 |
 
@@ -185,8 +185,10 @@ flowchart TB
 - (decides) [ADR-0024 下層街に、ギャングのザンダー一家と住人の屋台組合を置く](../50-adr/adr-0024-lower-city-gang-and-union.md)
 - (decides) [ADR-0025 企業の時代より前の街を市とし、市の財政破綻で企業の時代が始まったことにする](../50-adr/adr-0025-city-history-before-corporations.md)
 - (decides) [ADR-0026 屋台組合が、台帳でみかじめを割り振り、外から来た人に住む場所を割り振る](../50-adr/adr-0026-union-ledger-and-housing.md)
+- (decides) [ADR-0027 企業の階級と下層街の稼ぎを決め、身元で橋の行き来を分ける](../50-adr/adr-0027-resident-classes-and-identity.md)
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 - (depends_on) [DOM-17 街の歴史](./dom-17-city-history.md)
+- (depends_on) [DOM-18 住民の階級と暮らし](./dom-18-resident-classes.md)
 
 <!-- graph:auto:end -->
