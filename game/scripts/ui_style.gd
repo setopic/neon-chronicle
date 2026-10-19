@@ -26,6 +26,7 @@ const SIZE_TITLE := 36
 const SIZE_STAT := 20
 const SIZE_HEADING := 18
 const SIZE_BODY := 16
+const SIZE_TEXT := 15  # 体の状態やログのように、行の多い欄の本文
 const SIZE_SMALL := 14
 const SIZE_TINY := 12
 

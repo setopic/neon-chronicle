@@ -231,7 +231,7 @@ func _build_left() -> Control:
 	var box := _panel(tr("ui.jobs"))
 	# 仕事の列は高さに余りがあるので、狭くして折り返させ、体の状態の列に幅を回す
 	box.get_parent().get_parent().size_flags_stretch_ratio = 0.6
-	box.add_theme_constant_override("separation", 4)
+	box.add_theme_constant_override("separation", 3)
 	for id in GameData.order["jobs"]:
 		var button := Button.new()
 		button.toggle_mode = true
@@ -241,6 +241,7 @@ func _build_left() -> Control:
 		button.theme_type_variation = "CompactButton"
 		button.tooltip_text = GameData.desc_of("jobs", id)
 		button.pressed.connect(Game.set_job.bind(id))
+		UiStyle.add_hover(button)
 		box.add_child(button)
 		_job_buttons[id] = button
 		var bar := ProgressBar.new()
@@ -252,7 +253,7 @@ func _build_left() -> Control:
 	box.add_child(_section_title(tr("ui.skills")))
 	for id in GameData.order["skills"]:
 		var row := HBoxContainer.new()
-		var label := _label("", Color.WHITE, 16)
+		var label := _label("", UiStyle.TEXT, UiStyle.SIZE_BODY)
 		label.custom_minimum_size = Vector2(170, 0)
 		label.tooltip_text = GameData.desc_of("skills", id)
 		label.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -277,20 +278,20 @@ func _build_right() -> Control:
 	_durability_bar.show_percentage = false
 	_durability_bar.custom_minimum_size = Vector2(0, 16)
 	box.add_child(_durability_bar)
-	_body_label = _label("", DIM, 15)
+	_body_label = _label("", DIM, UiStyle.SIZE_TEXT)
 	_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_body_label)
 	# 体の種類の効果は転生の画面でしか見えなかったので、周の間も出す。合計は出どころを分けずに1行にする（ADR-0016）
 	_body_effects_label = _label(Loc.t("ui.body_effects", {
 		"body": GameData.name_of("bodies", Game.body), "quality": Game.body_quality,
-		"effects": GameData.desc_of("bodies", Game.body)}) + "\n" + tr("body.%s.trait" % Game.body), DIM, 14)
+		"effects": GameData.desc_of("bodies", Game.body)}) + "\n" + tr("body.%s.trait" % Game.body), DIM, UiStyle.SIZE_SMALL)
 	_body_effects_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_body_effects_label)
-	_effect_total_label = _label("", DIM, 14)
+	_effect_total_label = _label("", DIM, UiStyle.SIZE_SMALL)
 	_effect_total_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_effect_total_label)
 	# ジンの依頼は、その周の目標なので、周の状態を出す欄に置く。受けるまでは、並べた依頼ごとにボタンを出す（ADR-0034）
-	_request_label = _label("", PINK, 15)
+	_request_label = _label("", PINK, UiStyle.SIZE_TEXT)
 	_request_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_request_label)
 	for id in Game.request_offers:
@@ -301,15 +302,16 @@ func _build_right() -> Control:
 		button.text = Loc.t("ui.request_offer", {"goal": _request_goal(id),
 			"n": roundi(GameData.requests[id].get("bonus", Game.REQUEST_BONUS) * 100.0)})
 		button.pressed.connect(Game.accept_request.bind(id))
+		UiStyle.add_hover(button)
 		box.add_child(button)
 		_request_buttons[id] = button
-	_challenge_label = _label("", PINK, 15)
+	_challenge_label = _label("", PINK, UiStyle.SIZE_TEXT)
 	box.add_child(_challenge_label)
 	# ひと息つける間は、危ないイベントが起きにくいことを出す（DOM-28）
-	_calm_label = _label(tr("ui.calm"), CYAN, 14)
+	_calm_label = _label(tr("ui.calm"), CYAN, UiStyle.SIZE_SMALL)
 	box.add_child(_calm_label)
 	# 評判は周をまたいで残るので、周の状態と並べて出す。0の勢力は出さない（DOM-22）
-	_reputation_label = _label("", DIM, 14)
+	_reputation_label = _label("", DIM, UiStyle.SIZE_SMALL)
 	_reputation_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_reputation_label)
 	return box.get_parent().get_parent()
@@ -319,7 +321,7 @@ func _build_right() -> Control:
 func _build_implants() -> Control:
 	var box := _panel(tr("ui.implants"))
 	box.get_parent().get_parent().size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_capacity_label = _label("", DIM, 14)
+	_capacity_label = _label("", DIM, UiStyle.SIZE_SMALL)
 	box.add_child(_capacity_label)
 	for id in GameData.order["implants"]:
 		var button := Button.new()
@@ -328,6 +330,7 @@ func _build_implants() -> Control:
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.theme_type_variation = "CompactButton"
 		button.pressed.connect(_press_implant.bind(id))
+		UiStyle.add_hover(button)
 		box.add_child(button)
 		_implant_buttons[id] = button
 	# 偽の身元は闇市場で買う。インプラントと同じくクレジットで買うので、同じ欄に置く（DOM-24）
@@ -336,6 +339,7 @@ func _build_implants() -> Control:
 	_identity_button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_identity_button.theme_type_variation = "CompactButton"
 	_identity_button.pressed.connect(Game.buy_identity)
+	UiStyle.add_hover(_identity_button)
 	box.add_child(_identity_button)
 
 	return box.get_parent().get_parent()
@@ -349,7 +353,8 @@ func _build_log() -> Control:
 	_log_label = RichTextLabel.new()
 	_log_label.scroll_following = true
 	_log_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_log_label.add_theme_font_size_override("normal_font_size", 15)
+	_log_label.add_theme_font_size_override("normal_font_size", UiStyle.SIZE_TEXT)
+	_log_label.add_theme_color_override("default_color", UiStyle.TEXT)
 	box.add_child(_log_label)
 	return panel
 
@@ -1035,12 +1040,20 @@ func _panel(title: String) -> VBoxContainer:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 6)
 	margin.add_child(box)
-	box.add_child(_section_title(title))
+	var heading := _section_title(title)
+	# 見出しの下に細い線を引き、中身と分ける。行を足すと欄の高さが増えるので、見出しの枠の下の縁で引く
+	var rule := StyleBoxFlat.new()
+	rule.draw_center = false
+	rule.border_color = UiStyle.LINE
+	rule.border_width_bottom = 1
+	rule.content_margin_bottom = 2
+	heading.add_theme_stylebox_override("normal", rule)
+	box.add_child(heading)
 	return box
 
 
 func _section_title(text: String) -> Label:
-	return _label(text, CYAN, 18)
+	return _label(text, CYAN, UiStyle.SIZE_HEADING)
 
 
 func _label(text: String, color: Color, font_size: int) -> Label:
