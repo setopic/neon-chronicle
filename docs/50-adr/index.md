@@ -37,6 +37,7 @@ tags: [index]
 - [ADR-0018 街を複数の企業が分け合い、場所と住人をイベントと資料に出す](./adr-0018-companies-places-and-residents.md)
 - [ADR-0019 衣食住は文だけで書き、食べ物は合成食の企業が握る](./adr-0019-food-clothing-housing.md)
 - [ADR-0020 街を区画と3本の橋で分け、地図は設計文書の図に残す](./adr-0020-city-districts-and-map.md)
+- [ADR-0021 電気はヨミ・システムズ、水はリンドホルム食品が握り、街に公共の交通は置かない](./adr-0021-city-infrastructure.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
