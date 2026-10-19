@@ -2,7 +2,7 @@
 id: ADR-0006
 type: adr
 title: 記憶の断片を順に戻し、最後の仕事の選択でエンディングを分ける
-status: stable
+status: deprecated
 tags: [loop, story]
 decides:
   - DOM-08
@@ -15,7 +15,7 @@ related: []
 # 記憶の断片を順に戻し、最後の仕事の選択でエンディングを分ける
 
 - 日付: 2026-10-18
-- 状態: stable
+- 状態: deprecated（[ADR-0046](./adr-0046-third-ending.md)が置き換えた）
 
 ## 背景
 
@@ -74,5 +74,9 @@ related: []
 - [ARCH-01 ゲームの全体構成](../10-architecture/arch-01-game-overview.md)
 - [DOM-01 世界観](../20-domain/dom-01-world.md)
 - [DOM-08 記憶の断片とエンディング](../20-domain/dom-08-memory-fragments-and-endings.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0046 レイとの約束と屋台組合の評判で開く、3つ目のエンディングを足す](./adr-0046-third-ending.md)
 
 <!-- graph:auto:end -->

@@ -139,6 +139,12 @@ def main():
                 if len(parts) != 2 or parts[0] not in events or not any(c.get("id") == parts[1] for c in events[parts[0]].get("choices", [])):
                     errors.append(f"{where}: 前の周の跡の条件が、無い選択肢を指している: {trace}")
             for choice in event.get("choices", []):
+                story = choice.get("requires_story")
+                if story is not None:
+                    parts = story.split(".")
+                    if len(parts) != 2 or parts[0] not in events or not any(c.get("id") == parts[1] for c in events[parts[0]].get("choices", [])):
+                        errors.append(f"{where}.{choice.get('id')}: 話の条件が、無い選択肢を指している: {story}")
+            for choice in event.get("choices", []):
                 after = choice.get("requires_choice")
                 if after is None:
                     continue

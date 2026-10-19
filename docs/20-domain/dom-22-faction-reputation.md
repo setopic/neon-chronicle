@@ -87,5 +87,6 @@ implemented_by:
 
 - (decides) [ADR-0037 4つの勢力に評判を持たせ、周をまたいで残す](../50-adr/adr-0037-faction-reputation.md)
 - (depends_on) [DOM-23 屋台通りの対立](./dom-23-stall-street-feud.md)
+- (depends_on) [DOM-29 目覚めの日](./dom-29-day-of-waking.md)
 
 <!-- graph:auto:end -->
