@@ -52,6 +52,7 @@ tags: [index]
 - [ADR-0033 永続強化を増やし、どちらか一方しか取れない組を作る](./adr-0033-upgrade-groups.md)
 - [ADR-0034 ジンの依頼を2つ並べ、受けるものを選ばせる](./adr-0034-choose-jin-request.md)
 - [ADR-0035 転生のときに縛りを1つ選び、守り通せば記憶ポイントを上乗せする](./adr-0035-challenges.md)
+- [ADR-0036 橋を架けた技師たちの記録を、イベントと資料の追記で集める](./adr-0036-bridge-engineers-records.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

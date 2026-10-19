@@ -353,7 +353,8 @@ func choose(choice_id: String) -> void:
 		break_challenge("choice")
 	var event_id := pending_event
 	pending_event = ""
-	if GameData.events[event_id].get("character", "") != "":
+	# 人物のイベントと、資料の出るイベントは、選んだ選択肢を残す（DOM-13、DOM-14）
+	if GameData.events[event_id].get("character", "") != "" or GameData.events[event_id].get("record", false):
 		character_choices[event_id] = choice_id
 	_log("event.%s.%s.result" % [event_id, choice_id])
 	# エンディングの選択肢は、ほかの結果を持たず、その場で周を終える（DOM-08）
