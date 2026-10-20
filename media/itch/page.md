@@ -8,7 +8,7 @@
 | --- | --- |
 | Title | `Neon Chronicle` |
 | Project URL | `neon-chronicle` |
-| Short description or tagline | `A cyberpunk idle game: work, wear out your body, and wake up in a new one. / サイバーパンクの放置転生ゲーム` |
+| Short description or tagline | `A cyberpunk idle game: work, wear out your body, and wake up in a new one.`（120バイトまで。日本語は1文字3バイトに数えられるので、英語だけにしている） |
 | Classification | Games |
 | Kind of project | HTML |
 | Release status | In development |
@@ -33,16 +33,19 @@ SharedArrayBuffer supportを付けないのは、スレッドを使わない書�
 
 ## AIの使用の申告
 
-itch.ioは、生成AIを使ったかどうかの申告を求めている。コードと文面はClaudeと一緒に書いている。画像・音声は生成AIで作っていない（カバー画像はゲームの画面から作った）。申告の欄の選び方は、作者が決める。
+itch.ioは、生成AIを使ったかどうかの申告を求めている。コードと文面（ゲームの中の文と、この説明文）は、Claudeと一緒に書いている。音楽・効果音・街の3Dの絵・カバー画像は、画像や音声を作るAIで作ったものではないが、それを作るスクリプト（`game/audio/make_sounds.py`、`city.gd`など）はClaudeと一緒に書いた。カバー画像は、ゲームの画面写真に文字を重ねて作った。
+
+どこまでを「生成AIを使った」とするかは、作者が決める。
 
 ## 画面写真
 
 | ファイル | 写っているもの |
 | --- | --- |
-| `screenshot-ja.png` | 第1周の始まり（日本語） |
-| `screenshot-en.png` | 同じ画面（英語） |
-| `screenshot-rebirth.png` | 体が限界を迎えて、永続強化を選ぶ画面 |
-| `screenshot-hacker.png` | ハッカーの仕事を始め、インプラントを付けたところ（英語） |
+| `screenshot-ja.png` | 第1周の途中。傭兵に就けるようになったところ（日本語） |
+| `screenshot-event-ja.png` | 仕事中に起きたイベントと、その選択肢（日本語） |
+| `screenshot-memory.png` | 周の終わりに、記憶の断片が戻った画面（日本語） |
+| `screenshot-en.png` | 第1周の途中（英語） |
+| `screenshot-event-en.png` | イベントと、その選択肢（英語） |
 
 ## 説明文（Description）
 
@@ -53,16 +56,18 @@ Neon Chronicle is a cyberpunk idle game about working, wearing out, and starting
 
 Pick a job in the back alleys of a neon city. Work earns credits and skill experience, but your body decays every second, and dangerous jobs wear it down faster. When its integrity hits zero, that life is over. The memory points you earned buy permanent upgrades, and you wake up in a new body to begin the next life.
 
-- Three jobs: courier, hacker, and mercenary
+Events break out while you work. Each choice trades credits, integrity, and experience, and the chronicle remembers what you chose. Lives that push your skills far enough bring back fragments of a lost memory. Recover all five, and a path into the corporate core opens, leading to one of two endings.
+
+- Four jobs, from back-alley courier to a breach of the core server
+- Events with choices, and a chronicle that tells the story of every life
+- Five memory fragments and two endings
 - Skills, implants, and permanent upgrades that carry over between lives
-- A chronicle that records every life you have lived
-- One life takes about 4 to 7 minutes
+- The city keeps going while you are away (up to 8 hours)
+- Original music and sound effects (both can be turned off)
 - English and Japanese (switch in the top right corner)
 - Progress is saved in your browser
 
-This is an early version. Events, story, music, and offline progress are not in yet.
-
-Made with Godot 4.7. Font: Noto Sans JP (SIL Open Font License 1.1). Full license texts are in the game (Licenses button, top right).
+Made with Godot 4.7. Font: Noto Sans JP (SIL Open Font License 1.1). Licenses are listed in the game under "Licenses". Full license texts are in the game (Licenses button, top right).
 
 ---
 
@@ -70,16 +75,18 @@ Made with Godot 4.7. Font: Noto Sans JP (SIL Open Font License 1.1). Full licens
 
 ネオンの街の路地裏で、仕事を選びます。働くとクレジットとスキルの経験がたまりますが、体は1秒ごとに劣化し、危険な仕事ほど速くすり減ります。耐久が0になると、その人生は終わりです。稼いだ記憶ポイントで永続強化を買い、新しい体で目覚めて次の周を始めます。
 
-- 仕事は3つ：運び屋・ハッカー・傭兵
+働いている間にはイベントが起きます。選んだ選択肢でクレジット・耐久・経験が増減し、その選択はクロニクルに残ります。スキルを十分に伸ばした人生の終わりには、失われた記憶の断片が戻ります。5つすべてがそろうと企業の中枢への道が開け、2つのエンディングのどちらかにたどり着きます。
+
+- 仕事は4つ：路地裏の運び屋から、中枢サーバーへの侵入まで
+- 選択肢のあるイベントと、人生ごとの物語を記すクロニクル
+- 5つの記憶の断片と、2つのエンディング
 - スキル・インプラント・転生しても残る永続強化
-- これまでの人生を記録するクロニクル
-- 1周はおよそ4〜7分
+- 閉じている間も街の時間は進みます（最大8時間）
+- オリジナルの音楽と効果音（それぞれ消せます）
 - 日本語と英語（右上で切り替え）
 - 進み具合はブラウザに保存されます
 
-まだ初期の版です。イベント・ストーリー・音楽・オフライン中の進行は、まだ入っていません。
-
-Godot 4.7で作りました。フォントはNoto Sans JP（SIL Open Font License 1.1）です。ライセンスの全文は、ゲームの右上の「ライセンス」から見られます。
+Godot 4.7で作りました。フォントはNoto Sans JP（SIL Open Font License 1.1）です。ライセンスは、ゲームの右上の「ライセンス」で読めます。ライセンスの全文は、ゲームの右上の「ライセンス」から見られます。
 ```
 
 日本語の説明文は遊ぶ人に向けた紹介なので、ゲームの外の文書と違い、です・ます体で書いている。
