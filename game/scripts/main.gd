@@ -57,6 +57,8 @@ var _chapter_label: Label
 var _goals_label: Label
 var _pay_buttons := []  # [{button, goal}]。クレジットを払って満たす目標
 var _ally_buttons := {}  # {仲間のid: Button}。押すたびに、任せる仕事を替える
+var _facility_buttons := {}  # {設備のid: Button}。押すと、設備を次の段にする
+var _hidden_label: Label
 
 
 func _ready() -> void:
@@ -101,6 +103,8 @@ func _build() -> void:
 	_voice_labels.clear()
 	_pay_buttons.clear()
 	_ally_buttons.clear()
+	_facility_buttons.clear()
+	_hidden_label = null
 	_minigame_button = null
 	_rest_button = null
 
@@ -441,6 +445,20 @@ func _build_part_two(box: VBoxContainer) -> void:
 				button.autowrap_mode = TextServer.AUTOWRAP_OFF
 				allies.add_child(button)
 				_ally_buttons[id] = button
+	# 拠点の設備も1行に並べる。行の頭に、匿っている被験体の人数を出す
+	if Game.has_base:
+		var base := HBoxContainer.new()
+		box.add_child(base)
+		_hidden_label = _label("", UiStyle.TEXT, UiStyle.SIZE_SMALL)
+		_hidden_label.tooltip_text = tr("ui.hidden_note")
+		_hidden_label.mouse_filter = Control.MOUSE_FILTER_PASS
+		base.add_child(_hidden_label)
+		for id in GameData.order["facilities"]:
+			var button := _compact_button("", Game.build.bind(id))
+			button.autowrap_mode = TextServer.AUTOWRAP_OFF
+			button.tooltip_text = GameData.desc_of("facilities", id)
+			base.add_child(button)
+			_facility_buttons[id] = button
 	_chapter_label = _label("", PINK, UiStyle.SIZE_TEXT)
 	_chapter_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_chapter_label.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -965,9 +983,16 @@ func _refresh_part_two() -> void:
 	_room_button.disabled = not Game.can_rent_room()
 	for ally in _ally_buttons:
 		var job: String = Game.allies.get(ally, "")
-		var args := {"ally": GameData.name_of("allies", ally), "job": GameData.name_of("jobs", job) if job != "" else tr("ui.no_job"), "n": Game.format_number(Game.ally_income(ally))}
+		var args := {"ally": GameData.name_of("allies", ally), "job": GameData.name_of("jobs", job) if job != "" else tr("ui.no_job"), "n": Game.format_number(Game.ally_income(ally)), "share": roundi(Game.ally_share() * 10.0), "pct": roundi(Game.ally_share() * 100.0)}
 		_ally_buttons[ally].text = Loc.t("ui.ally", args)
 		_ally_buttons[ally].tooltip_text = "%s\n%s" %[GameData.desc_of("allies", ally), Loc.t("ui.ally_note", args)]
+	if _hidden_label != null:
+		_hidden_label.text = Loc.t("ui.hidden", {"n": Game.hidden, "max": Game.shelter_capacity()})
+	for facility in _facility_buttons:
+		var cost := Game.facility_cost(facility)
+		var args := {"facility": GameData.name_of("facilities", facility), "n": Game.facilities.get(facility, 0), "cost": Game.format_number(cost)}
+		_facility_buttons[facility].text = Loc.t("ui.facility_build" if cost >= 0.0 else "ui.facility_done", args)
+		_facility_buttons[facility].disabled = not Game.can_build(facility)
 	var id := Game.chapter_id()
 	if id == "":
 		_chapter_label.text = tr("ui.chapter_next")

@@ -93,6 +93,7 @@ tags: [index]
 - [ADR-0074 放っておく間のログに、仕事の区画の噂を流す](./adr-0074-city-rumors.md)
 - [ADR-0075 本当の体のあとに、転生の無い第二部を章で足す](./adr-0075-part-two-after-reclaim.md)
 - [ADR-0076 第二部の第2章で、昔の仲間を迎えて仕事を任せる](./adr-0076-part-two-chapter-name.md)
+- [ADR-0077 第二部の第3章で、隠れ家に設備を足し、逃げてきた被験体を匿う](./adr-0077-part-two-chapter-hideout.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

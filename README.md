@@ -171,6 +171,7 @@ graph LR
     ADR-0074["ADR-0074<br/>放っておく間のログに、仕事の区画の噂を流す"]
     ADR-0075["ADR-0075<br/>本当の体のあとに、転生の無い第二部を章で足す"]
     ADR-0076["ADR-0076<br/>第二部の第2章で、昔の仲間を迎えて仕事を任せる"]
+    ADR-0077["ADR-0077<br/>第二部の第3章で、隠れ家に設備を足し、逃げてきた被験体を匿う"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -343,6 +344,7 @@ graph LR
   ADR-0075 -.->|decides| DOM-08
   ADR-0076 -.->|decides| DOM-34
   ADR-0076 -.->|decides| DOM-10
+  ADR-0077 -.->|decides| DOM-34
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -459,6 +461,7 @@ graph LR
   DOM-34 -->|depends_on| DOM-08
   DOM-34 -->|depends_on| DOM-09
   DOM-34 -->|depends_on| DOM-10
+  DOM-34 -->|depends_on| DOM-15
   DOM-34 -->|depends_on| DOM-24
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
