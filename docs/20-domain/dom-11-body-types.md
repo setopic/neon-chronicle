@@ -17,7 +17,7 @@ implemented_by:
 
 体の種類は、[体](./dom-02-life-and-body.md)ごとの違いである。種類ごとに基本の劣化と[効果](./dom-03-jobs-and-skills.md)を持つ。[転生](./dom-05-rebirth.md)するときに、[ミオ](./dom-10-characters.md)が用意した体の種類から1つを選んで目覚める。選んだ体の種類は、その周の間だけ働く。
 
-体には、体の種類とは別に体の質がある。主人公は稼ぎを[ミオ](./dom-10-characters.md)の診療所の口座を通して受け取っていて、ミオはその1割を手数料として残す。前の身元の口座は[凍結される](./dom-09-consciousness-copy.md)が、手数料はミオの口座にあるので凍結されない。画面の稼ぎは、手数料を引いたあとの額である。ミオは手数料で体の部品を買って、次の体を組み立てる。そのため、前の周で稼いだクレジットが多いほど、次の体の体の質が高くなる。
+体には、体の種類とは別に体の質がある。主人公は稼ぎを[ミオ](./dom-10-characters.md)の診療所の口座を通して受け取っていて、ミオはその1割を手数料として残す。前の身元の口座は[凍結される](./dom-09-consciousness-copy.md)が、手数料はミオの口座にあるので凍結されない。画面の稼ぎは、手数料を引いたあとの額である。ミオは手数料で体の部品を買って、次の体を組み立てる。自分で死者から取り出した部品も使うので、闇市場の値より安く組み立てられる。第1周の体は、ミオが自分の金で用意した。そのため、前の周で稼いだクレジットが多いほど、次の体の体の質が高くなる。
 
 ## 属性
 
@@ -106,6 +106,7 @@ implemented_by:
 - (decides) [ADR-0012 転生のときに4種類の体から1つを選ぶ](../50-adr/adr-0012-choose-body-on-rebirth.md)
 - (decides) [ADR-0016 インプラントと体の種類の効果を画面の文に出す](../50-adr/adr-0016-show-effects-on-screen.md)
 - (decides) [ADR-0032 体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す](../50-adr/adr-0032-body-quality-and-memory-software.md)
+- (decides) [ADR-0060 主人公は体ごとに口座だけの身元を持つことにする](../50-adr/adr-0060-account-only-identity.md)
 - (depends_on) [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
 - (depends_on) [DOM-25 体の元の持ち主と特性](./dom-25-body-former-owners.md)
 - (depends_on) [DOM-26 体の容量とインプラントの取り外し](./dom-26-body-capacity.md)

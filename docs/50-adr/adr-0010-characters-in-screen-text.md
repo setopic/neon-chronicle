@@ -2,7 +2,7 @@
 id: ADR-0010
 type: adr
 title: ミオの一言を転生の画面に出し、人物を目覚めと断片の文に入れる
-status: stable
+status: deprecated
 tags: [world, story]
 decides:
   - DOM-10
@@ -13,7 +13,7 @@ related: []
 # ミオの一言を転生の画面に出し、人物を目覚めと断片の文に入れる
 
 - 日付: 2026-10-18
-- 状態: stable
+- 状態: deprecated（[ADR-0060](./adr-0060-account-only-identity.md)が置き換えた）
 
 ## 背景
 
@@ -72,5 +72,9 @@ related: []
 `decides`: この決定が影響を与えるノード（ADR用）
 
 - [DOM-10 登場人物](../20-domain/dom-10-characters.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0060 主人公は体ごとに口座だけの身元を持つことにする](./adr-0060-account-only-identity.md)
 
 <!-- graph:auto:end -->

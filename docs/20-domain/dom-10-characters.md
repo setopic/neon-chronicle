@@ -73,6 +73,7 @@ implemented_by:
 - (decides) [ADR-0010 ミオの一言を転生の画面に出し、人物を目覚めと断片の文に入れる](../50-adr/adr-0010-characters-in-screen-text.md)
 - (decides) [ADR-0014 人物のイベントを1周に1段ずつ進め、前の段の選択で文と選択肢を変える](../50-adr/adr-0014-character-events-across-lives.md)
 - (decides) [ADR-0043 ミオにも3段の人物のイベントを持たせる](../50-adr/adr-0043-mio-character-events.md)
+- (decides) [ADR-0060 主人公は体ごとに口座だけの身元を持つことにする](../50-adr/adr-0060-account-only-identity.md)
 - (depends_on) [DOM-11 体の種類](./dom-11-body-types.md)
 - (depends_on) [DOM-12 ジンの依頼](./dom-12-jin-requests.md)
 - (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)
