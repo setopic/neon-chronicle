@@ -341,7 +341,6 @@ graph LR
   ADR-0074 -.->|decides| DOM-33
   ADR-0075 -.->|decides| DOM-34
   ADR-0075 -.->|decides| DOM-08
-  ADR-0076 -.->|related| ADR-0075
   ADR-0076 -.->|decides| DOM-34
   ADR-0076 -.->|decides| DOM-10
   DOM-02 -->|depends_on| DOM-01
