@@ -19,6 +19,12 @@ Godot 4.7.2 / GDScript。ブラウザ向けに Compatibility 描画とスレッ�
 | `scripts/game_data.gd` | data の読み込み（同じ id は後から読んだものが上書き） |
 | `scripts/game_state.gd` | 進行・転生・セーブとロード（`user://save.json`） |
 | `scripts/main.gd` / `city.gd` | 画面と上部の3Dの街 |
+| `scripts/ui_style.gd` | 画面の色・文字の大きさ・枠・動きと Theme（ADR-0052） |
+| `scripts/job_scene.gd` | ログの左に描く、就いている仕事の様子（ADR-0053） |
+| `scripts/minigame.gd` | 仕事のミニゲームの共通の形（ADR-0054） |
+| `scripts/minigame_hacking.gd` | ハッカーと中枢サーバーへの侵入の仕事のミニゲーム（ADR-0055） |
+| `scripts/minigame_courier.gd` | 運び屋の仕事のミニゲーム（ADR-0056） |
+| `scripts/minigame_mercenary.gd` | 傭兵の仕事のミニゲーム（ADR-0057） |
 | `scripts/sound.gd` | 音楽と効果音を鳴らす |
 | `audio/` | 音楽と効果音の WAV と、それを合成する `make_sounds.py` |
 

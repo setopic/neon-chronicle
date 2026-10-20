@@ -15,7 +15,7 @@ implemented_by:
 
 ## 定義
 
-評判は、[勢力](./dom-15-city-places-and-powers.md)の1つが主人公をどう見ているかを表す整数である。[イベント](./dom-06-events.md)で選んだ選択肢によって上下し、[転生](./dom-05-rebirth.md)しても残る。評判が一定の値に届くと、その勢力に関わる選択肢を選べるようになる。
+評判は、[勢力](./dom-15-city-places-and-powers.md)の1つが主人公をどう見ているかを表す整数である。[イベント](./dom-06-events.md)で選んだ選択肢によって上下し、[転生](./dom-05-rebirth.md)しても残る。勢力は、体の替わる主人公を1人の人としては見分けない。評判は、勢力が[裏通りの診療所](./dom-09-consciousness-copy.md)から来る者をどう見ているかで、診療所から来る者が替わっても続く。評判が一定の値に届くと、その勢力に関わる選択肢を選べるようになる。
 
 ## 属性
 
@@ -86,7 +86,9 @@ implemented_by:
 このノードを参照しているノード
 
 - (decides) [ADR-0037 4つの勢力に評判を持たせ、周をまたいで残す](../50-adr/adr-0037-faction-reputation.md)
+- (decides) [ADR-0063 周をまたいで主人公を見分ける決まりを1つにする](../50-adr/adr-0063-recognizing-across-lives.md)
 - (depends_on) [DOM-23 屋台通りの対立](./dom-23-stall-street-feud.md)
 - (depends_on) [DOM-29 目覚めの日](./dom-29-day-of-waking.md)
+- (depends_on) [DOM-33 街の噂](./dom-33-city-rumors.md)
 
 <!-- graph:auto:end -->

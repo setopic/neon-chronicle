@@ -2,7 +2,7 @@
 id: ADR-0048
 type: adr
 title: 話の段と永続強化の組を、いつでも選び直せるようにする
-status: stable
+status: deprecated
 tags: [loop, story]
 decides:
   - DOM-31
@@ -15,7 +15,7 @@ related: []
 # 話の段と永続強化の組を、いつでも選び直せるようにする
 
 - 日付: 2026-10-20
-- 状態: stable
+- 状態: deprecated（[ADR-0050](./adr-0050-choose-again-after-ending.md)が置き換えた）
 
 ## 背景
 
@@ -89,5 +89,9 @@ DOM-31を新しく起こし、話の選び直しを定義する。DOM-05の排�
 
 - [DOM-05 転生と永続強化](../20-domain/dom-05-rebirth.md)
 - [DOM-31 話の選び直し](../20-domain/dom-31-choosing-again.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0050 話の選び直しを、エンディングにたどり着いてから使えるようにする](./adr-0050-choose-again-after-ending.md)
 
 <!-- graph:auto:end -->

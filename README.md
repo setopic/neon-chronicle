@@ -53,6 +53,7 @@ graph LR
   end
   subgraph architecture["アーキテクチャ"]
     ARCH-01["ARCH-01<br/>ゲームの全体構成"]
+    ARCH-02["ARCH-02<br/>主題と仕組みの対応"]
   end
   subgraph domain["ドメイン"]
     DOM-01["DOM-01<br/>世界観"]
@@ -86,6 +87,9 @@ graph LR
     DOM-29["DOM-29<br/>目覚めの日"]
     DOM-30["DOM-30<br/>分岐図"]
     DOM-31["DOM-31<br/>話の選び直し"]
+    DOM-32["DOM-32<br/>スキルの声"]
+    DOM-33["DOM-33<br/>街の噂"]
+    DOM-34["DOM-34<br/>第二部の暮らし"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -140,6 +144,35 @@ graph LR
     ADR-0047["ADR-0047<br/>話とエンディングの分岐図を、街と人物の画面の3つ目のタブに出す"]
     ADR-0048["ADR-0048<br/>話の段と永続強化の組を、いつでも選び直せるようにする"]
     ADR-0049["ADR-0049<br/>転生の画面とメインの画面を1280x720に収める"]
+    ADR-0050["ADR-0050<br/>話の選び直しを、エンディングにたどり着いてから使えるようにする"]
+    ADR-0051["ADR-0051<br/>仕事を、終わったら報酬が入る形にする"]
+    ADR-0052["ADR-0052<br/>画面の見た目の方向と、その土台を決める"]
+    ADR-0053["ADR-0053<br/>仕事の様子を、ログの左に線と点で描く"]
+    ADR-0054["ADR-0054<br/>仕事の1回を、ミニゲームで置き換えて遊べるようにする"]
+    ADR-0055["ADR-0055<br/>ハッカーの仕事のミニゲームを、符号の表を縦横にたどる遊びにする"]
+    ADR-0056["ADR-0056<br/>運び屋の仕事のミニゲームを、追っ手をかわして升目を進む遊びにする"]
+    ADR-0057["ADR-0057<br/>傭兵の仕事のミニゲームを、窓に出る敵を撃つ遊びにする"]
+    ADR-0058["ADR-0058<br/>メインの画面の欄を、2つずつ組にして入れ替えられるようにする"]
+    ADR-0059["ADR-0059<br/>意識を抜き取るとは、写しを取って体を眠らせることにする"]
+    ADR-0060["ADR-0060<br/>主人公は体ごとに口座だけの身元を持つことにする"]
+    ADR-0061["ADR-0061<br/>体の元の持ち主から取ったのは神経の型とする"]
+    ADR-0062["ADR-0062<br/>主人公の写しは廃棄した写しとして記録され、ミオは死んだことになっている"]
+    ADR-0063["ADR-0063<br/>周をまたいで主人公を見分ける決まりを1つにする"]
+    ADR-0064["ADR-0064<br/>置いたまま回収していない伏線の扱いを決める"]
+    ADR-0065["ADR-0065<br/>用語と名前の揺れを直す"]
+    ADR-0066["ADR-0066<br/>仕事の区画は仕事を請け負う場所とし、イベントの舞台とは分ける"]
+    ADR-0067["ADR-0067<br/>1つの周は、世界の中では数日から数週とする"]
+    ADR-0068["ADR-0068<br/>人物のイベントは、まだ戻っていない断片の中身を先に明かさない"]
+    ADR-0069["ADR-0069<br/>遊ぶ人の側の仕組みを挙げ、街の歴史の穴を埋める"]
+    ADR-0070["ADR-0070<br/>本作の主題を「使い捨て」とし、警告として描く"]
+    ADR-0071["ADR-0071<br/>記憶ポイントの見込みと伸びを見せ、閉じていた間の成果をログに出す"]
+    ADR-0072["ADR-0072<br/>スキルに節目を置き、下の仕事に戻る理由にする"]
+    ADR-0073["ADR-0073<br/>スキルを、主人公の頭の中の声としてイベントで話させる"]
+    ADR-0074["ADR-0074<br/>放っておく間のログに、仕事の区画の噂を流す"]
+    ADR-0075["ADR-0075<br/>本当の体のあとに、転生の無い第二部を章で足す"]
+    ADR-0076["ADR-0076<br/>第二部の第2章で、昔の仲間を迎えて仕事を任せる"]
+    ADR-0077["ADR-0077<br/>第二部の第3章で、隠れ家に設備を足し、逃げてきた被験体を匿う"]
+    ADR-0078["ADR-0078<br/>第二部の第4章で、持ち出された写しを止める作戦を遂げ、第二部を終える"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -243,6 +276,78 @@ graph LR
   ADR-0048 -.->|decides| DOM-31
   ADR-0048 -.->|decides| DOM-05
   ADR-0049 -.->|decides| ARCH-01
+  ADR-0050 ==>|supersedes| ADR-0048
+  ADR-0050 -.->|decides| DOM-31
+  ADR-0050 -.->|decides| DOM-05
+  ADR-0051 -.->|decides| DOM-03
+  ADR-0052 -.->|decides| ARCH-01
+  ADR-0053 -.->|decides| ARCH-01
+  ADR-0054 -.->|decides| DOM-03
+  ADR-0055 -.->|decides| DOM-03
+  ADR-0056 -.->|decides| DOM-03
+  ADR-0057 -.->|decides| DOM-03
+  ADR-0058 -.->|decides| ARCH-01
+  ADR-0059 -.->|decides| DOM-08
+  ADR-0059 -.->|decides| DOM-09
+  ADR-0059 -.->|decides| DOM-20
+  ADR-0060 ==>|supersedes| ADR-0010
+  ADR-0060 -.->|decides| DOM-09
+  ADR-0060 -.->|decides| DOM-10
+  ADR-0060 -.->|decides| DOM-11
+  ADR-0060 -.->|decides| DOM-18
+  ADR-0060 -.->|decides| DOM-19
+  ADR-0060 -.->|decides| DOM-24
+  ADR-0060 -.->|decides| DOM-26
+  ADR-0061 ==>|supersedes| ADR-0040
+  ADR-0061 -.->|decides| DOM-25
+  ADR-0062 -.->|decides| DOM-09
+  ADR-0062 -.->|decides| DOM-10
+  ADR-0062 -.->|decides| DOM-20
+  ADR-0063 ==>|supersedes| ADR-0023
+  ADR-0063 ==>|supersedes| ADR-0044
+  ADR-0063 -.->|decides| DOM-09
+  ADR-0063 -.->|decides| DOM-10
+  ADR-0063 -.->|decides| DOM-15
+  ADR-0063 -.->|decides| DOM-16
+  ADR-0063 -.->|decides| DOM-22
+  ADR-0063 -.->|decides| DOM-27
+  ADR-0064 ==>|supersedes| ADR-0009
+  ADR-0064 ==>|supersedes| ADR-0036
+  ADR-0064 -.->|decides| DOM-10
+  ADR-0064 -.->|decides| DOM-13
+  ADR-0064 -.->|decides| DOM-14
+  ADR-0064 -.->|decides| DOM-17
+  ADR-0064 -.->|decides| DOM-29
+  ADR-0065 -.->|decides| DOM-03
+  ADR-0065 -.->|decides| DOM-04
+  ADR-0065 -.->|decides| DOM-10
+  ADR-0065 -.->|decides| DOM-15
+  ADR-0065 -.->|decides| DOM-17
+  ADR-0065 -.->|decides| DOM-23
+  ADR-0065 -.->|decides| DOM-25
+  ADR-0066 ==>|supersedes| ADR-0039
+  ADR-0066 -.->|decides| DOM-15
+  ADR-0066 -.->|decides| DOM-24
+  ADR-0067 -.->|decides| DOM-02
+  ADR-0067 -.->|decides| DOM-27
+  ADR-0068 ==>|supersedes| ADR-0043
+  ADR-0068 -.->|decides| DOM-13
+  ADR-0068 -.->|decides| DOM-10
+  ADR-0068 -.->|decides| DOM-14
+  ADR-0069 -.->|decides| DOM-09
+  ADR-0069 -.->|decides| DOM-17
+  ADR-0070 -.->|decides| ARCH-02
+  ADR-0071 -.->|decides| DOM-05
+  ADR-0072 -.->|decides| DOM-03
+  ADR-0073 -.->|decides| DOM-32
+  ADR-0074 -.->|decides| DOM-33
+  ADR-0075 -.->|decides| DOM-34
+  ADR-0075 -.->|decides| DOM-08
+  ADR-0076 -.->|decides| DOM-34
+  ADR-0076 -.->|decides| DOM-10
+  ADR-0077 -.->|decides| DOM-34
+  ADR-0078 -.->|decides| DOM-34
+  ADR-0078 -.->|decides| DOM-09
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -335,15 +440,32 @@ graph LR
   DOM-26 -->|depends_on| DOM-04
   DOM-26 -->|depends_on| DOM-11
   DOM-27 -->|depends_on| DOM-07
+  DOM-27 -->|depends_on| DOM-09
   DOM-28 -->|depends_on| DOM-06
   DOM-29 -->|depends_on| DOM-08
   DOM-29 -->|depends_on| DOM-13
+  DOM-29 -->|depends_on| DOM-17
   DOM-29 -->|depends_on| DOM-20
   DOM-29 -->|depends_on| DOM-22
   DOM-30 -->|depends_on| DOM-23
   DOM-30 -->|depends_on| DOM-25
   DOM-30 -->|depends_on| DOM-29
   DOM-31 -->|depends_on| DOM-30
+  DOM-32 -->|depends_on| DOM-27
+  DOM-33 -->|depends_on| DOM-14
+  DOM-33 -->|depends_on| DOM-22
+  DOM-33 -->|depends_on| DOM-24
+  DOM-34 -->|depends_on| DOM-01
+  DOM-34 -->|depends_on| DOM-02
+  DOM-34 -->|depends_on| DOM-03
+  DOM-34 -->|depends_on| DOM-04
+  DOM-34 -->|depends_on| DOM-05
+  DOM-34 -->|depends_on| DOM-06
+  DOM-34 -->|depends_on| DOM-08
+  DOM-34 -->|depends_on| DOM-09
+  DOM-34 -->|depends_on| DOM-10
+  DOM-34 -->|depends_on| DOM-15
+  DOM-34 -->|depends_on| DOM-24
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04
@@ -363,7 +485,7 @@ graph LR
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
-  class ADR-0004,ADR-0005,ADR-0006,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0024,ADR-0033 deprecated;
+  class ADR-0004,ADR-0005,ADR-0006,ADR-0009,ADR-0010,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0023,ADR-0024,ADR-0033,ADR-0036,ADR-0039,ADR-0040,ADR-0043,ADR-0044,ADR-0048 deprecated;
 ```
 
 <!-- graph:diagram:end -->

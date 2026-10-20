@@ -2,7 +2,7 @@
 id: ADR-0036
 type: adr
 title: 橋を架けた技師たちの記録を、イベントと資料の追記で集める
-status: stable
+status: deprecated
 tags: [story]
 decides:
   - DOM-14
@@ -13,7 +13,7 @@ related: []
 # 橋を架けた技師たちの記録を、イベントと資料の追記で集める
 
 - 日付: 2026-10-20
-- 状態: stable
+- 状態: deprecated（[ADR-0064](./adr-0064-resolve-loose-threads.md)が置き換えた）
 
 ## 背景
 
@@ -69,5 +69,9 @@ DOM-14の出るイベントを、人物のイベントと選んだ選択肢を�
 `decides`: この決定が影響を与えるノード（ADR用）
 
 - [DOM-14 街と人物の資料](../20-domain/dom-14-city-and-people-profiles.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0064 置いたまま回収していない伏線の扱いを決める](./adr-0064-resolve-loose-threads.md)
 
 <!-- graph:auto:end -->

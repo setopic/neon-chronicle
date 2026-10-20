@@ -60,6 +60,8 @@ implemented_by:
 永続強化の値段 = 最初の値段 × 値段の伸び ^ いまのレベル
 ```
 
+周の途中は、記憶ポイントの見込みを導出値として持つ。記憶ポイントの見込みは、いま周が終わったら得る記憶ポイントで、周の終わりに足される上乗せも含む（[ADR-0071](../50-adr/adr-0071-show-rebirth-payoff.md)）。閉じていた時間（[DOM-02](./dom-02-life-and-body.md)）を進めたときは、閉じていた間に稼いだクレジットと、記憶ポイントの見込みの伸びを伝える。周が終わったときは、得た記憶ポイントを前の周の記録の記憶ポイントと比べて伝える。
+
 記憶ポイントの式には、稼いだクレジットを入れない。稼いだクレジットは、次の周の体の質に効く（[DOM-11](./dom-11-body-types.md)）。
 
 ジンの依頼を果たした周は、周の終わりに得る記憶ポイントに、依頼の上乗せが足される（[DOM-12](./dom-12-jin-requests.md)）。
@@ -89,6 +91,7 @@ implemented_by:
 | --- | --- | --- |
 | 転生 | 周が終わったあとに、新しい体で目覚めること。次の周が始まる | |
 | 記憶ポイント | 周の終わりに手に入り、永続強化を買うのに使う値。転生しても失われない | |
+| 記憶ポイントの見込み | 周の途中で、いま周が終わったら得る記憶ポイント。周の終わりに足される上乗せも含む | |
 | 永続強化 | 記憶ポイントで買う効果。レベルを持ち、転生しても失われない | |
 | 排他の組 | どれか1つしかレベルを持てない永続強化のまとまり | |
 | クロニクル | 終わった周の記録を、古い順に並べたもの | |
@@ -112,6 +115,8 @@ implemented_by:
 - (decides) [ADR-0032 体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す](../50-adr/adr-0032-body-quality-and-memory-software.md)
 - (decides) [ADR-0033 永続強化を増やし、どちらか一方しか取れない組を作る](../50-adr/adr-0033-upgrade-groups.md)
 - (decides) [ADR-0048 話の段と永続強化の組を、いつでも選び直せるようにする](../50-adr/adr-0048-no-point-of-no-return.md)
+- (decides) [ADR-0050 話の選び直しを、エンディングにたどり着いてから使えるようにする](../50-adr/adr-0050-choose-again-after-ending.md)
+- (decides) [ADR-0071 記憶ポイントの見込みと伸びを見せ、閉じていた間の成果をログに出す](../50-adr/adr-0071-show-rebirth-payoff.md)
 - (depends_on) [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 - (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
@@ -120,5 +125,6 @@ implemented_by:
 - (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)
 - (depends_on) [DOM-21 縛りの周](./dom-21-challenges.md)
 - (depends_on) [DOM-22 勢力の評判](./dom-22-faction-reputation.md)
+- (depends_on) [DOM-34 第二部の暮らし](./dom-34-part-two-life.md)
 
 <!-- graph:auto:end -->

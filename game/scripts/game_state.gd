@@ -6,6 +6,8 @@ signal life_ended
 signal life_started
 signal log_added
 signal event_changed
+signal job_paid(amount: float)  # 仕事の1回を終えて報酬が入ったとき。ADR-0051
+signal minigame_changed  # ミニゲームを始めたとき、終えたとき、やめたとき。ADR-0054
 
 var save_path := "user://save.json"  # 通しの検査（ci/playthrough.gd）が別のファイルに差し替える
 const SAVE_VERSION := 1
@@ -32,10 +34,35 @@ const QUALITY_DECAY := 0.15  # 体の質1段階ごとに、基本の劣化を下
 const IDENTITY_COST := 300.0  # 闇市場で偽の身元を買う値段。DOM-24
 const REPUTATION_LIMIT := 10  # 評判の上限。下限はこれを負にした値。DOM-22
 const QUALITY_CREDITS := 1000.0  # 体の質の式で、前の周で稼いだクレジットを割る値
+const RUMOR_INTERVAL := 120.0  # 同じ仕事をこの秒数だけ続けるごとに、街の噂を1つログに出す。DOM-33
+# 第二部の値。DOM-34
+const PART_TWO_LEVEL := 1  # 第二部の始めのスキルのレベル。取り戻したばかりの体を、まだうまく使えない
+const START_INJURY := 40.0  # 第二部の始めの怪我。長い眠りで弱った分
+const MAX_INJURY := 90.0  # 怪我の上限。体調の上限が、これより下がらない
+const TRUE_BODY_CAPACITY := 3  # 本当の体に組み込めるインプラントの大きさの合計
+const DAY_LENGTH := 60.0  # 第二部の1日の秒数
+const LODGING_COST := 20.0  # 住まいの無い日の、簡易宿の代金
+const ROOM_COST := 5000.0  # 住まいを借りる値段
+const ROOM_RENT := 60.0  # 住まいを借りたあとの、1日の家賃
+const WORK_DRAIN := 0.5  # 危険度1の仕事で、1秒ごとに減る体調
+const REST_RATE := 1.0  # 休んでいる間に、1秒ごとに戻る体調
+const ROOM_REST := 2.0  # 住まいで休むときの、体調の戻り方の倍率
+const TREAT_STEP := 10.0  # 診療所で1回に治す怪我
+const TREAT_COST := 100.0  # 怪我1あたりの治す代金
+const EVENT_INJURY := 0.5  # 選択肢で減った体調のうち、怪我として残る割合
+const COLLAPSE_INJURY := 10.0  # 倒れたときに負う怪我
+const COLLAPSE_LOSS := 0.2  # 倒れたときに失うクレジットの割合
+const ALLY_SHARE := 0.4  # 仲間に任せた仕事の稼ぎのうち、分け前として仲間が取る割合
+const STREET_DRAIN := 10.0  # 宿代を払えず、路上で寝た日に減る体調
+const SUBJECT_INTERVAL := 2  # 寝床に空きがあるとき、被験体が逃げてくる間隔（日）
+const SUBJECT_INCOME := 3.0  # 匿った被験体1人が、屋台を手伝って1秒ごとに稼ぐクレジット
+const SUBJECT_UPKEEP := 30.0  # 匿った被験体1人の、1日の食べる分の代金
+const OPERATION := "operation"  # 仲間に任せる先のうち、作戦に付けること。付けている間、その仲間は稼がない（ADR-0078）
 ## ログやクロニクルの引数のうち、id から表示名に変える項目
 const NAME_ARGS := {
 	"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades", "event": "events",
 	"fragment": "fragments", "ending": "endings", "body": "bodies", "challenge": "challenges", "faction": "factions",
+	"chapter": "chapters", "ally": "allies", "facility": "facilities",
 }
 
 # --- 1人生の状態 ---
@@ -48,6 +75,7 @@ var skill_xp := {}
 var skill_level := {}
 var implants: Array = []
 var job_time := {}
+var job_progress := 0.0  # 就いている仕事のいまの1回で、進んだ秒数。ADR-0051
 var alive := true
 var body := ""  # その周の体の種類のid。DOM-11
 var body_quality := 0  # その周の体の質。ADR-0032
@@ -55,11 +83,16 @@ var life_xp := 0.0  # その周で得た経験の合計。記憶ポイントの�
 var pending_event := ""  # 待っているイベントのid。無いときは空
 var last_deed := ""  # 最後に選んだ選択肢（"<イベント>.<選択肢>"）。周を終わらせた選択は入れない
 var request_offers: Array = []  # その周に並べたジンの依頼のid。0〜2個。DOM-12
+var life_rumors: Array = []  # その周に聞いた街の噂のid。DOM-33
+var rumor_time := 0.0  # いまの仕事に就いてから、または前の噂から、仕事を続けた秒数
 var request := ""  # その周に受けた依頼のid。まだ受けていないときは空
 var request_done := false
 var challenge := ""  # その周の縛りのid。選ばなかった周は空。DOM-21
 var challenge_broken := false
 var identity := false  # その周に偽の身元を持っているか。周の終わりに失う。DOM-24
+# ミニゲームを遊んでいる間は、周の時間を止める。セーブには残さず、開き直したら放置の仕事に戻る（ADR-0054）
+var minigame_active := false
+const MINIGAME_BONUS := 1.0  # 成功の度合いが1のとき、1回の報酬に上乗せする割合（ADR-0054）
 var tension := 0.0  # その周の緊張。耐久を減らす選択肢を選ぶと上がり、時間とともに下がる。DOM-28
 var life_choices := {}  # その周に選んだ選択肢 {イベントのid: 選択肢のid}。DOM-27
 var met_characters: Array = []  # その周に人物のイベントが起きた人物。1つの周で進む話は、人物ごとに1段まで。DOM-13
@@ -80,9 +113,27 @@ var character_choices := {}  # 人物のイベントで選んだ選択肢 {イ�
 var last_fragments: Array = []  # 直前の周の終わりに戻った記憶の断片のid
 var logs: Array = []  # [{key, args}]。言語を切り替えても訳し直せるようキーで持つ
 
+# 第二部の状態。DOM-34
+var part := 1  # 遊んでいる部。1は転生を繰り返す第一部、2は本当の体で暮らす第二部
+var injury := 0.0  # 怪我。体調の上限を下げ、診療所で治すまで残る
+var day := 1  # 第二部の日
+var day_time := 0.0  # その日に進んだ秒数
+var has_room := false  # 住まいを借りたか
+var allies := {}  # 迎えた仲間と、任せた仕事。{仲間のid: 仕事のid}。任せていなければ空
+var paid_goals: Array = []  # クレジットを払って満たした章の目標のid
+var chapter := 0  # 進めている章の、data に並んだ順の番号。すべて終えたら章の数になる
+var seen_beats: Array = []  # 起きた章の出来事のイベントのid
+var has_base := false  # 隠れ家（拠点）を持っているか
+var facilities := {}  # 拠点に足した設備の段。{設備のid: 段}
+var hidden := 0  # 匿っている被験体の人数
+var next_subject_day := 0  # 次に被験体が逃げてくる日
+var stages := 0  # 作戦で越えた段階の数
+var _part_two_stash := {}  # 第一部に戻っている間の、第二部の状態
+
 var _pending := 0.0
 var _save_timer := 0.0
 var _last_seen := 0.0  # 最後に時間を進めた時刻（Unix時間）。ロードしたときはセーブした時刻
+var _away := false  # 閉じていた時間を進めている間は真。噂を出さない（ADR-0074）
 
 
 func _ready() -> void:
@@ -96,29 +147,51 @@ func _process(delta: float) -> void:
 	var now := Time.get_unix_time_from_system()
 	var gap := maxf(delta, now - _last_seen)
 	_last_seen = now
+	var away := {}
 	if gap > AWAY_GAP:
-		_advance_away(minf(gap, MAX_AWAY))
+		away = _advance_away(minf(gap, MAX_AWAY))
 	else:
 		_pending = minf(_pending + delta, MAX_CATCHUP)
+	_away = gap > AWAY_GAP
 	while _pending >= STEP:
 		_pending -= STEP
 		_tick(STEP)
+	_away = false
+	if not away.is_empty():
+		_fill_away_log(away)
 	_save_timer += delta
 	if _save_timer >= SAVE_INTERVAL:
 		_save_timer = 0.0
 		save_game()
 
 
-## 閉じていた時間を、開いているときと同じ刻みで進める。周が終わっても自動で転生はしない（ADR-0007）
-func _advance_away(seconds: float) -> void:
-	if alive and not is_paused() and seconds >= AWAY_LOG:
-		_log("log.away", {"age": seconds})
+## 閉じていた時間を、開いているときと同じ刻みで進める。周が終わっても自動で転生はしない（ADR-0007）。
+## ログに残したときは、その行と進める前の値を返す。閉じていた間の成果は、進め終えてから _fill_away_log で足す（ADR-0071）
+func _advance_away(seconds: float) -> Dictionary:
 	_pending += seconds
+	if not alive or is_paused() or seconds < AWAY_LOG:
+		return {}
+	# 閉じている間に周が終わったときの行より前に出すため、先に行を置いておく
+	_log("log.away", {"age": seconds})
+	# 第二部には記憶ポイントが無いので、稼ぎだけを出す（DOM-34）
+	return {"entry": logs.back(), "earned": life_earned, "points": points_if_ended_now() if part == 1 else 0}
+
+
+func _fill_away_log(away: Dictionary) -> void:
+	var earned: float = life_earned - away["earned"]
+	var now := last_points_gained if not alive else points_if_ended_now()
+	var points := maxi(0, now - away["points"]) if part == 1 else 0
+	if earned <= 0.0 and points == 0:
+		return
+	var entry: Dictionary = away["entry"]
+	entry["key"] = "log.away_gain"
+	entry["args"].merge({"earned": earned, "points": points})
+	log_added.emit()
 
 
 ## 「イベントで止める」の設定で、時間が止まっているか（ADR-0004）
 func is_paused() -> bool:
-	return pending_event != "" and Loc.setting("pause_on_event", false)
+	return minigame_active or (pending_event != "" and Loc.setting("pause_on_event", false))
 
 
 func _notification(what: int) -> void:
@@ -131,20 +204,10 @@ func _tick(dt: float) -> void:
 	if not alive or is_paused():
 		return
 	age += dt
-	var danger := 1.0
-	if GameData.jobs.has(current_job):
-		var job: Dictionary = GameData.jobs[current_job]
-		var income := income_per_sec(current_job) * dt
-		credits += income
-		life_earned += income
-		job_time[current_job] = job_time.get(current_job, 0.0) + dt
-		var xp: Dictionary = job.get("xp", {})
-		for skill in xp:
-			_add_xp(skill, xp[skill] * (xp_mult() + effect("xp_" + skill)) * dt)
-		danger = job.get("danger", 1.0)
-		tension = maxf(0.0, tension - TENSION_FADE * dt)
-		if pending_event == "" and randf() < danger * dt / EVENT_INTERVAL * event_rate():
-			_start_event()
+	var danger := _work(dt)
+	if part == 2:
+		_tick_part_two(danger, dt)
+		return
 	_check_request()
 	var before := durability
 	durability -= decay_per_sec(danger) * dt
@@ -153,6 +216,84 @@ func _tick(dt: float) -> void:
 	if durability <= 0.0:
 		durability = 0.0
 		_end_life()
+
+
+## 就いている仕事を dt 秒だけ進め、その仕事の危険度を返す。仕事に就いていなければ1
+func _work(dt: float) -> float:
+	if not GameData.jobs.has(current_job):
+		return 1.0
+	var job: Dictionary = GameData.jobs[current_job]
+	job_time[current_job] = job_time.get(current_job, 0.0) + dt
+	job_progress += dt
+	var length := job_length(current_job)
+	if job_progress >= length:
+		job_progress -= length
+		_finish_job_round(job, length)
+	var danger: float = job.get("danger", 1.0)
+	rumor_time += dt
+	if rumor_time >= RUMOR_INTERVAL:
+		rumor_time -= RUMOR_INTERVAL
+		if not _away:
+			_tell_rumor()
+	tension = maxf(0.0, tension - TENSION_FADE * dt)
+	if pending_event == "" and randf() < danger * dt / EVENT_INTERVAL * event_rate():
+		_start_event()
+	return danger
+
+
+## 仕事の1回を終えたときに、その時点の稼ぎと経験の長さ分をまとめて入れる（ADR-0051）
+## mult は、ミニゲームで終えた1回の上乗せ。放置で終えた1回は1（ADR-0054）
+func _finish_job_round(job: Dictionary, length: float, mult := 1.0) -> void:
+	var pay := income_per_sec(current_job) * length * mult
+	credits += pay
+	life_earned += pay
+	var xp: Dictionary = job.get("xp", {})
+	for skill in xp:
+		_add_xp(skill, xp[skill] * (xp_mult() + effect("xp_" + skill)) * length * mult)
+	job_paid.emit(pay)
+
+
+## 就いている仕事のミニゲームの種類。ミニゲームの無い仕事は空（ADR-0054）
+func minigame_of(job_id: String) -> String:
+	return GameData.jobs.get(job_id, {}).get("minigame", "")
+
+
+func can_play_minigame() -> bool:
+	return alive and pending_event == "" and not minigame_active and minigame_of(current_job) != ""
+
+
+## いまの1回を、ミニゲームで置き換えて始める。遊んでいる間は周の時間が止まる
+func start_minigame() -> void:
+	if not can_play_minigame():
+		return
+	minigame_active = true
+	minigame_changed.emit()
+
+
+## ミニゲームを終えた。score は成功の度合い（0〜1）。0でも放置で終えた1回と同じだけ入る
+func finish_minigame(score: float) -> void:
+	if not minigame_active:
+		return
+	minigame_active = false
+	var length := job_length(current_job)
+	# ジンの依頼が数える就いた時間も、放置で終えた1回と同じだけ進める
+	job_time[current_job] = job_time.get(current_job, 0.0) + length
+	job_progress = 0.0
+	_finish_job_round(GameData.jobs[current_job], length, 1.0 + MINIGAME_BONUS * clampf(score, 0.0, 1.0))
+	_check_request()
+	minigame_changed.emit()
+
+
+## ミニゲームをやめた。報酬は入らず、いまの1回の進み具合はそのまま残る
+func cancel_minigame() -> void:
+	if not minigame_active:
+		return
+	minigame_active = false
+	minigame_changed.emit()
+
+
+func job_length(job_id: String) -> float:
+	return GameData.jobs.get(job_id, {}).get("length", 1.0)
 
 
 # --- 効果の計算 ---
@@ -165,15 +306,26 @@ func effect(key: String) -> float:
 	total += GameData.bodies.get(body, {}).get("trait_effects", {}).get(key, 0.0)
 	for id in implants:
 		total += GameData.implants.get(id, {}).get("effects", {}).get(key, 0.0)
-	for id in upgrades:
+	# 永続強化は意識の写しの改良なので、本当の体で暮らす第二部では効かない（DOM-34）
+	for id in (upgrades if part == 1 else {}):
 		total += upgrades[id] * GameData.upgrades.get(id, {}).get("effects_per_level", {}).get(key, 0.0)
 	for id in skill_level:
-		total += skill_level[id] * GameData.skills.get(id, {}).get("effects_per_level", {}).get(key, 0.0)
+		var skill: Dictionary = GameData.skills.get(id, {})
+		total += skill_level[id] * skill.get("effects_per_level", {}).get(key, 0.0)
+		total += milestones(id) * skill.get("effects_per_milestone", {}).get(key, 0.0)
 	return total
 
 
+## スキルが越えた節目の数。節目は milestone_every レベルごとで、上限は無い（DOM-03）
+func milestones(skill_id: String) -> int:
+	var every: int = int(GameData.skills.get(skill_id, {}).get("milestone_every", 0))
+	if every <= 0:
+		return 0
+	return int(skill_level.get(skill_id, 0)) / every
+
+
 func xp_mult() -> float:
-	return 1.0 + effect("xp") + deed_bonus()
+	return 1.0 + effect("xp") + (deed_bonus() if part == 1 else 0.0)
 
 
 ## 基本の劣化は体の種類が持ち、体の質で下がる。効果の合計とは別に掛けるので、劣化の効果が下限に届いていても体の差が残る（ADR-0012、ADR-0032）
@@ -198,12 +350,19 @@ func income_per_sec(job_id: String) -> float:
 
 func can_take_job(job_id: String) -> bool:
 	var job: Dictionary = GameData.jobs.get(job_id, {})
+	if not job_in_part(job_id):
+		return false
 	if job.get("needs_all_fragments", false) and next_fragment() != "":
 		return false
 	# 橋の向こうの仕事は、橋を渡れる身元が無いと就けない（DOM-24）
 	if job.get("needs_identity", false) and not identity:
 		return false
 	return meets(job.get("requires", {}))
+
+
+## その部にある仕事か。最後の仕事は第一部にだけある（DOM-34）
+func job_in_part(job_id: String) -> bool:
+	return part == 1 or not GameData.jobs.get(job_id, {}).get("needs_all_fragments", false)
 
 
 ## スキルのレベルが、就く条件や選ぶ条件（{スキルのid: レベル}）を満たしているか
@@ -220,6 +379,8 @@ func set_job(job_id: String) -> void:
 	if current_job != "":
 		break_challenge("job")
 	current_job = job_id
+	job_progress = 0.0  # 途中の1回の分は入らない（ADR-0051）
+	rumor_time = 0.0
 	_log("log.job", {"job": job_id})
 
 
@@ -237,7 +398,10 @@ func _add_xp(skill: String, amount: float) -> void:
 		skill_xp[skill] -= xp_to_next(level)
 		level += 1
 		skill_level[skill] = level
+		var reached := milestones(skill)
 		_log("log.skill_up", {"skill": skill, "level": level})
+		if reached > 0 and level % int(GameData.skills[skill]["milestone_every"]) == 0:
+			_log("log.skill_milestone", {"skill": skill, "level": level})
 
 
 # --- インプラントと永続強化 ---
@@ -266,6 +430,8 @@ func implant_cost(id: String) -> float:
 
 ## いまの体の容量。容量を持たない体の種類（MODで足したものなど）は、上限を設けない（DOM-26）
 func capacity() -> int:
+	if part == 2:
+		return TRUE_BODY_CAPACITY
 	return int(GameData.bodies.get(body, {}).get("capacity", 99))
 
 
@@ -331,9 +497,16 @@ func refund_upgrade(id: String) -> void:
 	_log("log.upgrade_refund", {"upgrade": id, "points": spent})
 
 
+## 話を選び直せるか。どれか1つのエンディングに一度でもたどり着いてから選び直せる（DOM-31、ADR-0050）
+func can_rewind_story() -> bool:
+	return not endings_reached().is_empty()
+
+
 ## 話を、from_event の段から選び直せるようにする。その段と、それより後の段の選択を話の進み具合から消す。
 ## 消した段は、次からまた起きうる。評判や経験など、選んだときに得たものはそのまま残す（DOM-31）
 func rewind_story(line: String, from_event: String) -> void:
+	if not can_rewind_story():
+		return
 	var stages := []
 	for id in GameData.order["events"]:
 		if story_line(GameData.events[id]) == line:
@@ -363,7 +536,7 @@ func buy_upgrade(id: String) -> void:
 func _start_event() -> void:
 	var candidates := []
 	for id in GameData.order["events"]:
-		if GameData.events[id].get("jobs", []).has(current_job) and _can_start(id):
+		if GameData.events[id].get("jobs", []).has(current_job) and event_in_part(id) and _can_start(id):
 			candidates.append(id)
 	if candidates.is_empty():
 		return
@@ -378,6 +551,17 @@ func _start_event() -> void:
 		met_characters.append(character)
 	_log("log.event", {"event": pending_event})
 	event_changed.emit()
+
+
+## その部で起きるイベントか。part を持つイベントは、その部にだけ起きる。
+## 第二部では、周をまたいで進む話と、前の周・体・記憶の断片に結びついたイベントは起きない（DOM-34）
+func event_in_part(event_id: String) -> bool:
+	var event: Dictionary = GameData.events.get(event_id, {})
+	if event.has("part"):
+		return int(event["part"]) == part
+	if part == 1:
+		return true
+	return story_line(event) == "" and not event.has("requires_trace") and not event.has("body") and not event.has("fragment")
 
 
 ## 緊張が高く、ひと息つける間か（DOM-28）
@@ -526,13 +710,25 @@ func choose(choice_id: String) -> void:
 	change_reputation(choice.get("reputation", {}))
 	_check_request()
 	var before := durability
-	durability = clampf(durability + choice.get("durability", 0.0), 0.0, MAX_DURABILITY)
+	var hurt := maxf(0.0, -choice.get("durability", 0.0))
+	if part == 2:
+		# 第二部では、体調の減った分の一部が怪我として残る（DOM-34）
+		injury = minf(MAX_INJURY, injury + hurt * EVENT_INJURY)
+	durability = clampf(durability + choice.get("durability", 0.0), 0.0, max_condition())
 	if before > LOW_DURABILITY and durability <= LOW_DURABILITY and durability > 0.0:
-		_log("log.durability_low")
+		_log("log.durability_low" if part == 1 else "log.condition_low")
 	var was_calm := is_calm()
-	tension += maxf(0.0, -choice.get("durability", 0.0))
+	tension += hurt
 	if not was_calm and is_calm():
 		_log("log.calm")
+	if part == 2:
+		if choice.has("ally"):
+			_welcome_ally(choice["ally"])
+		if choice.get("base", false):
+			_found_base()
+		_after_part_two_choice(event_id)
+		event_changed.emit()
+		return
 	event_changed.emit()
 	if durability <= 0.0:
 		_end_life(event_id)
@@ -556,6 +752,27 @@ func points_for_life() -> int:
 		levels += skill_level[skill]
 	# 依頼の上乗せは、この値をもとに _end_life で足す（ADR-0033）
 	return maxi(1, int((int(sqrt(life_xp / POINTS_XP)) + levels / 3) * (1.0 + effect("points"))))
+
+
+## 記憶ポイントの見込み。いま周が終わったら得る記憶ポイントで、依頼と縛りの上乗せを含む（ADR-0071）
+func points_if_ended_now() -> int:
+	var base := points_for_life()
+	return base + request_bonus_for(base) + challenge_bonus_for(base)
+
+
+func request_bonus_for(base: int) -> int:
+	var bonus: float = GameData.requests.get(request, {}).get("bonus", REQUEST_BONUS)
+	return maxi(1, roundi(base * bonus)) if request_done else 0
+
+
+func challenge_bonus_for(base: int) -> int:
+	var kept := _kept_challenge()
+	return maxi(1, roundi(base * GameData.challenges.get(kept, {}).get("bonus", 0.0))) if kept != "" else 0
+
+
+## まだ破っていない、その周の縛り。無ければ空
+func _kept_challenge() -> String:
+	return challenge if challenge != "" and not challenge_broken else ""
 
 
 # --- 体の質 ---
@@ -594,10 +811,9 @@ func _end_life(fatal_event := "", ending := "") -> void:
 	pending_event = ""
 	last_life_choices = life_choices.duplicate()
 	last_points_gained = points_for_life()
-	var bonus: float = GameData.requests.get(request, {}).get("bonus", REQUEST_BONUS)
-	last_request_bonus = maxi(1, roundi(last_points_gained * bonus)) if request_done else 0
-	var kept := challenge if challenge != "" and not challenge_broken else ""
-	last_challenge_bonus = maxi(1, roundi(last_points_gained * GameData.challenges.get(kept, {}).get("bonus", 0.0))) if kept != "" else 0
+	last_request_bonus = request_bonus_for(last_points_gained)
+	var kept := _kept_challenge()
+	last_challenge_bonus = challenge_bonus_for(last_points_gained)
 	last_points_gained += last_request_bonus + last_challenge_bonus
 	memory_points += last_points_gained
 	chronicle.append({
@@ -634,6 +850,8 @@ func _start_life(body_id := "", challenge_id := "") -> void:
 	request_done = false
 	met_characters = []
 	life_choices = {}
+	life_rumors = []
+	rumor_time = 0.0
 	tension = 0.0
 	challenge = challenge_id if GameData.challenges.has(challenge_id) and life_number > 1 else ""
 	challenge_broken = false
@@ -645,6 +863,7 @@ func _start_life(body_id := "", challenge_id := "") -> void:
 	durability = MAX_DURABILITY
 	age = 0.0
 	current_job = ""
+	job_progress = 0.0
 	pending_event = ""
 	last_deed = ""
 	job_time = {}
@@ -818,6 +1037,53 @@ func revealed(entry: Dictionary) -> bool:
 	return not entry.has("event") or character_choices.has(entry["event"])
 
 
+# --- 街の噂 ---
+
+## 就いている仕事の区画で、いま出せる噂のid。データに並んだ順。DOM-33
+func rumors_here() -> Array:
+	var district: String = GameData.jobs.get(current_job, {}).get("district", "")
+	return GameData.order["rumors"].filter(func(id): return _rumor_open(GameData.rumors[id], district))
+
+
+func _rumor_open(rumor: Dictionary, district: String) -> bool:
+	if not rumor.get("districts", []).has(district):
+		return false
+	var needs: Dictionary = rumor.get("reputation", {})
+	for faction in needs:
+		var value := int(reputation.get(faction, 0))
+		# 正の値は「その値以上」、負の値は「その値以下」の評判で出る
+		if (needs[faction] > 0 and value < needs[faction]) or (needs[faction] < 0 and value > needs[faction]):
+			return false
+	if rumor.has("note"):
+		var parts: PackedStringArray = rumor["note"].split(".")
+		var profile: Dictionary = GameData.profiles.get(parts[0], {})
+		if profile.is_empty() or not revealed(profile):
+			return false
+		for note in profile.get("notes", []):
+			if note["id"] == parts[1]:
+				return revealed(note)
+		return false
+	return true
+
+
+## その周にまだ聞いていない噂から、条件の付いた噂を先に出す。すべて聞いていれば、その区画の噂を聞き直す
+func _tell_rumor() -> void:
+	var here := rumors_here()
+	if here.is_empty():
+		return
+	var fresh := here.filter(func(id): return not life_rumors.has(id))
+	if fresh.is_empty():
+		life_rumors = life_rumors.filter(func(id): return not here.has(id))
+		fresh = here
+	var pick: String = fresh[0]
+	for id in fresh:
+		if GameData.rumors[id].has("reputation") or GameData.rumors[id].has("note"):
+			pick = id
+			break
+	life_rumors.append(pick)
+	_log("log.rumor", {"rumor": pick})
+
+
 # --- ログ ---
 
 func _log(key: String, args := {}) -> void:
@@ -835,6 +1101,10 @@ func format_entry(entry: Dictionary) -> String:
 			args[k] = GameData.name_of(NAME_ARGS[k], args[k]) if args[k] != "" else tr("ui.no_job")
 		elif k == "age":
 			args[k] = format_time(args[k])
+		elif k == "stage":
+			args[k] = tr("stage.%s.name" % args[k])
+		elif k == "rumor":
+			args[k] = tr("rumor.%s.text" % args[k])
 		elif args[k] is float:
 			args[k] = format_number(args[k])
 	return tr(entry["key"]).format(args)
@@ -856,6 +1126,503 @@ static func format_time(seconds: float) -> String:
 	return "%d:%02d" % [s / 60, s % 60]
 
 
+# --- 第二部 ---
+# 本当の体を取り戻したあとの暮らし。転生は無く、1つの体を保ちながら章の目標を満たしていく（DOM-34）。
+# 体調は耐久と同じ変数 durability に持つ。どちらも0で倒れる量で、イベントの起きやすさや選択肢の増減が同じ式で効くため
+
+## 第一部のエンディング「本当の体」にたどり着いていて、転生の画面にいるときだけ、第二部に入れる
+func can_enter_part_two() -> bool:
+	return part == 1 and not alive and endings_reached().has("reclaim")
+
+
+func enter_part_two() -> void:
+	if not can_enter_part_two():
+		return
+	part = 2
+	if _part_two_stash.is_empty():
+		_start_part_two()
+	else:
+		_apply_part_two_state(_part_two_stash)
+		_part_two_stash = {}
+		_log("log.part_two_back", {"day": day})
+	save_game()
+	life_started.emit()
+
+
+## 第一部の転生の画面に戻る。第二部の状態は、そのまま取っておく
+func can_leave_part_two() -> bool:
+	return part == 2 and pending_event == "" and not minigame_active
+
+
+func leave_part_two() -> void:
+	if not can_leave_part_two():
+		return
+	_part_two_stash = _part_two_state()
+	part = 1
+	alive = false
+	current_job = ""
+	save_game()
+	life_ended.emit()
+
+
+func _start_part_two() -> void:
+	request_offers = []
+	request = ""
+	request_done = false
+	challenge = ""
+	challenge_broken = false
+	met_characters = []
+	life_choices = {}
+	life_rumors = []
+	rumor_time = 0.0
+	tension = 0.0
+	identity = false
+	implants = []
+	credits = 0.0
+	life_earned = 0.0
+	life_xp = 0.0
+	age = 0.0
+	current_job = ""
+	job_progress = 0.0
+	pending_event = ""
+	last_deed = ""
+	job_time = {}
+	body = ""
+	body_quality = 0
+	skill_level = {}
+	skill_xp = {}
+	for skill in GameData.skills:
+		skill_level[skill] = PART_TWO_LEVEL
+		skill_xp[skill] = 0.0
+	injury = START_INJURY
+	durability = max_condition()
+	day = 1
+	day_time = 0.0
+	has_room = false
+	allies = {}
+	paid_goals = []
+	chapter = 0
+	seen_beats = []
+	has_base = false
+	facilities = {}
+	hidden = 0
+	next_subject_day = 0
+	stages = 0
+	alive = true
+	_log("log.part_two_start")
+
+
+## 第二部の状態。第一部に戻っている間と、セーブに残す
+func _part_two_state() -> Dictionary:
+	return {
+		"credits": credits, "life_earned": life_earned, "durability": durability, "age": age,
+		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
+		"implants": implants, "job_time": job_time, "identity": identity, "tension": tension,
+		"met_characters": met_characters, "life_rumors": life_rumors,
+		"injury": injury, "day": day, "day_time": day_time, "has_room": has_room, "allies": allies, "paid_goals": paid_goals,
+		"chapter": chapter, "seen_beats": seen_beats, "pending_event": pending_event,
+		"has_base": has_base, "facilities": facilities, "hidden": hidden, "next_subject_day": next_subject_day,
+		"stages": stages,
+	}
+
+
+func _apply_part_two_state(data: Dictionary) -> void:
+	credits = float(data.get("credits", 0.0))
+	life_earned = float(data.get("life_earned", 0.0))
+	durability = float(data.get("durability", MAX_DURABILITY))
+	age = float(data.get("age", 0.0))
+	current_job = data.get("current_job", "")
+	skill_xp = data.get("skill_xp", {})
+	skill_level = _int_values(data.get("skill_level", {}))
+	implants = data.get("implants", [])
+	job_time = data.get("job_time", {})
+	identity = data.get("identity", false)
+	tension = float(data.get("tension", 0.0))
+	met_characters = data.get("met_characters", [])
+	life_rumors = data.get("life_rumors", [])
+	injury = float(data.get("injury", 0.0))
+	day = int(data.get("day", 1))
+	day_time = float(data.get("day_time", 0.0))
+	has_room = data.get("has_room", false)
+	allies = data.get("allies", {})
+	paid_goals = data.get("paid_goals", [])
+	chapter = int(data.get("chapter", 0))
+	seen_beats = data.get("seen_beats", [])
+	has_base = data.get("has_base", false)
+	facilities = _int_values(data.get("facilities", {}))
+	hidden = int(data.get("hidden", 0))
+	next_subject_day = int(data.get("next_subject_day", 0))
+	stages = int(data.get("stages", 0))
+	pending_event = data.get("pending_event", "")
+	if not GameData.events.has(pending_event):
+		pending_event = ""
+	request_offers = []
+	request = ""
+	challenge = ""
+	body = ""
+	body_quality = 0
+	job_progress = 0.0
+	alive = true
+
+
+func _tick_part_two(danger: float, dt: float) -> void:
+	var pay := allies_income() * dt
+	credits += pay
+	life_earned += pay
+	var before := durability
+	if current_job != "":
+		durability -= condition_drain(danger) * dt
+	else:
+		durability = minf(max_condition(), durability + rest_rate() * dt)
+		injury = maxf(0.0, injury - facility_value("clinic", "heal", 0.0) * dt)
+	if before > LOW_DURABILITY and durability <= LOW_DURABILITY:
+		_log("log.condition_low")
+	day_time += dt
+	if day_time >= DAY_LENGTH:
+		day_time -= DAY_LENGTH
+		_new_day()
+	if durability <= 0.0:
+		_collapse()
+	_check_beats()
+
+
+## 体調の上限。怪我の分だけ下がる
+func max_condition() -> float:
+	if part == 1:
+		return MAX_DURABILITY
+	return MAX_DURABILITY - injury
+
+
+## 仕事で1秒ごとに減る体調。劣化の効果（格闘の節目など）で、疲れにくくなる
+func condition_drain(danger: float) -> float:
+	return WORK_DRAIN * danger * maxf(0.2, 1.0 + effect("decay"))
+
+
+func rest_rate() -> float:
+	return REST_RATE * facility_value("bed", "rest", ROOM_REST if has_room else 1.0)
+
+
+## 1日の暮らしにかかるクレジット。盗電の線を引くと住まいの代金が無くなり、匿った被験体の食べる分だけが残る
+func living_cost() -> float:
+	return facility_value("wire", "living", ROOM_RENT if has_room else LODGING_COST) + hidden * SUBJECT_UPKEEP
+
+
+## 日が替わる。暮らしの代金を払い、人物の話がまた進めるようになる。払えなければ路上で寝て、体調が減る
+func _new_day() -> void:
+	day += 1
+	met_characters = []
+	var cost := living_cost()
+	if credits >= cost:
+		credits -= cost
+	else:
+		credits = 0.0
+		durability = maxf(0.0, durability - STREET_DRAIN)
+		_log("log.street_night")
+	_subject_arrives()
+
+
+## 体調が0になった。周は終わらず、診療所に運ばれて休んでいる状態から続ける
+func _collapse() -> void:
+	injury = minf(MAX_INJURY, injury + COLLAPSE_INJURY)
+	var lost := credits * COLLAPSE_LOSS
+	credits -= lost
+	durability = max_condition() * 0.5
+	current_job = ""
+	job_progress = 0.0
+	day += 1
+	met_characters = []
+	_log("log.collapse", {"n": lost})
+	event_changed.emit()
+
+
+func rest() -> void:
+	if part != 2 or current_job == "" or pending_event != "" or minigame_active:
+		return
+	current_job = ""
+	job_progress = 0.0
+	_log("log.rest")
+
+
+func treat_amount() -> float:
+	return minf(TREAT_STEP, injury)
+
+
+func treat_cost() -> float:
+	return treat_amount() * TREAT_COST
+
+
+func can_treat() -> bool:
+	return part == 2 and injury > 0.0 and credits >= treat_cost()
+
+
+## 裏通りの診療所で、怪我を TREAT_STEP だけ治す
+func treat() -> void:
+	if not can_treat():
+		return
+	credits -= treat_cost()
+	injury -= treat_amount()
+	_log("log.treated", {"n": injury})
+
+
+func can_rent_room() -> bool:
+	return part == 2 and not has_room and credits >= ROOM_COST
+
+
+func rent_room() -> void:
+	if not can_rent_room():
+		return
+	credits -= ROOM_COST
+	has_room = true
+	_log("log.room")
+
+
+## 仲間を迎え、得意な仕事を任せる
+func _welcome_ally(ally_id: String) -> void:
+	if not GameData.allies.has(ally_id) or allies.has(ally_id):
+		return
+	allies[ally_id] = ""
+	assign_ally(ally_id, GameData.allies[ally_id].get("job", ""))
+	_log("log.ally", {"ally": ally_id})
+
+
+## 仲間がその仕事に就けるか。仲間は自分のスキルのレベルで就く条件を見る。身元は自分のものを持っている
+func ally_can_take(ally_id: String, job_id: String) -> bool:
+	var job: Dictionary = GameData.jobs.get(job_id, {})
+	if job.is_empty() or not job_in_part(job_id) or not allies.has(ally_id):
+		return false
+	var levels: Dictionary = GameData.allies[ally_id].get("skills", {})
+	for skill in job.get("requires", {}):
+		if levels.get(skill, 0) < job["requires"][skill]:
+			return false
+	return true
+
+
+func assign_ally(ally_id: String, job_id: String) -> void:
+	if allies.has(ally_id) and (job_id == "" or ally_can_take(ally_id, job_id) or (job_id == OPERATION and not current_stage().is_empty())):
+		allies[ally_id] = job_id
+
+
+## 仲間に任せる仕事を、就ける仕事の並びの次へ替える。最後の次は、何も任せない
+func next_ally_job(ally_id: String) -> void:
+	var choices := [""]
+	for id in GameData.order["jobs"]:
+		if ally_can_take(ally_id, id):
+			choices.append(id)
+	if not current_stage().is_empty():
+		choices.append(OPERATION)
+	assign_ally(ally_id, choices[(choices.find(allies.get(ally_id, "")) + 1) % choices.size()])
+
+
+## 仲間に任せた仕事の、分け前を引いた1秒あたりの稼ぎ。主人公のインプラントやスキルの効果は効かない
+func ally_income(ally_id: String) -> float:
+	var job: Dictionary = GameData.jobs.get(allies.get(ally_id, ""), {})
+	if job.is_empty():
+		return 0.0
+	var level: int = GameData.allies[ally_id].get("skills", {}).get(job.get("skill", ""), 0)
+	return job.get("income", 0.0) * (1.0 + job.get("skill_bonus", 0.1) * level) * (1.0 - ally_share())
+
+
+## 分け前の割合。拠点に作業場があると下がる
+func ally_share() -> float:
+	return facility_value("workshop", "share", ALLY_SHARE)
+
+
+## 仲間と、匿った被験体の稼ぎ。どちらも主人公が休んでいる間も入る
+func allies_income() -> float:
+	var total := hidden * SUBJECT_INCOME
+	for id in allies:
+		total += ally_income(id)
+	return total
+
+
+# 拠点。屋台組合の台帳に載せてもらった場所に、設備をクレジットで足していく。逃げてきた被験体を、寝床の数だけ匿う
+
+## 拠点を得る。被験体は、得た日から SUBJECT_INTERVAL 日ごとに逃げてくる
+func _found_base() -> void:
+	if has_base:
+		return
+	has_base = true
+	next_subject_day = day + SUBJECT_INTERVAL
+	_log("log.base")
+
+
+## 設備の効き目。設備が無ければ fallback。段ごとに値が違う効き目は、並びのいまの段の値を返す
+func facility_value(facility_id: String, key: String, fallback: Variant) -> Variant:
+	var level: int = facilities.get(facility_id, 0)
+	if level <= 0:
+		return fallback
+	var value: Variant = GameData.facilities.get(facility_id, {}).get(key, fallback)
+	return value[level - 1] if value is Array else value
+
+
+## 設備を次の段にする値段。いちばん上の段なら負
+func facility_cost(facility_id: String) -> float:
+	var costs: Array = GameData.facilities.get(facility_id, {}).get("costs", [])
+	var level: int = facilities.get(facility_id, 0)
+	return float(costs[level]) if level < costs.size() else -1.0
+
+
+func can_build(facility_id: String) -> bool:
+	var cost := facility_cost(facility_id)
+	return part == 2 and has_base and cost >= 0.0 and credits >= cost
+
+
+func build(facility_id: String) -> void:
+	if not can_build(facility_id):
+		return
+	credits -= facility_cost(facility_id)
+	facilities[facility_id] = facilities.get(facility_id, 0) + 1
+	_log("log.facility", {"facility": facility_id, "n": facilities[facility_id]})
+
+
+## 匿える人数。寝床の段で決まる
+func shelter_capacity() -> int:
+	return int(facility_value("bed", "beds", 0))
+
+
+func _subject_arrives() -> void:
+	if not has_base or day < next_subject_day or hidden >= shelter_capacity():
+		return
+	hidden += 1
+	next_subject_day = day + SUBJECT_INTERVAL
+	_log("log.subject", {"n": hidden})
+
+
+## 進めている章のid。すべて終えていれば空
+func chapter_id() -> String:
+	return GameData.order["chapters"][chapter] if chapter < GameData.order["chapters"].size() else ""
+
+
+func goal_met(goal: Dictionary) -> bool:
+	if goal.has("skills") and not meets(goal["skills"]):
+		return false
+	if goal.get("room", false) and not has_room:
+		return false
+	if goal.get("healed", false) and injury > 0.0:
+		return false
+	if goal.has("pay") and not paid_goals.has(goal.get("id")):
+		return false
+	for id in goal.get("facilities", {}):
+		if facilities.get(id, 0) < int(goal["facilities"][id]):
+			return false
+	if hidden < int(goal.get("hidden", 0)):
+		return false
+	if goal.get("operation", false) and (operation().is_empty() or stages < operation().size()):
+		return false
+	return true
+
+
+## クレジットを払って満たす目標を、いま払えるか
+func can_pay_goal(goal: Dictionary) -> bool:
+	return part == 2 and goal.has("pay") and not paid_goals.has(goal.get("id")) and credits >= float(goal["pay"])
+
+
+func pay_goal(goal: Dictionary) -> void:
+	if not can_pay_goal(goal):
+		return
+	credits -= float(goal["pay"])
+	paid_goals.append(goal["id"])
+	_log("chapter.%s.goal.%s.paid" % [chapter_id(), goal["id"]])
+
+
+func goals_met() -> bool:
+	for goal in GameData.chapters.get(chapter_id(), {}).get("goals", []):
+		if not goal_met(goal):
+			return false
+	return true
+
+
+## 章の出来事は、data に並んだ順に、条件がそろったところで起きる。条件は日・目標・すべての目標・越えた段階の数のどれか
+func _beat_ready(beat: Dictionary) -> bool:
+	if day < int(beat.get("day", 0)):
+		return false
+	if stages < int(beat.get("stages", 0)):
+		return false
+	if beat.has("goal"):
+		for goal in GameData.chapters[chapter_id()].get("goals", []):
+			if goal.get("id") == beat["goal"] and not goal_met(goal):
+				return false
+	return not beat.get("goals", false) or goals_met()
+
+
+func _check_beats() -> void:
+	if pending_event != "" or minigame_active or chapter_id() == "":
+		return
+	for beat in GameData.chapters[chapter_id()].get("beats", []):
+		var id: String = beat.get("event", "")
+		if seen_beats.has(id):
+			continue
+		if _beat_ready(beat):
+			seen_beats.append(id)
+			pending_event = id
+			_log("log.event", {"event": id})
+			event_changed.emit()
+		return
+
+
+## 第二部で選択肢を選んだあと。章の最後の出来事なら章を終える。体調が0なら倒れる
+func _after_part_two_choice(event_id: String) -> void:
+	var beats: Array = GameData.chapters.get(chapter_id(), {}).get("beats", [])
+	if not beats.is_empty() and beats.back().get("event", "") == event_id:
+		_log("log.chapter_end", {"chapter": chapter_id()})
+		chapter += 1
+	if durability <= 0.0:
+		_collapse()
+
+
+# 作戦。章の最後の大きな仕事を、data に並んだ段階の順に挑む。乱数は使わず、挑んだときの体調が足りなければしくじる（ADR-0078）
+
+func operation() -> Array:
+	return GameData.chapters.get(chapter_id(), {}).get("operation", [])
+
+
+## いま挑む段階。作戦の無い章か、すべての段階を越えていれば空
+func current_stage() -> Dictionary:
+	var all := operation()
+	return all[stages] if stages < all.size() else {}
+
+
+## 段階に要るスキルのレベル。その段階に合う仲間を作戦に付けていれば下がる
+func stage_level(stage: Dictionary) -> int:
+	var level := int(stage.get("level", 0))
+	if allies.get(stage.get("ally", ""), "") == OPERATION:
+		level -= int(stage.get("help", 0))
+	return level
+
+
+## 作戦には、その章のクレジットを払う目標（手はず）を払い終えてから挑む
+func can_attempt_stage() -> bool:
+	var stage := current_stage()
+	if part != 2 or stage.is_empty() or pending_event != "" or minigame_active:
+		return false
+	for goal in GameData.chapters[chapter_id()].get("goals", []):
+		if goal.has("pay") and not paid_goals.has(goal.get("id")):
+			return false
+	return skill_level.get(stage.get("skill", ""), 0) >= stage_level(stage)
+
+
+## 段階に挑む。体調が足りれば越え、足りなければ倒れて、その段階をやり直す。
+## 倒れたときは、ふだんの倒れ方と同じく怪我を負い、クレジットの一部を失う。越えた段階は残る
+func attempt_stage() -> void:
+	if not can_attempt_stage():
+		return
+	var stage := current_stage()
+	current_job = ""
+	job_progress = 0.0
+	durability -= float(stage.get("durability", 0.0))
+	if durability <= 0.0:
+		_log("log.stage_failed", {"stage": stage["id"]})
+		_collapse()
+		return
+	stages += 1
+	_log("log.stage_done", {"stage": stage["id"]})
+	if current_stage().is_empty():
+		for id in allies:
+			if allies[id] == OPERATION:
+				assign_ally(id, GameData.allies[id].get("job", ""))
+	_check_beats()
+
+
 # --- セーブとロード ---
 
 func save_game() -> void:
@@ -863,12 +1630,13 @@ func save_game() -> void:
 		"version": SAVE_VERSION, "saved_at": Time.get_unix_time_from_system(),
 		"credits": credits, "life_earned": life_earned, "durability": durability, "age": age,
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
-		"implants": implants, "job_time": job_time, "alive": alive, "body": body, "body_quality": body_quality, "life_xp": life_xp, "pending_event": pending_event,
-		"last_deed": last_deed, "request_offers": request_offers, "request": request, "request_done": request_done,
+		"implants": implants, "job_time": job_time, "job_progress": job_progress, "alive": alive, "body": body, "body_quality": body_quality, "life_xp": life_xp, "pending_event": pending_event,
+		"last_deed": last_deed, "request_offers": request_offers, "life_rumors": life_rumors, "request": request, "request_done": request_done,
 		"challenge": challenge, "challenge_broken": challenge_broken, "identity": identity, "tension": tension, "last_challenge_bonus": last_challenge_bonus, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
 		"last_points_gained": last_points_gained, "last_request_bonus": last_request_bonus, "upgrades": upgrades, "reputation": reputation, "life_choices": life_choices, "last_life_choices": last_life_choices,
 		"chronicle": chronicle, "fragments": fragments, "last_fragments": last_fragments,
 		"character_choices": character_choices, "logs": logs,
+		"part": part, "part_two": _part_two_state() if part == 2 else _part_two_stash,
 	}
 	var file := FileAccess.open(save_path, FileAccess.WRITE)
 	if file:
@@ -890,6 +1658,8 @@ func load_game() -> bool:
 	skill_level = _int_values(data.get("skill_level", {}))
 	implants = data.get("implants", [])
 	job_time = data.get("job_time", {})
+	# #117 より前のセーブは、仕事の進み具合を持たない。0から始める
+	job_progress = float(data.get("job_progress", 0.0))
 	alive = data.get("alive", true)
 	# #36 より前の体は、どれも効果の無い最初の体だった
 	body = data.get("body", first_body())
@@ -928,6 +1698,8 @@ func load_game() -> bool:
 	# #91 より前のセーブには、周ごとの選択が無い。前の周の跡のイベントは、次の周から起きうる
 	life_choices = data.get("life_choices", {})
 	last_life_choices = data.get("last_life_choices", {})
+	# #144 より前のセーブの周は、まだ噂を聞いていない
+	life_rumors = data.get("life_rumors", [])
 	chronicle = data.get("chronicle", [])
 	for entry in chronicle:
 		if not entry.has("body"):
@@ -936,17 +1708,26 @@ func load_game() -> bool:
 	last_fragments = data.get("last_fragments", [])
 	character_choices = data.get("character_choices", {})
 	logs = data.get("logs", [])
+	# #174 より前のセーブには、第二部が無い
+	part = int(data.get("part", 1))
+	_part_two_stash = {}
+	if part == 2:
+		_apply_part_two_state(data.get("part_two", {}))
+	else:
+		_part_two_stash = data.get("part_two", {})
 	# 次のフレームで、セーブしてから今までの時間を進める。#9 より前のセーブは時刻を持たない
 	_last_seen = data.get("saved_at", Time.get_unix_time_from_system())
 	# JSON では整数も小数になるため、ログの Lv などを整数に戻す
 	for entry in logs:
-		for k in ["level", "life", "points", "min"]:
+		for k in ["level", "life", "points", "min", "day"]:
 			if entry.get("args", {}).has(k):
 				entry["args"][k] = int(entry["args"][k])
 	return true
 
 
 func reset_game() -> void:
+	part = 1
+	_part_two_stash = {}
 	life_number = 1
 	memory_points = 0
 	last_points_gained = 0

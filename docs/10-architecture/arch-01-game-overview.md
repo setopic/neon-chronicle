@@ -25,12 +25,15 @@ related: []
 | `game/data/*.json` | 仕事・スキル・インプラント・永続強化・イベント・記憶の断片・エンディングの数値を持つ | 表示文を持つこと |
 | `game/lang/*.json` | 言語ごとの表示文を、`<種類>.<id>.name`のようなキーで持つ | 数値を持つこと |
 | `mod_paths.gd` | 本体とMODの読み込み先をまとめる | ファイルを読むこと |
-| `loc.gd`（`Loc`） | 言語ファイルを読み、言語を切り替える。言語と「イベントで止める」「音楽」「効果音」の設定を`user://settings.json`に保存する（[ADR-0045](../50-adr/adr-0045-event-waves.md)、[ADR-0008](../50-adr/adr-0008-audio.md)） | 数値を扱うこと |
+| `loc.gd`（`Loc`） | 言語ファイルを読み、言語を切り替える。言語と「イベントで止める」「音楽」「効果音」の設定と、メインの画面の欄の並びを`user://settings.json`に保存する（[ADR-0045](../50-adr/adr-0045-event-waves.md)、[ADR-0008](../50-adr/adr-0008-audio.md)、[ADR-0058](../50-adr/adr-0058-panel-layout-swaps.md)） | 数値を扱うこと |
 | `game_data.gd`（`GameData`） | `data`を読む。同じidは後から読んだものが上書きする | 進行の状態を持つこと |
 | `sound.gd`（`Sound`） | 音楽と効果音を鳴らす。「音楽」と「効果音」の設定で消したものは鳴らさない（[ADR-0008](../50-adr/adr-0008-audio.md)） | 進行を変えること |
 | `game/audio/` | 音楽と効果音のWAVと、それを合成する`make_sounds.py`を持つ（[ADR-0008](../50-adr/adr-0008-audio.md)） | 外部の素材を持つこと |
 | `game_state.gd`（`Game`） | 進行・転生・セーブとロード（`user://save.json`）を受け持つ。セーブはセーブした時刻を持ち、開いたときに閉じていた時間を進める（[ADR-0007](../50-adr/adr-0007-away-progress.md)） | 画面を描くこと |
-| `main.gd`・`city.gd` | 画面と、上部の3Dの街を描く。右上の「ライセンス」のボタンで、素材のライセンスを表示する | 進行の計算をすること |
+| `main.gd`・`city.gd` | 画面と、上部の3Dの街を描く。右上の「ライセンス」のボタンで、素材のライセンスを表示する。「並べ替え」のボタンで、メインの画面の欄を組ごとに入れ替える（[ADR-0058](../50-adr/adr-0058-panel-layout-swaps.md)） | 進行の計算をすること |
+| `ui_style.gd`（`UiStyle`） | 画面の色・文字の大きさ・枠・動きと、GodotのThemeを持つ（[ADR-0052](../50-adr/adr-0052-ui-style-foundation.md)） | 画面の配置を決めること |
+| `job_scene.gd`（`JobScene`） | 就いている仕事の様子を、いまの1回の進み具合に合わせて描く（[ADR-0053](../50-adr/adr-0053-job-scene.md)） | 進行の計算をすること |
+| `minigame.gd`（`Minigame`） | 仕事のミニゲームの共通の形を持ち、`jobs.json`の種類からミニゲームを作る（[ADR-0054](../50-adr/adr-0054-minigame-frame.md)） | 報酬を入れること。それは`Game`が受け持つ |
 | `game/credits.txt` | 使った外部の素材とそのライセンスの一覧を持つ（[ADR-0002](../50-adr/adr-0002-asset-licenses-in-game.md)） | Godotの第三者の部品を並べること。それは実行中にGodotから取る |
 
 ## 境界
@@ -66,6 +69,9 @@ related: []
 - (decides) [ADR-0008 音楽と効果音をスクリプトで作り、最初の操作から鳴らす](../50-adr/adr-0008-audio.md)
 - (decides) [ADR-0017 画面の右上のボタンとダイアログの見た目をそろえる](../50-adr/adr-0017-header-and-dialog-look.md)
 - (decides) [ADR-0049 転生の画面とメインの画面を1280x720に収める](../50-adr/adr-0049-fit-screens-1280x720.md)
+- (decides) [ADR-0052 画面の見た目の方向と、その土台を決める](../50-adr/adr-0052-ui-style-foundation.md)
+- (decides) [ADR-0053 仕事の様子を、ログの左に線と点で描く](../50-adr/adr-0053-job-scene.md)
+- (decides) [ADR-0058 メインの画面の欄を、2つずつ組にして入れ替えられるようにする](../50-adr/adr-0058-panel-layout-swaps.md)
 - (depends_on) [UC-01 itch.ioでブラウザ版を公開する](../30-usecases/uc-01-itch-web-release.md)
 
 <!-- graph:auto:end -->

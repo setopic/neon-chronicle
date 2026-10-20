@@ -59,10 +59,20 @@ jobs:
         working-directory: game
         run: timeout 300 ~/godot/godot --headless --path . --script res://ci/playthrough.gd
 
+      # エンディング「本当の体」のあと、第二部の章を終えるまで自動で遊び、章の長さが目安の範囲に入るかを見る（DOM-34）。
+      - name: 第二部の章を終えるまで遊んで、長さを確かめる
+        working-directory: game
+        run: timeout 300 ~/godot/godot --headless --path . --script res://ci/part_two.gd
+
       # セーブの時刻をずらしてロードし、閉じていた時間の分だけ進むかを見る（ADR-0007）。
       - name: 閉じていた時間の分だけ進むか確かめる
         working-directory: game
         run: timeout 120 ~/godot/godot --headless --path . --script res://ci/away.gd
+
+      # ミニゲームで終えた1回の報酬が上乗せされ、放置の仕事と二重に入らないかを見る（ADR-0054）。
+      - name: ミニゲームの報酬が二重に入らないか確かめる
+        working-directory: game
+        run: timeout 120 ~/godot/godot --headless --path . --script res://ci/minigame.gd
 
       # 人物のイベントが周をまたいで決まった順に進み、前の選択で文と選択肢が変わるかを見る（DOM-13）。
       - name: 人物のイベントが周をまたいで進むか確かめる
@@ -73,3 +83,7 @@ jobs:
       - name: 分岐図を組み立てられるか確かめる
         working-directory: game
         run: timeout 120 ~/godot/godot --headless --path . --script res://ci/chart.gd
+
+      - name: 欄をどう並べ替えても、1280x720に収まるか確かめる
+        working-directory: game
+        run: timeout 120 ~/godot/godot --headless --path . --script res://ci/layout.gd

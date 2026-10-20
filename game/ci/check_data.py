@@ -21,6 +21,12 @@ CIの app-check.yml から呼ぶ。Godotを使わずに分かる抜けだけを�
     要る断片は data にある断片を指す（DOM-13）
 14. 街と人物の資料の出るイベントと、追記の要る断片・出るイベントは、data にあるものを指す。
     追記は要る断片と出るイベントのどちらか一方を持ち、文のキー（profile.<id>.<追記>）がある（DOM-14）
+15. スキルの条件のある選択肢に、声の文のキー（event.<id>.<選択肢>.voice）がある。
+    各スキルに、条件を満たしていないときの声の文のキー（skill.<id>.voice）がある（DOM-32）
+16. 街の噂は、仕事の区画と勢力と資料の追記のうち、data にあるものを指す。
+    各噂に、文のキー（rumor.<id>.text）がある（DOM-33）
+17. 第二部の章の出来事は、data にある第二部のイベントを指す。章の目標ごとに、文のキー（chapter.<id>.goal.<目標>）がある。
+    第二部のイベントは周の記録に残らないので、選択肢の物語の句は要らない（DOM-34）
 
 ゲームは足りないキーを英語で補うので（loc.gd）、抜けは画面にキーのまま出るまで気づけない。
 """
@@ -36,7 +42,8 @@ BASE_LOCALE = "en"
 KEY_PREFIX = {
     "jobs": "job", "skills": "skill", "implants": "implant", "upgrades": "upgrade", "events": "event",
     "fragments": "fragment", "endings": "ending", "bodies": "body", "profiles": "profile",
-    "challenges": "challenge", "factions": "faction",
+    "challenges": "challenge", "factions": "faction", "chapters": "chapter",
+    "facilities": "facility",
 }
 # game_state.gd の mio_line_key と同じ組
 MIO_REASONS = ("decay", "event")
@@ -85,6 +92,9 @@ def main():
     skills = {e.get("id") for data in datas.values() for e in data.get("skills", [])}
     fragments = {e.get("id") for data in datas.values() for e in data.get("fragments", [])}
     events = {e.get("id"): e for data in datas.values() for e in data.get("events", [])}
+    districts = {e.get("district") for data in datas.values() for e in data.get("jobs", [])}
+    factions = {e.get("id") for data in datas.values() for e in data.get("factions", [])}
+    notes = {f"{p.get('id')}.{n.get('id')}" for data in datas.values() for p in data.get("profiles", []) for n in p.get("notes", [])}
     if not any(data.get("bodies") for data in datas.values()):
         errors.append("data に体の種類（bodies）が1つも無い")
 
@@ -95,10 +105,21 @@ def main():
                     key = f"{prefix}.{entry.get('id')}.{suffix}"
                     if key not in base:
                         errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+        for skill in data.get("skills", []):
+            key = f"skill.{skill.get('id')}.voice"
+            if key not in base:
+                errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
         for job in data.get("jobs", []):
             key = f"job.{job.get('id')}.chronicle"
             if key not in base:
                 errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+            # 1回の長さが無いと、報酬が1秒ごとに入ってしまう（ADR-0051）
+            if not job.get("length", 0) > 0:
+                errors.append(f"{path.relative_to(GAME)}: 1回の長さ（length）が無い: job.{job.get('id')}")
+            # ミニゲームの遊び方の説明が無いと、始めたときに何をすればよいか分からない（ADR-0054）
+            kind = job.get("minigame", "")
+            if kind and f"minigame.{kind}.help" not in base:
+                errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: minigame.{kind}.help")
         for event in data.get("events", []):
             choices = event.get("choices", [])
             if not any(not c.get("requires") and not c.get("requires_choice") for c in choices):
@@ -110,7 +131,10 @@ def main():
             for choice in choices:
                 if "ending" in choice and choice["ending"] not in endings:
                     errors.append(f"{path.relative_to(GAME)}: 無いエンディングを指している: event.{event.get('id')}.{choice.get('id')}")
-                suffixes = ("name", "result") if "ending" in choice else ("name", "result", "chronicle")
+                no_chronicle = "ending" in choice or event.get("part") == 2
+                suffixes = ("name", "result") if no_chronicle else ("name", "result", "chronicle")
+                if choice.get("requires"):
+                    suffixes += ("voice",)
                 for suffix in suffixes:
                     key = f"event.{event.get('id')}.{choice.get('id')}.{suffix}"
                     if key not in base:
@@ -181,6 +205,37 @@ def main():
                 key = f"profile.{profile.get('id')}.{note.get('id')}"
                 if key not in base:
                     errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+
+        for rumor in data.get("rumors", []):
+            where = f"{path.relative_to(GAME)}: rumor.{rumor.get('id')}"
+            if not rumor.get("districts"):
+                errors.append(f"{where}: 仕事の区画を持たない")
+            for district in rumor.get("districts", []):
+                if district not in districts:
+                    errors.append(f"{where}: 無い仕事の区画を指している: {district}")
+            for faction, value in rumor.get("reputation", {}).items():
+                if faction not in factions:
+                    errors.append(f"{where}: 無い勢力を指している: {faction}")
+                if value == 0:
+                    errors.append(f"{where}: 評判の条件が0になっている: {faction}")
+            if "note" in rumor and rumor["note"] not in notes:
+                errors.append(f"{where}: 無い追記を指している: {rumor['note']}")
+            key = f"rumor.{rumor.get('id')}.text"
+            if key not in base:
+                errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+
+        for chapter in data.get("chapters", []):
+            where = f"{path.relative_to(GAME)}: chapter.{chapter.get('id')}"
+            for goal in chapter.get("goals", []):
+                key = f"chapter.{chapter.get('id')}.goal.{goal.get('id')}"
+                if key not in base:
+                    errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+            goal_ids = {g.get("id") for g in chapter.get("goals", [])}
+            for beat in chapter.get("beats", []):
+                if events.get(beat.get("event"), {}).get("part") != 2:
+                    errors.append(f"{where}: 第二部のイベントではない出来事を指している: {beat.get('event')}")
+                if "goal" in beat and beat["goal"] not in goal_ids:
+                    errors.append(f"{where}: 無い目標を指している: {beat['goal']}")
 
         for ending in data.get("endings", []):
             key = f"ending.{ending.get('id')}.chronicle"

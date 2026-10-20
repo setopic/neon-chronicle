@@ -300,6 +300,7 @@
       "id": "rei_1",
       "jobs": ["hacker"],
       "character": "rei",
+      "fragment": "white_room",
       "choices": [
         { "id": "listen", "xp": { "hacking": 6 } },
         { "id": "refuse" }
@@ -309,6 +310,7 @@
       "id": "rei_2",
       "jobs": ["hacker"],
       "character": "rei",
+      "fragment": "contract",
       "desc_by": "rei_1",
       "choices": [
         { "id": "help", "requires": { "hacking": 6 }, "credits": 40, "durability": -6, "xp": { "hacking": 12 } },

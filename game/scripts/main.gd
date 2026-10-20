@@ -2,27 +2,32 @@ extends Control
 
 ## メイン画面。UI はコードで組み立て、言語の切り替えや転生のたびに作り直す。
 ## 上：3Dの街と状態、左：仕事とスキル、右：体とインプラント、下：ログ。
+## 上の帯より下の欄は、2つずつ組にして入れ替えられる（ADR-0058）。
 
 const City := preload("res://scripts/city.gd")
 
-const PINK := Color(1.0, 0.25, 0.75)
-const CYAN := Color(0.2, 0.95, 1.0)
-const DIM := Color(0.6, 0.6, 0.75)
-const DANGER := Color(1.0, 0.3, 0.3)
-const BG := Color(0.03, 0.02, 0.07)
-const PANEL_BG := Color(0.07, 0.05, 0.13, 0.94)
+# 色は見た目の土台（UiStyle）から取る。ADR-0052
+const PINK := UiStyle.PINK
+const CYAN := UiStyle.CYAN
+const DIM := UiStyle.DIM
+const DANGER := UiStyle.DANGER
 const REFRESH_INTERVAL := 0.1
 # 割合で増減させる効果の種類と、その文のキー。並びが画面に出る順になる（DOM-03）
 const FX_KEYS := {"income": "ui.fx_income", "xp": "ui.fx_xp", "decay": "ui.fx_decay"}
 # 使った素材の一覧とライセンスの全文。書き出しに含めるよう export_presets.cfg の include_filter に挙げてある。ADR-0002。
 const CREDITS_PATH := "res://credits.txt"
 const FONT_LICENSE_PATH := "res://fonts/OFL-NotoSansJP.txt"
+# 欄の並びで入れ替えられる組。設定の panel_layout に、入れ替えた組を true で残す。並びが画面に出る順になる（ADR-0058）
+const LAYOUT_SWAPS := ["jobs_body", "scene_log", "rows", "columns"]
 
 var _content: Control
 var _refresh_timer := 0.0
 # 毎回更新する部品
 var _stats_label: Label
+var _pay_label: Label  # クレジットの横に、仕事の1回の報酬を短く出す。ADR-0051
+var _rest_stats_label: Label
 var _job_buttons := {}
+var _job_bars := {}  # 仕事のid -> いまの1回の進み具合のバー
 var _skill_rows := {}  # id -> {label, bar}
 var _durability_bar: ProgressBar
 var _body_label: Label
@@ -41,20 +46,38 @@ var _log_label: RichTextLabel
 var _upgrade_buttons := {}
 var _refund_buttons := {}
 var _choice_buttons := {}  # 選択肢のid -> ボタン
+var _voice_labels := {}  # スキルの条件のある選択肢のid -> 声の行。DOM-32
+var _minigame_button: Button  # 就いている仕事の1回を、ミニゲームで終える。ADR-0054
 var _story_closed_life := 0  # 戻った記憶の断片やエンディングの画面を閉じた周の番号。DOM-08
+# 第二部の暮らしの操作と、章の目標。DOM-34
+var _rest_button: Button
+var _treat_button: Button
+var _room_button: Button
+var _chapter_label: Label
+var _goals_label: Label
+var _pay_buttons := []  # [{button, goal}]。クレジットを払って満たす目標
+var _ally_buttons := {}  # {仲間のid: Button}。押すたびに、任せる仕事を替える
+var _facility_buttons := {}  # {設備のid: Button}。押すと、設備を次の段にする
+var _stage_button: Button  # 作戦のいまの段階に挑む。作戦の無い章では無い（ADR-0078）
+var _hidden_label: Label
 
 
 func _ready() -> void:
-	theme = _make_theme()
+	theme = UiStyle.make_theme()
 	var bg := ColorRect.new()
-	bg.color = BG
+	bg.color = UiStyle.BG
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 	Loc.language_changed.connect(_build)
 	Game.life_ended.connect(_build)
-	Game.life_started.connect(_build)
+	# 周の始まりは、メインの画面ごと浮かび上がらせて、目覚めたことを見せる（ADR-0052）
+	Game.life_started.connect(func():
+		_build()
+		UiStyle.fade_in(_content))
 	Game.event_changed.connect(_build)
 	Game.log_added.connect(_refresh_log)
+	Game.job_paid.connect(_show_pay)
+	Game.minigame_changed.connect(_build)
 	_build()
 
 
@@ -71,12 +94,20 @@ func _build() -> void:
 	if _content:
 		_content.queue_free()
 	_job_buttons.clear()
+	_job_bars.clear()
 	_skill_rows.clear()
 	_implant_buttons.clear()
 	_upgrade_buttons.clear()
 	_refund_buttons.clear()
 	_request_buttons.clear()
 	_choice_buttons.clear()
+	_voice_labels.clear()
+	_pay_buttons.clear()
+	_ally_buttons.clear()
+	_facility_buttons.clear()
+	_hidden_label = null
+	_minigame_button = null
+	_rest_button = null
 
 	_content = Control.new()
 	_content.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -111,10 +142,19 @@ func _build() -> void:
 	middle_scroll.add_child(middle)
 	middle.add_child(_build_left())
 	middle.add_child(_build_right())
-	main_column.add_child(_build_log())
+	_swap_if_chosen(middle, "jobs_body")
+	# 仕事の様子は、ログの左に置く。体の状態の欄は周の始まりに行が増えるので、そこには置かない（ADR-0053）
+	var bottom := HBoxContainer.new()
+	bottom.add_theme_constant_override("separation", 10)
+	main_column.add_child(bottom)
+	bottom.add_child(_build_job_scene())
+	bottom.add_child(_build_log())
+	_swap_if_chosen(bottom, "scene_log")
+	_swap_if_chosen(main_column, "rows")
 	var implants_scroll := _scroll(lower)
 	implants_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	implants_scroll.add_child(_build_implants())
+	_swap_if_chosen(lower, "columns")
 
 	if not Game.alive:
 		var last: Dictionary = Game.chronicle.back() if not Game.chronicle.is_empty() else {}
@@ -125,8 +165,57 @@ func _build() -> void:
 			_content.add_child(_build_rebirth())
 	elif Game.pending_event != "":
 		_content.add_child(_build_event())
+	elif Game.minigame_active:
+		_content.add_child(_build_minigame())
 	_refresh()
 	_refresh_log()
+
+
+## 利用者が入れ替えた組なら、箱の中の2つの欄の順を逆にする。
+## 欄の大きさは変えずに順だけを変えるので、どの並びでも既定の並びと同じく1280x720に収まる（ADR-0058）
+func _swap_if_chosen(box: Container, key: String) -> void:
+	if _layout_swapped(key):
+		box.move_child(box.get_child(1), 0)
+
+
+func _layout_swapped(key: String) -> bool:
+	var layout: Variant = Loc.setting("panel_layout", {})
+	return layout is Dictionary and layout.get(key, false) == true
+
+
+func _set_layout_swapped(key: String, on: bool) -> void:
+	var layout: Variant = Loc.setting("panel_layout", {})
+	var next: Dictionary = layout.duplicate() if layout is Dictionary else {}
+	next[key] = on
+	Loc.set_setting("panel_layout", next)
+	_build()
+
+
+## 欄の並びを入れ替える画面。並びは設定に残すので、最初からやり直しても変わらない（ADR-0058）
+func _show_layout() -> void:
+	var box := VBoxContainer.new()
+	var toggles: Array[Button] = []
+	for key in LAYOUT_SWAPS:
+		var toggle := _toggle(_layout_text(key), _layout_swapped(key), func(on): _set_layout_swapped(key, on))
+		box.add_child(toggle)
+		toggles.append(toggle)
+	box.add_child(_button(tr("ui.layout_default"), func():
+		Loc.set_setting("panel_layout", {})
+		for toggle in toggles:
+			toggle.set_pressed_no_signal(false)
+		_build()))
+	_show_dialog(tr("ui.layout"), box)
+
+
+func _layout_text(key: String) -> String:
+	match key:
+		"jobs_body":
+			return Loc.t("ui.layout_swap", {"a": tr("ui.jobs"), "b": tr("ui.body")})
+		"scene_log":
+			return Loc.t("ui.layout_swap", {"a": tr("ui.job_scene"), "b": tr("ui.log")})
+		"rows":
+			return tr("ui.layout_rows")
+	return tr("ui.layout_columns")
 
 
 func _scroll(parent: Control) -> ScrollContainer:
@@ -143,6 +232,16 @@ func _build_header() -> Control:
 	var city := City.new()
 	city.set_anchors_preset(Control.PRESET_FULL_RECT)
 	header.add_child(city)
+	var scanlines := UiStyle.Scanlines.new()
+	scanlines.set_anchors_preset(Control.PRESET_FULL_RECT)
+	header.add_child(scanlines)
+	# 帯の下の縁に線を引き、街と下の欄を分ける
+	var edge := ColorRect.new()
+	edge.color = Color(UiStyle.CYAN, 0.6)
+	edge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	edge.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	edge.offset_top = -2
+	header.add_child(edge)
 
 	var overlay := MarginContainer.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -152,12 +251,33 @@ func _build_header() -> Control:
 	var row := HBoxContainer.new()
 	overlay.add_child(row)
 
+	# 題と状態は、街の上に重ねた板に載せて、街の明かりに紛れないようにする
+	var plate := PanelContainer.new()
+	plate.theme_type_variation = "HudPlate"
+	plate.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	plate.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(plate)
 	var titles := VBoxContainer.new()
-	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(titles)
-	titles.add_child(_label(tr("ui.title"), PINK, 36))
-	_stats_label = _label("", CYAN, 20)
-	titles.add_child(_stats_label)
+	titles.add_theme_constant_override("separation", 0)
+	plate.add_child(titles)
+	var title := _label(tr("ui.title"), PINK, UiStyle.SIZE_TITLE)
+	title.add_theme_font_override("font", UiStyle.title_font())
+	titles.add_child(title)
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(spacer)
+	var stats := HBoxContainer.new()
+	stats.add_theme_constant_override("separation", 0)
+	titles.add_child(stats)
+	_stats_label = _label("", CYAN, UiStyle.SIZE_STAT)
+	stats.add_child(_stats_label)
+	_pay_label = _label("", PINK, UiStyle.SIZE_STAT)
+	_pay_label.modulate.a = 0.0
+	# 幅を先に取っておき、報酬が出るたびに後ろの稼ぎと記憶ポイントが動かないようにする
+	_pay_label.custom_minimum_size = Vector2(80, 0)
+	stats.add_child(_pay_label)
+	_rest_stats_label = _label("", CYAN, UiStyle.SIZE_STAT)
+	stats.add_child(_rest_stats_label)
 
 	# ボタンは設定と読み物の2段に分ける。1段に並べると、英語では1280の幅に収まらない（ADR-0017）
 	var tools := VBoxContainer.new()
@@ -173,6 +293,7 @@ func _build_header() -> Control:
 		if locale == Loc.current():
 			language.select(language.item_count - 1)
 	language.item_selected.connect(func(i): Loc.set_language(language.get_item_metadata(i)))
+	UiStyle.add_hover(language)
 	settings.add_child(language)
 	settings.add_child(_toggle(tr("ui.pause_on_event"), Loc.setting("pause_on_event", false),
 		func(on): Loc.set_setting("pause_on_event", on)))
@@ -184,6 +305,7 @@ func _build_header() -> Control:
 	menu.add_child(_button(tr("ui.fragments"), _show_fragments))
 	menu.add_child(_button(tr("ui.profiles"), _show_profiles))
 	menu.add_child(_button(tr("ui.licenses"), _show_licenses))
+	menu.add_child(_button(tr("ui.layout"), _show_layout))
 	# 押すとやり直しになるので、ほかのボタンから離して右端に置く
 	var reset := _button(tr("ui.reset"), _confirm_reset)
 	reset.add_theme_color_override("font_color", DANGER)
@@ -195,7 +317,7 @@ func _build_left() -> Control:
 	var box := _panel(tr("ui.jobs"))
 	# 仕事の列は高さに余りがあるので、狭くして折り返させ、体の状態の列に幅を回す
 	box.get_parent().get_parent().size_flags_stretch_ratio = 0.6
-	box.add_theme_constant_override("separation", 4)
+	box.add_theme_constant_override("separation", 3)
 	for id in GameData.order["jobs"]:
 		var button := Button.new()
 		button.toggle_mode = true
@@ -205,25 +327,37 @@ func _build_left() -> Control:
 		button.theme_type_variation = "CompactButton"
 		button.tooltip_text = GameData.desc_of("jobs", id)
 		button.pressed.connect(Game.set_job.bind(id))
+		UiStyle.add_hover(button)
 		box.add_child(button)
 		_job_buttons[id] = button
+		var bar := ProgressBar.new()
+		bar.show_percentage = false
+		bar.custom_minimum_size = Vector2(0, 6)
+		box.add_child(bar)
+		_job_bars[id] = bar
 
 	box.add_child(_section_title(tr("ui.skills")))
 	for id in GameData.order["skills"]:
 		var row := HBoxContainer.new()
-		var label := _label("", Color.WHITE, 16)
-		label.custom_minimum_size = Vector2(170, 0)
+		var label := _label("", UiStyle.TEXT, UiStyle.SIZE_BODY)
 		label.tooltip_text = GameData.desc_of("skills", id)
 		label.mouse_filter = Control.MOUSE_FILTER_PASS
 		row.add_child(label)
+		# 次の節目と、そこで強まる効果。下の仕事に戻る理由を見えるようにする（DOM-03）。
+		# 1280x720に収めるため、別の行にせずレベルと同じ行に置き、経験の棒をその下に細く出す
+		var milestone := _label("", DIM, UiStyle.SIZE_SMALL)
+		milestone.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		milestone.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		milestone.clip_text = true
+		milestone.tooltip_text = tr("ui.milestone_tip")
+		milestone.mouse_filter = Control.MOUSE_FILTER_PASS
+		row.add_child(milestone)
+		box.add_child(row)
 		var bar := ProgressBar.new()
 		bar.show_percentage = false
-		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		bar.custom_minimum_size = Vector2(0, 10)
-		row.add_child(bar)
-		box.add_child(row)
-		_skill_rows[id] = {"label": label, "bar": bar}
+		bar.custom_minimum_size = Vector2(0, 4)
+		box.add_child(bar)
+		_skill_rows[id] = {"label": label, "bar": bar, "milestone": milestone}
 	return box.get_parent().get_parent()
 
 
@@ -236,20 +370,25 @@ func _build_right() -> Control:
 	_durability_bar.show_percentage = false
 	_durability_bar.custom_minimum_size = Vector2(0, 16)
 	box.add_child(_durability_bar)
-	_body_label = _label("", DIM, 15)
+	_body_label = _label("", DIM, UiStyle.SIZE_TEXT)
 	_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_body_label)
 	# 体の種類の効果は転生の画面でしか見えなかったので、周の間も出す。合計は出どころを分けずに1行にする（ADR-0016）
 	_body_effects_label = _label(Loc.t("ui.body_effects", {
 		"body": GameData.name_of("bodies", Game.body), "quality": Game.body_quality,
-		"effects": GameData.desc_of("bodies", Game.body)}) + "\n" + tr("body.%s.trait" % Game.body), DIM, 14)
+		"effects": GameData.desc_of("bodies", Game.body)}) + "\n" + tr("body.%s.trait" % Game.body), DIM, UiStyle.SIZE_SMALL)
+	# 第二部の本当の体には種類が無いので、体調の仕組みの説明を体調の行のツールチップに出す（DOM-34）
+	_body_effects_label.visible = Game.part == 1
+	if Game.part == 2:
+		_body_label.tooltip_text = tr("ui.true_body")
+		_body_label.mouse_filter = Control.MOUSE_FILTER_PASS
 	_body_effects_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_body_effects_label)
-	_effect_total_label = _label("", DIM, 14)
+	_effect_total_label = _label("", DIM, UiStyle.SIZE_SMALL)
 	_effect_total_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_effect_total_label)
 	# ジンの依頼は、その周の目標なので、周の状態を出す欄に置く。受けるまでは、並べた依頼ごとにボタンを出す（ADR-0034）
-	_request_label = _label("", PINK, 15)
+	_request_label = _label("", PINK, UiStyle.SIZE_TEXT)
 	_request_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_request_label)
 	for id in Game.request_offers:
@@ -260,25 +399,104 @@ func _build_right() -> Control:
 		button.text = Loc.t("ui.request_offer", {"goal": _request_goal(id),
 			"n": roundi(GameData.requests[id].get("bonus", Game.REQUEST_BONUS) * 100.0)})
 		button.pressed.connect(Game.accept_request.bind(id))
+		UiStyle.add_hover(button)
 		box.add_child(button)
 		_request_buttons[id] = button
-	_challenge_label = _label("", PINK, 15)
+	_challenge_label = _label("", PINK, UiStyle.SIZE_TEXT)
 	box.add_child(_challenge_label)
 	# ひと息つける間は、危ないイベントが起きにくいことを出す（DOM-28）
-	_calm_label = _label(tr("ui.calm"), CYAN, 14)
+	_calm_label = _label(tr("ui.calm"), CYAN, UiStyle.SIZE_SMALL)
 	box.add_child(_calm_label)
 	# 評判は周をまたいで残るので、周の状態と並べて出す。0の勢力は出さない（DOM-22）
-	_reputation_label = _label("", DIM, 14)
+	_reputation_label = _label("", DIM, UiStyle.SIZE_SMALL)
 	_reputation_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_reputation_label)
+	if Game.part == 2:
+		_build_part_two(box)
 	return box.get_parent().get_parent()
+
+
+## 第二部の暮らしの操作と、章の目標。依頼と縛りの行は第二部では出ないので、その分の高さを使う。
+## 欄を入れ替えても1280x720に収まるよう、ボタンは1行に並べ、目標は1つの文にまとめる（DOM-34、ADR-0058）
+func _build_part_two(box: VBoxContainer) -> void:
+	var row := HBoxContainer.new()
+	box.add_child(row)
+	_rest_button = _compact_button(tr("ui.rest"), Game.rest)
+	row.add_child(_rest_button)
+	_room_button = _compact_button("", Game.rent_room)
+	_room_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(_room_button)
+	var leave := _compact_button(tr("ui.part_two_leave"), func():
+		_story_closed_life = Game.life_number
+		Game.leave_part_two())
+	leave.disabled = not Game.can_leave_part_two()
+	row.add_child(leave)
+	for button in row.get_children():
+		button.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_room_button.tooltip_text = Loc.t("ui.room_note", {"rent": Game.format_number(Game.ROOM_RENT)})
+	_treat_button = _compact_button("", Game.treat)
+	box.add_child(_treat_button)
+	# 仲間は1行に並べる。迎えた仲間だけを出す
+	if not Game.allies.is_empty():
+		var allies := HBoxContainer.new()
+		box.add_child(allies)
+		for id in GameData.order["allies"]:
+			if Game.allies.has(id):
+				var button := _compact_button("", Game.next_ally_job.bind(id))
+				button.autowrap_mode = TextServer.AUTOWRAP_OFF
+				allies.add_child(button)
+				_ally_buttons[id] = button
+	# 拠点の設備も1行に並べる。行の頭に、匿っている被験体の人数を出す
+	if Game.has_base:
+		var base := HBoxContainer.new()
+		box.add_child(base)
+		_hidden_label = _label("", UiStyle.TEXT, UiStyle.SIZE_SMALL)
+		_hidden_label.tooltip_text = tr("ui.hidden_note")
+		_hidden_label.mouse_filter = Control.MOUSE_FILTER_PASS
+		base.add_child(_hidden_label)
+		for id in GameData.order["facilities"]:
+			var button := _compact_button("", Game.build.bind(id))
+			button.autowrap_mode = TextServer.AUTOWRAP_OFF
+			button.tooltip_text = GameData.desc_of("facilities", id)
+			base.add_child(button)
+			_facility_buttons[id] = button
+	_chapter_label = _label("", PINK, UiStyle.SIZE_TEXT)
+	_chapter_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_chapter_label.mouse_filter = Control.MOUSE_FILTER_PASS
+	box.add_child(_chapter_label)
+	_goals_label = _label("", UiStyle.TEXT, UiStyle.SIZE_SMALL)
+	_goals_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(_goals_label)
+	# クレジットを払って満たす目標は、払うボタンにする
+	for goal in GameData.chapters.get(Game.chapter_id(), {}).get("goals", []):
+		if goal.has("pay"):
+			var button := _compact_button("", Game.pay_goal.bind(goal))
+			box.add_child(button)
+			_pay_buttons.append({"button": button, "goal": goal})
+	_stage_button = null
+	if not Game.operation().is_empty():
+		# 作戦は手はずを払ってから挑むので、払うボタンと同時には出ない。行は増えない
+		_stage_button = _compact_button("", Game.attempt_stage)
+		_stage_button.autowrap_mode = TextServer.AUTOWRAP_OFF
+		box.add_child(_stage_button)
+
+
+func _compact_button(text: String, pressed: Callable) -> Button:
+	var button := Button.new()
+	button.text = text
+	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	button.theme_type_variation = "CompactButton"
+	button.pressed.connect(pressed)
+	UiStyle.add_hover(button)
+	return button
 
 
 ## インプラントと偽の身元。体の状態の欄に積むと中段が画面の高さを超えるので、3つ目の列に分ける
 func _build_implants() -> Control:
 	var box := _panel(tr("ui.implants"))
 	box.get_parent().get_parent().size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_capacity_label = _label("", DIM, 14)
+	_capacity_label = _label("", DIM, UiStyle.SIZE_SMALL)
 	box.add_child(_capacity_label)
 	for id in GameData.order["implants"]:
 		var button := Button.new()
@@ -287,6 +505,7 @@ func _build_implants() -> Control:
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.theme_type_variation = "CompactButton"
 		button.pressed.connect(_press_implant.bind(id))
+		UiStyle.add_hover(button)
 		box.add_child(button)
 		_implant_buttons[id] = button
 	# 偽の身元は闇市場で買う。インプラントと同じくクレジットで買うので、同じ欄に置く（DOM-24）
@@ -295,27 +514,44 @@ func _build_implants() -> Control:
 	_identity_button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_identity_button.theme_type_variation = "CompactButton"
 	_identity_button.pressed.connect(Game.buy_identity)
+	UiStyle.add_hover(_identity_button)
 	box.add_child(_identity_button)
 
 	return box.get_parent().get_parent()
 
 
+func _build_job_scene() -> Control:
+	var box := _panel(tr("ui.job_scene"))
+	var panel: Control = box.get_parent().get_parent()
+	panel.size_flags_horizontal = Control.SIZE_FILL
+	panel.custom_minimum_size = Vector2(300, 0)
+	var scene := JobScene.new()
+	scene.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	box.add_child(scene)
+	# ミニゲームは様子の欄から始める。遊ぶのは就いている仕事の1回なので、様子と同じ欄に置く（ADR-0054）
+	_minigame_button = _button(Loc.t("ui.minigame_play", {"n": roundi(1.0 + Game.MINIGAME_BONUS)}), Game.start_minigame)
+	_minigame_button.theme_type_variation = "CompactButton"
+	box.add_child(_minigame_button)
+	return panel
+
+
 func _build_log() -> Control:
 	var box := _panel(tr("ui.log"))
 	var panel: Control = box.get_parent().get_parent()
-	panel.size_flags_horizontal = Control.SIZE_FILL
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	panel.custom_minimum_size = Vector2(0, 180)
 	_log_label = RichTextLabel.new()
 	_log_label.scroll_following = true
 	_log_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_log_label.add_theme_font_size_override("normal_font_size", 15)
+	_log_label.add_theme_font_size_override("normal_font_size", UiStyle.SIZE_TEXT)
+	_log_label.add_theme_color_override("default_color", UiStyle.TEXT)
 	box.add_child(_log_label)
 	return panel
 
 
 func _build_rebirth() -> Control:
 	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.75)
+	dim.color = Color(UiStyle.BG, 0.88)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	# 画面が低いと「新しい体で目覚める」が下にはみ出すので、パネルごと縦にスクロールできるようにする
 	var outer := ScrollContainer.new()
@@ -341,16 +577,16 @@ func _build_rebirth() -> Control:
 	var left: VBoxContainer = bottom[0]
 	var right: VBoxContainer = bottom[1]
 
-	var summary := _label(Game.format_entry({"key": "ui.rebirth_summary", "args": last}), Color.WHITE, 17)
+	var summary := _label(Game.format_entry({"key": "ui.rebirth_summary", "args": last}), UiStyle.TEXT, UiStyle.SIZE_LEAD)
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	intro.add_child(summary)
 	if not last.is_empty():
-		var story := _label(Game.story_of(last), CYAN, 17)
+		var story := _label(Game.story_of(last), CYAN, UiStyle.SIZE_LEAD)
 		story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		intro.add_child(story)
 		# エンディングのあとは物語が終わっているので、診療所の場面を出さない
 		if last.get("ending", "") == "":
-			var mio := _label(tr(Game.mio_line_key(last)), Color.WHITE, 16)
+			var mio := _label(tr(Game.mio_line_key(last)), UiStyle.TEXT, UiStyle.SIZE_BODY)
 			mio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			intro.add_child(mio)
 	var gained := Loc.t("ui.points_gained", {"n": Game.last_points_gained})
@@ -358,21 +594,31 @@ func _build_rebirth() -> Control:
 		gained += Loc.t("ui.request_bonus", {"n": Game.last_request_bonus})
 	if Game.last_challenge_bonus > 0:
 		gained += Loc.t("ui.challenge_bonus", {"n": Game.last_challenge_bonus})
-	intro.add_child(_label(gained, PINK, 20))
-	intro.add_child(_label(_fragment_progress(), DIM, 14))
+	gained += _points_vs_last()
+	# 上乗せと前の周との差が並ぶと列の幅を超えることがあるので、列を広げずに折り返す
+	var gained_label := _label(gained, PINK, UiStyle.SIZE_STAT)
+	gained_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	intro.add_child(gained_label)
+	intro.add_child(_label(_fragment_progress(), DIM, UiStyle.SIZE_SMALL))
+	# 本当の体にたどり着いたら、転生の代わりに第二部へ進める（DOM-34）
+	if Game.can_enter_part_two():
+		var enter := _button(tr("ui.part_two_enter"), Game.enter_part_two)
+		enter.add_theme_color_override("font_color", PINK)
+		enter.tooltip_text = tr("ui.part_two_enter_note")
+		intro.add_child(enter)
 
 	# 説明は見出しと同じ行に置き、画面の高さに収める
 	var heading := HBoxContainer.new()
 	heading.add_theme_constant_override("separation", 14)
 	left.add_child(heading)
 	heading.add_child(_section_title(tr("ui.upgrades")))
-	var note := _label(tr("ui.upgrades_note"), DIM, 14)
+	var note := _label(tr("ui.upgrades_note"), DIM, UiStyle.SIZE_SMALL)
 	note.size_flags_vertical = Control.SIZE_SHRINK_END
 	note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	heading.add_child(note)
 	# 残りの記憶ポイントも見出しの行に置き、ボタンの列の下に行を足さない
-	_rebirth_points_label = _label("", PINK, 16)
+	_rebirth_points_label = _label("", PINK, UiStyle.SIZE_BODY)
 	_rebirth_points_label.size_flags_vertical = Control.SIZE_SHRINK_END
 	heading.add_child(_rebirth_points_label)
 	for id in GameData.order["upgrades"]:
@@ -382,6 +628,7 @@ func _build_rebirth() -> Control:
 		# 列の幅に収まらない説明は折り返す。折り返さないと、最も長い行がパネルの幅を決める
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.theme_type_variation = "CompactButton"
+		UiStyle.add_hover(button)
 		button.pressed.connect(Game.buy_upgrade.bind(id))
 		left.add_child(button)
 		_upgrade_buttons[id] = button
@@ -393,6 +640,7 @@ func _build_rebirth() -> Control:
 		refund.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		refund.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		refund.theme_type_variation = "CompactButton"
+		UiStyle.add_hover(refund)
 		refund.pressed.connect(Game.refund_upgrade.bind(id))
 		left.add_child(refund)
 		_refund_buttons[id] = refund
@@ -400,7 +648,7 @@ func _build_rebirth() -> Control:
 	history.add_child(_section_title(tr("ui.chronicle")))
 	history.add_child(_label(Loc.t("ui.chronicle_bonus", {
 		"n": Game.chronicle_deeds(), "pct": int(round(Game.deed_bonus() * 100.0)),
-	}), PINK, 14))
+	}), PINK, UiStyle.SIZE_SMALL))
 	# 物語文は1件で2〜3行になるので、全件をスクロールで見せ、最新の記録を下に出しておく
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(0, 70)
@@ -411,10 +659,10 @@ func _build_rebirth() -> Control:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 	for entry in Game.chronicle:
-		var story := _label(Loc.t("ui.chronicle_story", {"life": int(entry.get("life", 0)), "story": Game.story_of(entry)}), Color.WHITE, 14)
+		var story := _label(Loc.t("ui.chronicle_story", {"life": int(entry.get("life", 0)), "story": Game.story_of(entry)}), UiStyle.TEXT, UiStyle.SIZE_SMALL)
 		story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		list.add_child(story)
-		var stats := _label(Game.format_entry({"key": "ui.chronicle_stats", "args": entry}), DIM, 12)
+		var stats := _label(Game.format_entry({"key": "ui.chronicle_stats", "args": entry}), DIM, UiStyle.SIZE_TINY)
 		stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		list.add_child(stats)
 	list.resized.connect(func(): scroll.scroll_vertical = int(list.size.y))
@@ -425,7 +673,7 @@ func _build_rebirth() -> Control:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
 		right.add_child(row)
-		row.add_child(_label(tr("ui.challenge_choice"), DIM, 14))
+		row.add_child(_label(tr("ui.challenge_choice"), DIM, UiStyle.SIZE_SMALL))
 		var picker := OptionButton.new()
 		picker.add_item(tr("ui.challenge_none"))
 		for id in GameData.order["challenges"]:
@@ -439,13 +687,13 @@ func _build_rebirth() -> Control:
 		picker.select(GameData.order["challenges"].find(Game.next_challenge) + 1)
 		picker.item_selected.connect(_pick_challenge)
 		row.add_child(picker)
-	var body_choice := _label(tr("ui.body_choice"), DIM, 14)
+	var body_choice := _label(tr("ui.body_choice"), DIM, UiStyle.SIZE_SMALL)
 	body_choice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	right.add_child(body_choice)
 	var bodies := GridContainer.new()
 	bodies.columns = 2
 	bodies.add_theme_constant_override("h_separation", 8)
-	bodies.add_theme_constant_override("v_separation", 8)
+	bodies.add_theme_constant_override("v_separation", 6)
 	right.add_child(bodies)
 	for id in GameData.order["bodies"]:
 		var awaken := Button.new()
@@ -459,12 +707,15 @@ func _build_rebirth() -> Control:
 			GameData.desc_of("bodies", id) + "  " + Loc.t("ui.capacity_short", {"max": int(GameData.bodies[id].get("capacity", 99))}),
 			tr("body.%s.trait" % id)]
 		awaken.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		awaken.add_theme_font_size_override("font_size", 14)
+		# 説明が4行あり、右の列の高さを決めるので、ほかのボタンより1段小さい文字にする
+		awaken.add_theme_font_size_override("font_size", UiStyle.SIZE_NOTE)
 		awaken.disabled = not Game.can_choose_body(id)
 		awaken.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		awaken.add_theme_color_override("font_color", CYAN)
+		UiStyle.add_hover(awaken)
 		awaken.pressed.connect(Game.rebirth.bind(id))
 		bodies.add_child(awaken)
+	UiStyle.fade_in(dim)
 	return dim
 
 
@@ -488,7 +739,7 @@ func _rebirth_columns(box: VBoxContainer) -> Array:
 ## 断片がすべて戻ってから就く仕事でしかエンディングにならないので、両方が同じ周に出ることは無い
 func _build_story(ending: String) -> Control:
 	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.9)
+	dim.color = Color(UiStyle.BG, 0.94)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -499,34 +750,36 @@ func _build_story(ending: String) -> Control:
 	panel.custom_minimum_size = Vector2(700, 0)
 	center.add_child(panel)
 	if ending != "":
-		var text := _label(GameData.desc_of("endings", ending), Color.WHITE, 18)
+		var text := _label(GameData.desc_of("endings", ending), UiStyle.TEXT, UiStyle.SIZE_HEADING)
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		box.add_child(text)
 		box.add_child(_label(Loc.t("ui.endings_reached", {
 			"n": Game.endings_reached().size(), "max": GameData.order["endings"].size(),
-		}), PINK, 15))
+		}), PINK, UiStyle.SIZE_TEXT))
 	for id in Game.last_fragments:
-		box.add_child(_label(GameData.name_of("fragments", id), PINK, 20))
-		var text := _label(GameData.desc_of("fragments", id), Color.WHITE, 18)
+		box.add_child(_label(GameData.name_of("fragments", id), PINK, UiStyle.SIZE_STAT))
+		var text := _label(GameData.desc_of("fragments", id), UiStyle.TEXT, UiStyle.SIZE_HEADING)
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		box.add_child(text)
 	if ending == "":
-		box.add_child(_label(_fragment_progress(), DIM, 15))
+		box.add_child(_label(_fragment_progress(), DIM, UiStyle.SIZE_TEXT))
 	var close := Button.new()
 	close.text = tr("ui.story_continue")
 	close.custom_minimum_size = Vector2(0, 44)
 	close.add_theme_color_override("font_color", CYAN)
+	UiStyle.add_hover(close)
 	close.pressed.connect(func():
 		_story_closed_life = Game.life_number
 		_build())
 	box.add_child(close)
+	UiStyle.fade_in(dim)
 	return dim
 
 
 ## 待っているイベントと選択肢。時間を止めない設定では、選ぶ間も後ろで進行が続く（DOM-06）
 func _build_event() -> Control:
 	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.5)
+	dim.color = Color(UiStyle.BG, 0.6)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -536,16 +789,55 @@ func _build_event() -> Control:
 	var panel: Control = box.get_parent().get_parent()
 	panel.custom_minimum_size = Vector2(620, 0)
 	center.add_child(panel)
-	var text := _label(Game.event_desc(Game.pending_event), Color.WHITE, 17)
+	var text := _label(Game.event_desc(Game.pending_event), UiStyle.TEXT, UiStyle.SIZE_LEAD)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(text)
+	# スキルの条件のある選択肢ごとに、そのスキルの声を1行出す。文は、条件を満たしているかで _refresh が選ぶ（DOM-32）
+	for choice in Game.event_choices():
+		if choice.get("requires", {}).is_empty():
+			continue
+		var voice := _label("", DIM, UiStyle.SIZE_SMALL)
+		voice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		box.add_child(voice)
+		_voice_labels[choice["id"]] = voice
 	for choice in Game.event_choices():
 		var button := Button.new()
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.custom_minimum_size = Vector2(0, 40)
+		UiStyle.add_hover(button)
 		button.pressed.connect(Game.choose.bind(choice["id"]))
 		box.add_child(button)
 		_choice_buttons[choice["id"]] = button
+	UiStyle.fade_in(dim)
+	return dim
+
+
+## ミニゲームの画面。遊んでいる間は周の時間が止まる。やめると、この1回の報酬は入らない（ADR-0054）
+func _build_minigame() -> Control:
+	var dim := ColorRect.new()
+	dim.color = Color(UiStyle.BG, 0.85)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.add_child(center)
+	var kind := Game.minigame_of(Game.current_job)
+	var box := _panel(Loc.t("ui.minigame_title", {"job": GameData.name_of("jobs", Game.current_job)}))
+	var panel: Control = box.get_parent().get_parent()
+	panel.custom_minimum_size = Vector2(660, 0)
+	center.add_child(panel)
+	var help := _label(tr("minigame.%s.help" % kind), UiStyle.TEXT, UiStyle.SIZE_BODY)
+	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(help)
+	box.add_child(_label(Loc.t("ui.minigame_bonus", {"pct": roundi(Game.MINIGAME_BONUS * 100.0)}), DIM, UiStyle.SIZE_SMALL))
+	var skill: String = GameData.jobs[Game.current_job].get("skill", "")
+	var game := Minigame.create(kind, Game.skill_level.get(skill, 0))
+	if game != null:
+		game.finished.connect(Game.finish_minigame)
+		box.add_child(game)
+	var cancel := _button(tr("ui.minigame_cancel"), Game.cancel_minigame)
+	cancel.add_theme_color_override("font_color", DIM)
+	box.add_child(cancel)
+	UiStyle.fade_in(dim)
 	return dim
 
 
@@ -555,12 +847,17 @@ func _refresh() -> void:
 	if _stats_label == null:
 		return
 	var income := Game.income_per_sec(Game.current_job)
-	_stats_label.text = "%s    %s    %s    %s" % [
-		Loc.t("ui.life", {"n": Game.life_number}),
-		Loc.t("ui.credits", {"n": Game.format_number(Game.credits)}),
+	var when := Loc.t("ui.life", {"n": Game.life_number})
+	if Game.part == 2:
+		when = "%s %s" % [tr("ui.part_two"), Loc.t("ui.day", {"n": Game.day})]
+	_stats_label.text = "%s    %s" % [when, Loc.t("ui.credits", {"n": Game.format_number(Game.credits)})]
+	# 第二部には記憶ポイントが無いので、代わりに1日の暮らしの代金を出す（DOM-34）
+	var last_stat := Loc.t("ui.living_cost", {"n": Game.format_number(Game.living_cost())}) if Game.part == 2 \
+		else Loc.t("ui.memory_points", {"n": Game.memory_points}) + _points_estimate()
+	_rest_stats_label.text = "    %s    %s" % [
 		Loc.t("ui.income", {"n": "%.1f" % income}),
 		# 体の欄に効果の行を足した分、記憶ポイントは周の状態と並べて上に出す（ADR-0016）
-		Loc.t("ui.memory_points", {"n": Game.memory_points}),
+		last_stat,
 	]
 	for id in _job_buttons:
 		var button: Button = _job_buttons[id]
@@ -572,19 +869,42 @@ func _refresh() -> void:
 			button.text = "%s  %s" % [name, _job_requirement_text(id)]
 			button.disabled = true
 		button.set_pressed_no_signal(id == Game.current_job)
+		button.visible = Game.job_in_part(id)
+		var bar: ProgressBar = _job_bars[id]
+		bar.visible = id == Game.current_job
+		bar.max_value = Game.job_length(id)
+		bar.value = Game.job_progress
+	if is_instance_valid(_minigame_button):
+		_minigame_button.visible = Game.minigame_of(Game.current_job) != ""
+		_minigame_button.disabled = not Game.can_play_minigame()
 	for id in _skill_rows:
 		var level: int = Game.skill_level.get(id, 0)
 		_skill_rows[id]["label"].text = "%s  %s" % [GameData.name_of("skills", id), Loc.t("ui.level", {"level": level})]
 		var bar: ProgressBar = _skill_rows[id]["bar"]
 		bar.max_value = Game.xp_to_next(level)
 		bar.value = Game.skill_xp.get(id, 0.0)
+		var every: int = int(GameData.skills[id].get("milestone_every", 0))
+		_skill_rows[id]["milestone"].visible = every > 0
+		if every > 0:
+			_skill_rows[id]["milestone"].text = Loc.t("ui.next_milestone", {
+				"level": (Game.milestones(id) + 1) * every,
+				"effects": _effects_text(GameData.skills[id].get("effects_per_milestone", {}))})
 	_durability_bar.value = Game.durability
 	_durability_bar.modulate = DANGER if Game.durability < Game.LOW_DURABILITY else Color.WHITE
-	_body_label.text = "%s    %s    %s" % [
-		Loc.t("ui.durability", {"now": int(ceil(Game.durability)), "max": int(Game.MAX_DURABILITY)}),
-		Loc.t("ui.age", {"age": Game.format_time(Game.age)}),
-		Loc.t("ui.decay", {"n": "%.2f" % Game.current_decay()}),
-	]
+	if Game.part == 2:
+		_body_label.text = "%s    %s    %s" % [
+			Loc.t("ui.condition", {"now": int(ceil(Game.durability)), "max": int(Game.max_condition())}),
+			Loc.t("ui.injury", {"n": int(ceil(Game.injury))}),
+			Loc.t("ui.drain", {"n": "%.2f" % Game.condition_drain(GameData.jobs[Game.current_job].get("danger", 1.0))})
+				if Game.current_job != "" else Loc.t("ui.rest_rate", {"n": "%.1f" % Game.rest_rate()}),
+		]
+		_refresh_part_two()
+	else:
+		_body_label.text = "%s    %s    %s" % [
+			Loc.t("ui.durability", {"now": int(ceil(Game.durability)), "max": int(Game.MAX_DURABILITY)}),
+			Loc.t("ui.age", {"age": Game.format_time(Game.age)}),
+			Loc.t("ui.decay", {"n": "%.2f" % Game.current_decay()}),
+		]
 	_effect_total_label.text = Loc.t("ui.effect_total", {"effects": _effects_text({
 		"income": Game.effect("income"),
 		"xp": Game.xp_mult() - 1.0,
@@ -605,7 +925,9 @@ func _refresh() -> void:
 	if is_instance_valid(_capacity_label):
 		_capacity_label.text = Loc.t("ui.capacity", {"load": Game.implant_load(), "max": Game.capacity()})
 	if is_instance_valid(_identity_button):
-		_identity_button.text = tr("ui.identity_owned") if Game.identity else Loc.t("ui.identity_buy", {"n": Game.format_number(Game.IDENTITY_COST)})
+		# 第二部には周の終わりが無いので、買った身元はそのまま持ち続ける（DOM-34）
+		var buy_key := "ui.identity_buy" if Game.part == 1 else "ui.identity_buy_kept"
+		_identity_button.text = tr("ui.identity_owned" if Game.part == 1 else "ui.identity_owned_kept") if Game.identity else Loc.t(buy_key, {"n": Game.format_number(Game.IDENTITY_COST)})
 		_identity_button.disabled = Game.identity or not Game.alive or Game.credits < Game.IDENTITY_COST
 	for id in _implant_buttons:
 		var button: Button = _implant_buttons[id]
@@ -622,7 +944,7 @@ func _refresh() -> void:
 			if not Game.implant_fits(id):
 				parts.append(tr("ui.implant_no_room"))
 			button.disabled = not Game.alive or Game.credits < Game.implant_cost(id) or not Game.implant_fits(id)
-		if data.get("persistent", false):
+		if data.get("persistent", false) and Game.part == 1:
 			parts.append(tr("ui.persistent"))
 		button.text = "  ".join(parts)
 	for id in _upgrade_buttons:
@@ -644,12 +966,85 @@ func _refresh() -> void:
 			parts.append(_requirement_text(choice.get("requires", {}), _reputation_items(choice.get("requires_reputation", {}))))
 			button.disabled = true
 		button.text = "    ".join(parts)
+		var voice: Label = _voice_labels.get(choice["id"])
+		if voice != null:
+			voice.text = _voice_text(choice)
 	for id in _refund_buttons:
 		var refund: Button = _refund_buttons[id]
 		refund.visible = Game.upgrades.get(id, 0) > 0
 		refund.text = Loc.t("ui.upgrade_refund", {"upgrade": GameData.name_of("upgrades", id), "n": Game.upgrade_spent(id)})
 	if is_instance_valid(_rebirth_points_label):
 		_rebirth_points_label.text = Loc.t("ui.memory_points", {"n": Game.memory_points})
+
+
+func _refresh_part_two() -> void:
+	if not is_instance_valid(_rest_button):
+		return
+	var resting := Game.current_job == ""
+	_rest_button.text = tr("ui.resting") if resting else tr("ui.rest")
+	_rest_button.disabled = resting or not Game.can_leave_part_two()
+	_treat_button.visible = Game.injury > 0.0
+	_treat_button.text = Loc.t("ui.treat", {"n": int(ceil(Game.treat_amount())), "cost": Game.format_number(Game.treat_cost())})
+	_treat_button.disabled = not Game.can_treat()
+	_room_button.text = tr("ui.room_owned") if Game.has_room else Loc.t("ui.room_rent", {"cost": Game.format_number(Game.ROOM_COST)})
+	_room_button.disabled = not Game.can_rent_room()
+	for ally in _ally_buttons:
+		var job: String = Game.allies.get(ally, "")
+		var job_name := tr("ui.ally_operation") if job == Game.OPERATION else GameData.name_of("jobs", job) if job != "" else tr("ui.no_job")
+		var args := {"ally": GameData.name_of("allies", ally), "job": job_name, "n": Game.format_number(Game.ally_income(ally)), "share": roundi(Game.ally_share() * 10.0), "pct": roundi(Game.ally_share() * 100.0)}
+		_ally_buttons[ally].text = Loc.t("ui.ally", args)
+		_ally_buttons[ally].tooltip_text = "%s\n%s" %[GameData.desc_of("allies", ally), Loc.t("ui.ally_note", args)]
+	if _hidden_label != null:
+		_hidden_label.text = Loc.t("ui.hidden", {"n": Game.hidden, "max": Game.shelter_capacity()})
+	for facility in _facility_buttons:
+		var cost := Game.facility_cost(facility)
+		var args := {"facility": GameData.name_of("facilities", facility), "n": Game.facilities.get(facility, 0), "cost": Game.format_number(cost)}
+		_facility_buttons[facility].text = Loc.t("ui.facility_build" if cost >= 0.0 else "ui.facility_done", args)
+		_facility_buttons[facility].disabled = not Game.can_build(facility)
+	var id := Game.chapter_id()
+	if id == "":
+		_chapter_label.text = tr("ui.chapter_next")
+	else:
+		_chapter_label.text = Loc.t("ui.chapter", {"n": Game.chapter + 1, "name": GameData.name_of("chapters", id)})
+		_chapter_label.tooltip_text = GameData.desc_of("chapters", id)
+	var goals := PackedStringArray()
+	for goal in GameData.chapters.get(id, {}).get("goals", []):
+		goals.append(Loc.t("ui.goal_done" if Game.goal_met(goal) else "ui.goal_open", {"goal": tr("chapter.%s.goal.%s" % [id, goal["id"]])}))
+	_goals_label.text = "  ".join(goals)
+	for row in _pay_buttons:
+		var goal: Dictionary = row["goal"]
+		var button: Button = row["button"]
+		button.visible = not Game.goal_met(goal)
+		button.text = Loc.t("ui.goal_pay", {"goal": tr("chapter.%s.goal.%s" % [id, goal["id"]]), "cost": Game.format_number(float(goal["pay"]))})
+		button.disabled = not Game.can_pay_goal(goal)
+	if _stage_button != null:
+		var stage := Game.current_stage()
+		var paid := true
+		for row in _pay_buttons:
+			paid = paid and Game.goal_met(row["goal"])
+		_stage_button.visible = paid and not stage.is_empty()
+		if _stage_button.visible:
+			var args := {"stage": tr("stage.%s.name" % stage["id"]), "skill": GameData.name_of("skills", stage["skill"]), "level": Game.stage_level(stage),
+				"n": int(stage.get("durability", 0)), "ally": GameData.name_of("allies", stage.get("ally", ""))}
+			_stage_button.text = Loc.t("ui.stage", args)
+			_stage_button.tooltip_text = "%s
+%s" % [tr("stage.%s.desc" % stage["id"]), Loc.t("ui.stage_note", args)]
+			_stage_button.disabled = not Game.can_attempt_stage()
+
+
+## 周の途中に、記憶ポイントの見込みを出す（ADR-0071）
+func _points_estimate() -> String:
+	return Loc.t("ui.points_estimate", {"n": Game.points_if_ended_now()}) if Game.alive else ""
+
+
+## 転生の画面で、前の周の記録と比べた差を出す。第1周のあとは比べる周が無い（ADR-0071）
+func _points_vs_last() -> String:
+	if Game.chronicle.size() < 2:
+		return ""
+	var diff: int = Game.last_points_gained - int(Game.chronicle[-2].get("points", 0))
+	if diff == 0:
+		return tr("ui.points_vs_last_same")
+	return Loc.t("ui.points_vs_last_more" if diff > 0 else "ui.points_vs_last_less", {"n": absi(diff)})
 
 
 func _refresh_log() -> void:
@@ -659,6 +1054,17 @@ func _refresh_log() -> void:
 	for entry in Game.logs.slice(-30):
 		lines.append(Game.format_entry(entry))
 	_log_label.text = "\n".join(lines)
+
+
+## 仕事の1回の報酬を、クレジットの横に出して消す。1回ごとのログは残さない（ADR-0051）
+func _show_pay(amount: float) -> void:
+	if not is_instance_valid(_pay_label):
+		return
+	_pay_label.text = " +" + Game.format_number(amount)
+	_pay_label.modulate.a = 1.0
+	var tween := _pay_label.create_tween()
+	tween.tween_interval(0.6)
+	tween.tween_property(_pay_label, "modulate:a", 0.0, 0.9)
 
 
 func _job_requirement_text(job_id: String) -> String:
@@ -711,6 +1117,14 @@ func _fragment_progress() -> String:
 
 
 ## 「必要」を1つだけ付けて、条件を「、」でつなぐ。items は先に並べる条件
+## スキルの声の1行。条件を満たしていればその選択肢の文で勧め、満たしていなければスキルごとの文でからかう（DOM-32）
+func _voice_text(choice: Dictionary) -> String:
+	var requires: Dictionary = choice["requires"]
+	var skill: String = requires.keys()[0]
+	var key := "event.%s.%s.voice" % [Game.pending_event, choice["id"]] if Game.meets(requires) else "skill.%s.voice" % skill
+	return Loc.t("ui.voice", {"skill": GameData.name_of("skills", skill), "line": tr(key)})
+
+
 func _requirement_text(requires: Dictionary, items := PackedStringArray()) -> String:
 	for skill in requires:
 		items.append(Loc.t("ui.skill_at", {"skill": GameData.name_of("skills", skill), "level": int(requires[skill])}))
@@ -821,7 +1235,7 @@ func _show_fragments() -> void:
 		lines.append(GameData.name_of("fragments", id))
 		lines.append(GameData.desc_of("fragments", id))
 		lines.append("")
-	_show_text(tr("ui.fragments"), "\n".join(lines), Vector2(700, 420), 16)
+	_show_text(tr("ui.fragments"), "\n".join(lines), Vector2(700, 420), UiStyle.SIZE_BODY)
 
 
 ## 街と人物の資料を読む。追記は、要る断片が戻るか出るイベントが起きるまで伏せる（DOM-14）
@@ -838,9 +1252,9 @@ func _show_profiles(tab := 0) -> void:
 		lines.append(GameData.name_of("profiles", id))
 		lines.append("\n".join(paragraphs))
 		lines.append("")
-	# 地図は資料と同じ画面に、タブで分けて置く。上のボタンをこれ以上増やすと、英語では1280の幅に収まらない（ADR-0022）
+	# 地図は資料と同じ画面に、タブで分けて置く（ADR-0022）
 	var tabs := TabContainer.new()
-	tabs.add_child(_text_body("\n".join(lines), CityMap.SIZE, 16))
+	tabs.add_child(_text_body("\n".join(lines), CityMap.SIZE, UiStyle.SIZE_BODY))
 	tabs.add_child(CityMap.new())
 	tabs.add_child(_chart_tab())
 	tabs.set_tab_title(0, tr("ui.profile_text"))
@@ -859,7 +1273,11 @@ func _chart_tab() -> Control:
 	var chart := BranchChart.new()
 	chart_scroll.add_child(chart)
 	box.add_child(chart_scroll)
-	box.add_child(_label(tr("ui.rewind_note"), DIM, 13))
+	# 最初のエンディングまでは選び直せないので、ボタンを出さずに案内だけを出す（DOM-31、ADR-0050）
+	if not Game.can_rewind_story():
+		box.add_child(_label(tr("ui.rewind_locked"), DIM, UiStyle.SIZE_NOTE))
+		return box
+	box.add_child(_label(tr("ui.rewind_note"), DIM, UiStyle.SIZE_NOTE))
 	var flow := HFlowContainer.new()
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(CityMap.SIZE.x, 80)
@@ -890,7 +1308,7 @@ func _rewind(line: String, event_id: String, content: Control) -> void:
 
 
 func _show_licenses() -> void:
-	_show_text(tr("ui.licenses"), license_text(), Vector2(900, 520), 14)
+	_show_text(tr("ui.licenses"), license_text(), Vector2(900, 520), UiStyle.SIZE_SMALL)
 
 
 func _show_text(title: String, body: String, min_size: Vector2, font_size: int) -> void:
@@ -903,6 +1321,7 @@ func _text_body(body: String, min_size: Vector2, font_size: int) -> RichTextLabe
 	text.selection_enabled = true
 	text.custom_minimum_size = min_size
 	text.add_theme_font_size_override("normal_font_size", font_size)
+	text.add_theme_color_override("default_color", UiStyle.TEXT)
 	text.text = body
 	return text
 
@@ -948,6 +1367,7 @@ func _button(text: String, pressed: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
 	button.pressed.connect(pressed)
+	UiStyle.add_hover(button)
 	return button
 
 
@@ -957,6 +1377,7 @@ func _toggle(text: String, on: bool, changed: Callable) -> Button:
 	button.text = text
 	button.button_pressed = on
 	button.toggled.connect(changed)
+	UiStyle.add_hover(button)
 	return button
 
 
@@ -971,12 +1392,20 @@ func _panel(title: String) -> VBoxContainer:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 6)
 	margin.add_child(box)
-	box.add_child(_section_title(title))
+	var heading := _section_title(title)
+	# 見出しの下に細い線を引き、中身と分ける。行を足すと欄の高さが増えるので、見出しの枠の下の縁で引く
+	var rule := StyleBoxFlat.new()
+	rule.draw_center = false
+	rule.border_color = UiStyle.LINE
+	rule.border_width_bottom = 1
+	rule.content_margin_bottom = 2
+	heading.add_theme_stylebox_override("normal", rule)
+	box.add_child(heading)
 	return box
 
 
 func _section_title(text: String) -> Label:
-	return _label(text, CYAN, 18)
+	return _label(text, CYAN, UiStyle.SIZE_HEADING)
 
 
 func _label(text: String, color: Color, font_size: int) -> Label:
@@ -985,109 +1414,3 @@ func _label(text: String, color: Color, font_size: int) -> Label:
 	label.add_theme_color_override("font_color", color)
 	label.add_theme_font_size_override("font_size", font_size)
 	return label
-
-
-func _make_theme() -> Theme:
-	var t := Theme.new()
-	t.default_font_size = 16
-	var panel := StyleBoxFlat.new()
-	panel.bg_color = PANEL_BG
-	panel.border_color = Color(CYAN, 0.35)
-	panel.set_border_width_all(1)
-	panel.set_corner_radius_all(6)
-	t.set_stylebox("panel", "PanelContainer", panel)
-
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = Color(0.12, 0.08, 0.2)
-	normal.border_color = Color(PINK, 0.5)
-	normal.set_border_width_all(1)
-	normal.set_corner_radius_all(4)
-	normal.set_content_margin_all(8)
-	var hover := normal.duplicate()
-	hover.bg_color = Color(0.2, 0.1, 0.3)
-	var pressed := normal.duplicate()
-	pressed.bg_color = Color(0.35, 0.08, 0.3)
-	pressed.border_color = PINK
-	var disabled := normal.duplicate()
-	disabled.bg_color = Color(0.08, 0.07, 0.11)
-	disabled.border_color = Color(0.3, 0.3, 0.4, 0.4)
-	for type in ["Button", "OptionButton"]:
-		t.set_stylebox("normal", type, normal)
-		t.set_stylebox("hover", type, hover)
-		t.set_stylebox("pressed", type, pressed)
-		t.set_stylebox("hover_pressed", type, pressed)
-		t.set_stylebox("disabled", type, disabled)
-	# 転生の画面の永続強化と、仕事・ジンの依頼・インプラントのボタン。数が多いので、上下の余白と文字を詰めて1280x720に収める
-	t.set_type_variation("CompactButton", "Button")
-	t.set_font_size("font_size", "CompactButton", 14)
-	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
-		var compact: StyleBoxFlat = t.get_stylebox(state, "Button").duplicate()
-		compact.content_margin_top = 4
-		compact.content_margin_bottom = 4
-		t.set_stylebox(state, "CompactButton", compact)
-	t.set_color("font_disabled_color", "Button", Color(0.5, 0.5, 0.6))
-	# キーボードで選んでいるボタンの枠。標準の白い枠は、ほかの色から浮く
-	var focus := StyleBoxFlat.new()
-	focus.draw_center = false
-	focus.border_color = CYAN
-	focus.set_border_width_all(1)
-	focus.set_corner_radius_all(4)
-	t.set_stylebox("focus", "Button", focus)
-	t.set_stylebox("focus", "OptionButton", focus)
-
-	var bar_bg := StyleBoxFlat.new()
-	bar_bg.bg_color = Color(0.1, 0.08, 0.16)
-	bar_bg.set_corner_radius_all(3)
-	var bar_fill := StyleBoxFlat.new()
-	bar_fill.bg_color = CYAN
-	bar_fill.set_corner_radius_all(3)
-	t.set_stylebox("background", "ProgressBar", bar_bg)
-	t.set_stylebox("fill", "ProgressBar", bar_fill)
-
-	# 記憶・街と人物・ライセンス・最初からの画面も、灰色の標準の見た目ではなくパネルと同じ色にする（ADR-0017）
-	var frame := StyleBoxFlat.new()
-	frame.bg_color = Color(0.05, 0.03, 0.1)
-	frame.border_color = CYAN
-	frame.set_border_width_all(1)
-	frame.set_corner_radius_all(6)
-	frame.expand_margin_left = 8
-	frame.expand_margin_right = 8
-	frame.expand_margin_bottom = 8
-	frame.expand_margin_top = 40
-	t.set_stylebox("embedded_border", "Window", frame)
-	var unfocused := frame.duplicate()
-	unfocused.border_color = Color(CYAN, 0.35)
-	t.set_stylebox("embedded_unfocused_border", "Window", unfocused)
-	t.set_constant("title_height", "Window", 40)
-	t.set_font_size("title_font_size", "Window", 18)
-	t.set_color("title_color", "Window", CYAN)
-	var dialog := StyleBoxFlat.new()
-	dialog.bg_color = Color(0.05, 0.03, 0.1)
-	dialog.set_content_margin_all(10)
-	t.set_stylebox("panel", "AcceptDialog", dialog)
-	# 街と人物の画面の、資料と地図のタブ（ADR-0022）
-	var tab := StyleBoxFlat.new()
-	tab.bg_color = Color(0.12, 0.08, 0.2)
-	tab.border_color = Color(PINK, 0.5)
-	tab.set_border_width_all(1)
-	tab.set_corner_radius_all(4)
-	tab.set_content_margin_all(8)
-	var tab_selected := tab.duplicate()
-	tab_selected.bg_color = Color(0.35, 0.08, 0.3)
-	tab_selected.border_color = PINK
-	t.set_stylebox("tab_unselected", "TabContainer", tab)
-	t.set_stylebox("tab_hovered", "TabContainer", tab)
-	t.set_stylebox("tab_selected", "TabContainer", tab_selected)
-	var tab_panel := StyleBoxFlat.new()
-	tab_panel.bg_color = Color(0.05, 0.03, 0.1)
-	tab_panel.border_color = Color(CYAN, 0.35)
-	tab_panel.set_border_width_all(1)
-	tab_panel.set_content_margin_all(8)
-	t.set_stylebox("panel", "TabContainer", tab_panel)
-	var popup := StyleBoxFlat.new()
-	popup.bg_color = Color(0.07, 0.05, 0.13)
-	popup.border_color = Color(PINK, 0.5)
-	popup.set_border_width_all(1)
-	popup.set_content_margin_all(6)
-	t.set_stylebox("panel", "PopupMenu", popup)
-	return t

@@ -2,7 +2,7 @@
 id: ADR-0040
 type: adr
 title: 体の種類ごとに元の持ち主を1人決め、その特性を持たせる
-status: stable
+status: deprecated
 tags: [loop, story]
 decides:
   - DOM-25
@@ -13,7 +13,7 @@ related: []
 # 体の種類ごとに元の持ち主を1人決め、その特性を持たせる
 
 - 日付: 2026-10-20
-- 状態: stable
+- 状態: deprecated（[ADR-0061](./adr-0061-nerve-pattern-of-former-owners.md)が置き換えた）
 
 ## 背景
 
@@ -67,5 +67,9 @@ DOM-25を新しく起こし、元の持ち主と特性を定義する。
 `decides`: この決定が影響を与えるノード（ADR用）
 
 - [DOM-25 体の元の持ち主と特性](../20-domain/dom-25-body-former-owners.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0061 体の元の持ち主から取ったのは神経の型とする](./adr-0061-nerve-pattern-of-former-owners.md)
 
 <!-- graph:auto:end -->
