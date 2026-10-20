@@ -126,6 +126,8 @@ GitHub Projectの欄は次の6つである。日付はどれも日本時間で�
 
 見積もり・着手日・終了日・実績は、人もClaudeもProjectに手で書かない。`.github/workflows/project-record.yml`が書く。クラウドのセッションはProjectを読み書きできないので、この形にした。
 
+PRの本文には、閉じるissueを`Closes #番号`と書く。ワークフローは、この行でPRとissueを結び付けて、日付と実績を出す。この行が無いと、PRをマージしたあとにissueを手で閉じても、実績は空のまま残る。
+
 日付は、issueを「完了」で閉じたときに、ワークフローがGitHubの記録から決める。着手日は、本文に`Closes #番号`を持つPRのうち、いちばん早く作られたものの日付である。そのようなPRが無ければ、終了日と同じ日にする。スレッドを始めてからPRを作るまでに日をまたいだときは、着手日が実際より遅く出る。
 
 実績も、issueを閉じたときにワークフローが決める。そのissueを閉じるPRのコミットから`Cost-Index:`の行を拾い、セッションごとの最大値を足したものである。行の書き方と出し方は、下の「実績の出し方」にある。Claudeは実績を計算しない。
@@ -162,7 +164,7 @@ issueを閉じたスレッドのClaudeは、次の形のコメントを付ける
 
 同時に進めるissueは1つにし、issueごとにセッションを分ける。セッションの消費は、そのセッションの記録（`~/.claude/projects/*/*.jsonl`）にある。クラウドのコンテナにも手元のPCにも、同じ形で残る。応答ごとに、モデルとトークン数が入っている。
 
-この記録から、`.claude/hooks/cost_index.py`がコスト指数を出す。リポジトリの`.claude/settings.json`が、セッションの開始時にこのスクリプトを回す。スクリプトは記録のパスを`.git/claude-sessions/`に残し、gitの`core.hooksPath`を`.githooks`に向ける。以後のコミットでは、`.githooks/prepare-commit-msg`が、そのセッションのここまでの累計を次の行としてコミットメッセージに足す。
+この記録から、`.claude/hooks/cost_index.py`がコスト指数を出す。リポジトリの`.claude/settings.json`が、セッションの開始時にこのスクリプトを回す。スクリプトは記録のパスを`.git/claude-sessions/`に残し、gitの`core.hooksPath`を`.githooks`に向ける。以後のコミットでは、`.githooks/prepare-commit-msg`が、そのセッションのここまでの累計を次の行としてコミットメッセージに足す。セッションを始めたのとは別のクローンでコミットするときは、そのクローンでも`git config core.hooksPath .githooks`を一度実行しておく。セッションの開始時に向け直すのは、セッションを始めたフォルダのクローンだけだからである。
 
 ```text
 Cost-Index: 5800 (session a75dd425-d13e-5e2c-9216-e5485903f6de)
