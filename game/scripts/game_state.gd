@@ -247,8 +247,18 @@ func effect(key: String) -> float:
 	for id in upgrades:
 		total += upgrades[id] * GameData.upgrades.get(id, {}).get("effects_per_level", {}).get(key, 0.0)
 	for id in skill_level:
-		total += skill_level[id] * GameData.skills.get(id, {}).get("effects_per_level", {}).get(key, 0.0)
+		var skill: Dictionary = GameData.skills.get(id, {})
+		total += skill_level[id] * skill.get("effects_per_level", {}).get(key, 0.0)
+		total += milestones(id) * skill.get("effects_per_milestone", {}).get(key, 0.0)
 	return total
+
+
+## スキルが越えた節目の数。節目は milestone_every レベルごとで、上限は無い（DOM-03）
+func milestones(skill_id: String) -> int:
+	var every: int = int(GameData.skills.get(skill_id, {}).get("milestone_every", 0))
+	if every <= 0:
+		return 0
+	return int(skill_level.get(skill_id, 0)) / every
 
 
 func xp_mult() -> float:
@@ -317,7 +327,10 @@ func _add_xp(skill: String, amount: float) -> void:
 		skill_xp[skill] -= xp_to_next(level)
 		level += 1
 		skill_level[skill] = level
+		var reached := milestones(skill)
 		_log("log.skill_up", {"skill": skill, "level": level})
+		if reached > 0 and level % int(GameData.skills[skill]["milestone_every"]) == 0:
+			_log("log.skill_milestone", {"skill": skill, "level": level})
 
 
 # --- インプラントと永続強化 ---

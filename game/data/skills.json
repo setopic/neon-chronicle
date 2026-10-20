@@ -1,7 +1,7 @@
 {
   "skills": [
-    { "id": "hacking", "effects_per_level": {} },
-    { "id": "combat", "effects_per_level": { "decay": -0.01 } },
-    { "id": "negotiation", "effects_per_level": { "income": 0.03 } }
+    { "id": "hacking", "effects_per_level": {}, "milestone_every": 5, "effects_per_milestone": { "xp": 0.15 } },
+    { "id": "combat", "effects_per_level": { "decay": -0.01 }, "milestone_every": 5, "effects_per_milestone": { "decay": -0.1 } },
+    { "id": "negotiation", "effects_per_level": { "income": 0.03 }, "milestone_every": 5, "effects_per_milestone": { "income": 0.2 } }
   ]
 }

@@ -322,18 +322,24 @@ func _build_left() -> Control:
 	for id in GameData.order["skills"]:
 		var row := HBoxContainer.new()
 		var label := _label("", UiStyle.TEXT, UiStyle.SIZE_BODY)
-		label.custom_minimum_size = Vector2(170, 0)
 		label.tooltip_text = GameData.desc_of("skills", id)
 		label.mouse_filter = Control.MOUSE_FILTER_PASS
 		row.add_child(label)
+		# 次の節目と、そこで強まる効果。下の仕事に戻る理由を見えるようにする（DOM-03）。
+		# 1280x720に収めるため、別の行にせずレベルと同じ行に置き、経験の棒をその下に細く出す
+		var milestone := _label("", DIM, UiStyle.SIZE_SMALL)
+		milestone.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		milestone.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		milestone.clip_text = true
+		milestone.tooltip_text = tr("ui.milestone_tip")
+		milestone.mouse_filter = Control.MOUSE_FILTER_PASS
+		row.add_child(milestone)
+		box.add_child(row)
 		var bar := ProgressBar.new()
 		bar.show_percentage = false
-		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		bar.custom_minimum_size = Vector2(0, 10)
-		row.add_child(bar)
-		box.add_child(row)
-		_skill_rows[id] = {"label": label, "bar": bar}
+		bar.custom_minimum_size = Vector2(0, 4)
+		box.add_child(bar)
+		_skill_rows[id] = {"label": label, "bar": bar, "milestone": milestone}
 	return box.get_parent().get_parent()
 
 
@@ -758,6 +764,12 @@ func _refresh() -> void:
 		var bar: ProgressBar = _skill_rows[id]["bar"]
 		bar.max_value = Game.xp_to_next(level)
 		bar.value = Game.skill_xp.get(id, 0.0)
+		var every: int = int(GameData.skills[id].get("milestone_every", 0))
+		_skill_rows[id]["milestone"].visible = every > 0
+		if every > 0:
+			_skill_rows[id]["milestone"].text = Loc.t("ui.next_milestone", {
+				"level": (Game.milestones(id) + 1) * every,
+				"effects": _effects_text(GameData.skills[id].get("effects_per_milestone", {}))})
 	_durability_bar.value = Game.durability
 	_durability_bar.modulate = DANGER if Game.durability < Game.LOW_DURABILITY else Color.WHITE
 	_body_label.text = "%s    %s    %s" % [

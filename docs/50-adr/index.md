@@ -88,6 +88,7 @@ tags: [index]
 - [ADR-0069 遊ぶ人の側の仕組みを挙げ、街の歴史の穴を埋める](./adr-0069-meta-mechanics-and-city-history-gaps.md)
 - [ADR-0070 本作の主題を「使い捨て」とし、警告として描く](./adr-0070-theme-disposable.md)
 - [ADR-0071 記憶ポイントの見込みと伸びを見せ、閉じていた間の成果をログに出す](./adr-0071-show-rebirth-payoff.md)
+- [ADR-0072 スキルに節目を置き、下の仕事に戻る理由にする](./adr-0072-skill-milestones.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
