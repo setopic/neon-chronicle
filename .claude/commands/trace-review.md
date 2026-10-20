@@ -18,14 +18,16 @@ META-07は、issueを閉じる前に決まったことを文書へ移したか�
 
 1. `list_issues`に`state: CLOSED`と`fields: ["number", "title", "labels"]`を渡し、閉じたissueを全部読む。`pageInfo.hasNextPage`が続く限り、`after`にカーソルを渡して送る
 2. 各issueを`issue_read`の`get`で読む。`state_reason`が`completed`でないもの（取り下げ・重複）は除く
-3. `closed_by_pull_requests`の`references`にあるPRを、`pull_request_read`の`get`で読む。本文の`## 対応するノード`の節から、次の節の見出しまでを取り出す
-4. 節の中に、`DOM-34`や`ADR-0078`のようなノードのid（英大文字と数字を`-`で繋いだもの）があるかを見る
+3. `closed_by_pull_requests`の`references`が空なら、`search_pull_requests`に`repo:setopic/neon-chronicle is:merged "#番号"`の`query`と、`fields: ["number", "title"]`を渡して引く。この検索は、`"#14"`で引くと`ADR-0014`や`DOM-14`を題に含むPRも返す。そのため、返ったPRのうち、題に`#番号`があり、その直後が数字でないものだけを取る。取れたPRは、`Closes`が無いPRとして覚えておく
+4. `references`にあるPRと、3で取れたPRを、`pull_request_read`の`get`で読む。本文の`## 対応するノード`の節から、次の節の見出しまでを取り出す
+5. 節の中に、`DOM-34`や`ADR-0078`のようなノードのid（英大文字と数字を`-`で繋いだもの）があるかを見る
 
-挙げるのは、次の3つにあたるissueである。
+挙げるのは、次の4つにあたるissueである。3で取れたPRのissueは、「`Closes`が無い」の行に挙げたうえで、「対応するノード」がほかの行にあたれば、そちらにも挙げる。
 
 | 気になる点 | 次の一手 |
 | --- | --- |
-| 閉じたPRが無い | 手で閉じたissueである。決まったことがどの文書にあるかを、持ち主に確かめる |
+| 閉じたPRが無い（3でも取れない） | 手で閉じたissueである。決まったことがどの文書にあるかを、持ち主に確かめる |
+| `Closes`が無い（3で取れた） | PRの本文に`Closes #番号`が無いので、ワークフローが実績も日付も書いていない。手で補うかを持ち主に聞く |
 | PRの「対応するノード」が`なし`だけ | 文書の要らない変更だったかを、issueの本文と見比べる |
 | PRに「対応するノード」の節が無いか、節にidが無い | PRの差分から触った文書を探し、移したかを見る |
 
