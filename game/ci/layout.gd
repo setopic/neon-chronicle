@@ -45,6 +45,10 @@ func _process(_delta: float) -> bool:
 		var game := root.get_node("Game")
 		game.part = 2
 		game._start_part_two()
+		# いちばん行の多い第2章で、仲間を3人とも迎えた画面を見る
+		game.chapter = root.get_node("GameData").order["chapters"].find("name")
+		for id in root.get_node("GameData").order["allies"]:
+			game._welcome_ally(id)
 		_add_cases()
 		_next_case()
 		return false

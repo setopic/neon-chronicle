@@ -15,7 +15,28 @@
         { "event": "p2_mio_debt", "goal": "debt" },
         { "event": "p2_heavy_body_end", "goals": true }
       ]
+    },
+    {
+      "id": "name",
+      "goals": [
+        { "id": "runner", "skills": { "negotiation": 18 } },
+        { "id": "muscle", "pay": 20000 },
+        { "id": "hacker", "skills": { "hacking": 22 } },
+        { "id": "vault", "pay": 250000 }
+      ],
+      "beats": [
+        { "event": "p2_crew" },
+        { "event": "p2_saki", "goal": "runner" },
+        { "event": "p2_gou", "goal": "muscle" },
+        { "event": "p2_towa", "goal": "hacker" },
+        { "event": "p2_name_end", "goals": true }
+      ]
     }
+  ],
+  "allies": [
+    { "id": "saki", "job": "courier", "skills": { "negotiation": 25, "combat": 10, "hacking": 2 } },
+    { "id": "gou", "job": "mercenary", "skills": { "combat": 25, "negotiation": 8, "hacking": 1 } },
+    { "id": "towa", "job": "hacker", "skills": { "hacking": 25, "negotiation": 10, "combat": 2 } }
   ],
   "events": [
     {
@@ -61,6 +82,50 @@
       "jobs": [],
       "choices": [
         { "id": "listen" }
+      ]
+    },
+    {
+      "id": "p2_crew",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "ask_each" },
+        { "id": "ask_jin", "xp": { "negotiation": 6 } }
+      ]
+    },
+    {
+      "id": "p2_saki",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "ask", "ally": "saki" },
+        { "id": "ride", "ally": "saki", "durability": -6, "xp": { "combat": 6 } }
+      ]
+    },
+    {
+      "id": "p2_gou",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "shake", "ally": "gou" },
+        { "id": "spar", "ally": "gou", "durability": -10, "xp": { "combat": 10 } }
+      ]
+    },
+    {
+      "id": "p2_towa",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "show", "ally": "towa", "xp": { "hacking": 8 } },
+        { "id": "teach", "ally": "towa", "requires": { "hacking": 24 }, "xp": { "hacking": 12 } }
+      ]
+    },
+    {
+      "id": "p2_name_end",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "read" }
       ]
     },
     {

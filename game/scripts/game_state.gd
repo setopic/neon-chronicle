@@ -52,12 +52,13 @@ const TREAT_COST := 100.0  # 怪我1あたりの治す代金
 const EVENT_INJURY := 0.5  # 選択肢で減った体調のうち、怪我として残る割合
 const COLLAPSE_INJURY := 10.0  # 倒れたときに負う怪我
 const COLLAPSE_LOSS := 0.2  # 倒れたときに失うクレジットの割合
+const ALLY_SHARE := 0.4  # 仲間に任せた仕事の稼ぎのうち、分け前として仲間が取る割合
 const STREET_DRAIN := 10.0  # 宿代を払えず、路上で寝た日に減る体調
 ## ログやクロニクルの引数のうち、id から表示名に変える項目
 const NAME_ARGS := {
 	"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades", "event": "events",
 	"fragment": "fragments", "ending": "endings", "body": "bodies", "challenge": "challenges", "faction": "factions",
-	"chapter": "chapters",
+	"chapter": "chapters", "ally": "allies",
 }
 
 # --- 1人生の状態 ---
@@ -114,6 +115,7 @@ var injury := 0.0  # 怪我。体調の上限を下げ、診療所で治すま�
 var day := 1  # 第二部の日
 var day_time := 0.0  # その日に進んだ秒数
 var has_room := false  # 住まいを借りたか
+var allies := {}  # 迎えた仲間と、任せた仕事。{仲間のid: 仕事のid}。任せていなければ空
 var paid_goals: Array = []  # クレジットを払って満たした章の目標のid
 var chapter := 0  # 進めている章の、data に並んだ順の番号。すべて終えたら章の数になる
 var seen_beats: Array = []  # 起きた章の出来事のイベントのid
@@ -711,6 +713,8 @@ func choose(choice_id: String) -> void:
 	if not was_calm and is_calm():
 		_log("log.calm")
 	if part == 2:
+		if choice.has("ally"):
+			_welcome_ally(choice["ally"])
 		_after_part_two_choice(event_id)
 		event_changed.emit()
 		return
@@ -1182,6 +1186,7 @@ func _start_part_two() -> void:
 	day = 1
 	day_time = 0.0
 	has_room = false
+	allies = {}
 	paid_goals = []
 	chapter = 0
 	seen_beats = []
@@ -1196,7 +1201,7 @@ func _part_two_state() -> Dictionary:
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
 		"implants": implants, "job_time": job_time, "identity": identity, "tension": tension,
 		"met_characters": met_characters, "life_rumors": life_rumors,
-		"injury": injury, "day": day, "day_time": day_time, "has_room": has_room, "paid_goals": paid_goals,
+		"injury": injury, "day": day, "day_time": day_time, "has_room": has_room, "allies": allies, "paid_goals": paid_goals,
 		"chapter": chapter, "seen_beats": seen_beats, "pending_event": pending_event,
 	}
 
@@ -1219,6 +1224,7 @@ func _apply_part_two_state(data: Dictionary) -> void:
 	day = int(data.get("day", 1))
 	day_time = float(data.get("day_time", 0.0))
 	has_room = data.get("has_room", false)
+	allies = data.get("allies", {})
 	paid_goals = data.get("paid_goals", [])
 	chapter = int(data.get("chapter", 0))
 	seen_beats = data.get("seen_beats", [])
@@ -1235,6 +1241,9 @@ func _apply_part_two_state(data: Dictionary) -> void:
 
 
 func _tick_part_two(danger: float, dt: float) -> void:
+	var pay := allies_income() * dt
+	credits += pay
+	life_earned += pay
 	var before := durability
 	if current_job != "":
 		durability -= condition_drain(danger) * dt
@@ -1338,6 +1347,57 @@ func rent_room() -> void:
 	credits -= ROOM_COST
 	has_room = true
 	_log("log.room")
+
+
+## 仲間を迎え、得意な仕事を任せる
+func _welcome_ally(ally_id: String) -> void:
+	if not GameData.allies.has(ally_id) or allies.has(ally_id):
+		return
+	allies[ally_id] = ""
+	assign_ally(ally_id, GameData.allies[ally_id].get("job", ""))
+	_log("log.ally", {"ally": ally_id})
+
+
+## 仲間がその仕事に就けるか。仲間は自分のスキルのレベルで就く条件を見る。身元は自分のものを持っている
+func ally_can_take(ally_id: String, job_id: String) -> bool:
+	var job: Dictionary = GameData.jobs.get(job_id, {})
+	if job.is_empty() or not job_in_part(job_id) or not allies.has(ally_id):
+		return false
+	var levels: Dictionary = GameData.allies[ally_id].get("skills", {})
+	for skill in job.get("requires", {}):
+		if levels.get(skill, 0) < job["requires"][skill]:
+			return false
+	return true
+
+
+func assign_ally(ally_id: String, job_id: String) -> void:
+	if allies.has(ally_id) and (job_id == "" or ally_can_take(ally_id, job_id)):
+		allies[ally_id] = job_id
+
+
+## 仲間に任せる仕事を、就ける仕事の並びの次へ替える。最後の次は、何も任せない
+func next_ally_job(ally_id: String) -> void:
+	var choices := [""]
+	for id in GameData.order["jobs"]:
+		if ally_can_take(ally_id, id):
+			choices.append(id)
+	assign_ally(ally_id, choices[(choices.find(allies.get(ally_id, "")) + 1) % choices.size()])
+
+
+## 仲間に任せた仕事の、分け前を引いた1秒あたりの稼ぎ。主人公のインプラントやスキルの効果は効かない
+func ally_income(ally_id: String) -> float:
+	var job: Dictionary = GameData.jobs.get(allies.get(ally_id, ""), {})
+	if job.is_empty():
+		return 0.0
+	var level: int = GameData.allies[ally_id].get("skills", {}).get(job.get("skill", ""), 0)
+	return job.get("income", 0.0) * (1.0 + job.get("skill_bonus", 0.1) * level) * (1.0 - ALLY_SHARE)
+
+
+func allies_income() -> float:
+	var total := 0.0
+	for id in allies:
+		total += ally_income(id)
+	return total
 
 
 ## 進めている章のid。すべて終えていれば空
