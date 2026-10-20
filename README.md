@@ -151,6 +151,7 @@ graph LR
     ADR-0058["ADR-0058<br/>メインの画面の欄を、2つずつ組にして入れ替えられるようにする"]
     ADR-0059["ADR-0059<br/>意識を抜き取るとは、写しを取って体を眠らせることにする"]
     ADR-0060["ADR-0060<br/>主人公は体ごとに口座だけの身元を持つことにする"]
+    ADR-0061["ADR-0061<br/>体の元の持ち主から取ったのは神経の型とする"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -276,6 +277,8 @@ graph LR
   ADR-0060 -.->|decides| DOM-19
   ADR-0060 -.->|decides| DOM-24
   ADR-0060 -.->|decides| DOM-26
+  ADR-0061 ==>|supersedes| ADR-0040
+  ADR-0061 -.->|decides| DOM-25
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -396,7 +399,7 @@ graph LR
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
-  class ADR-0004,ADR-0005,ADR-0006,ADR-0010,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0024,ADR-0033,ADR-0048 deprecated;
+  class ADR-0004,ADR-0005,ADR-0006,ADR-0010,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0024,ADR-0033,ADR-0040,ADR-0048 deprecated;
 ```
 
 <!-- graph:diagram:end -->
