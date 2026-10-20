@@ -149,6 +149,7 @@ graph LR
     ADR-0056["ADR-0056<br/>運び屋の仕事のミニゲームを、追っ手をかわして升目を進む遊びにする"]
     ADR-0057["ADR-0057<br/>傭兵の仕事のミニゲームを、窓に出る敵を撃つ遊びにする"]
     ADR-0058["ADR-0058<br/>メインの画面の欄を、2つずつ組にして入れ替えられるようにする"]
+    ADR-0059["ADR-0059<br/>意識を抜き取るとは、写しを取って体を眠らせることにする"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -263,6 +264,9 @@ graph LR
   ADR-0056 -.->|decides| DOM-03
   ADR-0057 -.->|decides| DOM-03
   ADR-0058 -.->|decides| ARCH-01
+  ADR-0059 -.->|decides| DOM-08
+  ADR-0059 -.->|decides| DOM-09
+  ADR-0059 -.->|decides| DOM-20
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
