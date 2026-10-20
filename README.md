@@ -53,6 +53,7 @@ graph LR
   end
   subgraph architecture["アーキテクチャ"]
     ARCH-01["ARCH-01<br/>ゲームの全体構成"]
+    ARCH-02["ARCH-02<br/>主題と仕組みの対応"]
   end
   subgraph domain["ドメイン"]
     DOM-01["DOM-01<br/>世界観"]
@@ -160,6 +161,7 @@ graph LR
     ADR-0067["ADR-0067<br/>1つの周は、世界の中では数日から数週とする"]
     ADR-0068["ADR-0068<br/>人物のイベントは、まだ戻っていない断片の中身を先に明かさない"]
     ADR-0069["ADR-0069<br/>遊ぶ人の側の仕組みを挙げ、街の歴史の穴を埋める"]
+    ADR-0070["ADR-0070<br/>本作の主題を「使い捨て」とし、警告として描く"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -323,6 +325,7 @@ graph LR
   ADR-0068 -.->|decides| DOM-14
   ADR-0069 -.->|decides| DOM-09
   ADR-0069 -.->|decides| DOM-17
+  ADR-0070 -.->|decides| ARCH-02
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02

@@ -86,6 +86,7 @@ tags: [index]
 - [ADR-0067 1つの周は、世界の中では数日から数週とする](./adr-0067-length-of-a-life.md)
 - [ADR-0068 人物のイベントは、まだ戻っていない断片の中身を先に明かさない](./adr-0068-reveal-order-of-character-events.md)
 - [ADR-0069 遊ぶ人の側の仕組みを挙げ、街の歴史の穴を埋める](./adr-0069-meta-mechanics-and-city-history-gaps.md)
+- [ADR-0070 本作の主題を「使い捨て」とし、警告として描く](./adr-0070-theme-disposable.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
