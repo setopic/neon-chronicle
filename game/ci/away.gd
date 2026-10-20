@@ -1,6 +1,6 @@
 extends SceneTree
 
-## 閉じていた時間の分だけ進むかを確かめる。ADR-0007、ADR-0051、ADR-0071。
+## 閉じていた時間の分だけ進むかを確かめる。ADR-0007、ADR-0051、ADR-0071、ADR-0074。
 ## セーブの時刻を過去にずらしてロードし、1フレーム分だけ進めて結果を見る。
 ## セーブは別のファイルに書くので、手元のセーブは消えない。
 ##
@@ -34,6 +34,17 @@ func _process(_delta: float) -> bool:
 	var away: Dictionary = _first_log("log.away_gain")
 	_expect(not away.is_empty(), "閉じていた間の成果がログに残る")
 	_expect(absf(away.get("args", {}).get("earned", 0.0) - _game.life_earned) < 0.01, "ログの稼ぎが、閉じていた間に稼いだクレジットと同じ")
+	_expect(_first_log("log.rumor").is_empty(), "閉じていた間は、街の噂を出さない")
+
+	# 開いている間は、同じ仕事を続けるごとに、その場所の噂が出る。評判の条件の付いた噂が先に出る（DOM-33）
+	_game.reset_game()
+	_game.reputation = {"zander": 3}
+	_game.set_job("courier")
+	_play(_game.RUMOR_INTERVAL)
+	var rumor: Dictionary = _first_log("log.rumor")
+	_expect(rumor.get("args", {}).get("rumor") == "zander_trusted", "評判の条件の付いた噂が先に出る（%s）" % rumor)
+	_play(_game.RUMOR_INTERVAL)
+	_expect(_game.life_rumors == ["zander_trusted", "stalls_food"], "次は、まだ聞いていない噂が出る（%s）" % [_game.life_rumors])
 
 	_reopen_after(30.0 * 24.0 * 3600.0)
 	_expect(not _game.alive, "長く閉じていたら、周が終わる")
@@ -58,6 +69,15 @@ func _reopen_after(seconds: float, changes := {}) -> void:
 	FileAccess.open(SAVE_PATH, FileAccess.WRITE).store_string(JSON.stringify(data))
 	_game.load_game()
 	_game._process(0.016)
+
+
+## 開いている間と同じ刻みで、seconds 秒だけ進める。体が壊れないよう、耐久を保つ
+func _play(seconds: float) -> void:
+	var t := 0.0
+	while t < seconds:
+		_game.durability = _game.MAX_DURABILITY
+		_game._tick(_game.STEP)
+		t += _game.STEP
 
 
 func _first_log(key: String) -> Dictionary:

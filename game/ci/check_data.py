@@ -23,6 +23,8 @@ CIの app-check.yml から呼ぶ。Godotを使わずに分かる抜けだけを�
     追記は要る断片と出るイベントのどちらか一方を持ち、文のキー（profile.<id>.<追記>）がある（DOM-14）
 15. スキルの条件のある選択肢に、声の文のキー（event.<id>.<選択肢>.voice）がある。
     各スキルに、条件を満たしていないときの声の文のキー（skill.<id>.voice）がある（DOM-32）
+16. 街の噂は、仕事の区画と勢力と資料の追記のうち、data にあるものを指す。
+    各噂に、文のキー（rumor.<id>.text）がある（DOM-33）
 
 ゲームは足りないキーを英語で補うので（loc.gd）、抜けは画面にキーのまま出るまで気づけない。
 """
@@ -87,6 +89,9 @@ def main():
     skills = {e.get("id") for data in datas.values() for e in data.get("skills", [])}
     fragments = {e.get("id") for data in datas.values() for e in data.get("fragments", [])}
     events = {e.get("id"): e for data in datas.values() for e in data.get("events", [])}
+    districts = {e.get("district") for data in datas.values() for e in data.get("jobs", [])}
+    factions = {e.get("id") for data in datas.values() for e in data.get("factions", [])}
+    notes = {f"{p.get('id')}.{n.get('id')}" for data in datas.values() for p in data.get("profiles", []) for n in p.get("notes", [])}
     if not any(data.get("bodies") for data in datas.values()):
         errors.append("data に体の種類（bodies）が1つも無い")
 
@@ -196,6 +201,24 @@ def main():
                 key = f"profile.{profile.get('id')}.{note.get('id')}"
                 if key not in base:
                     errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+
+        for rumor in data.get("rumors", []):
+            where = f"{path.relative_to(GAME)}: rumor.{rumor.get('id')}"
+            if not rumor.get("districts"):
+                errors.append(f"{where}: 仕事の区画を持たない")
+            for district in rumor.get("districts", []):
+                if district not in districts:
+                    errors.append(f"{where}: 無い仕事の区画を指している: {district}")
+            for faction, value in rumor.get("reputation", {}).items():
+                if faction not in factions:
+                    errors.append(f"{where}: 無い勢力を指している: {faction}")
+                if value == 0:
+                    errors.append(f"{where}: 評判の条件が0になっている: {faction}")
+            if "note" in rumor and rumor["note"] not in notes:
+                errors.append(f"{where}: 無い追記を指している: {rumor['note']}")
+            key = f"rumor.{rumor.get('id')}.text"
+            if key not in base:
+                errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
 
         for ending in data.get("endings", []):
             key = f"ending.{ending.get('id')}.chronicle"

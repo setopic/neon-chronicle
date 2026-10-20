@@ -1,0 +1,27 @@
+{
+  "rumors": [
+    { "id": "zander_trusted", "districts": ["stalls", "black_market"], "reputation": { "zander": 3 } },
+    { "id": "zander_marked", "districts": ["stalls", "black_market"], "reputation": { "zander": -3 } },
+    { "id": "union_trusted", "districts": ["stalls"], "reputation": { "union": 3 } },
+    { "id": "union_marked", "districts": ["stalls"], "reputation": { "union": -3 } },
+    { "id": "yomi_trusted", "districts": ["waldeck", "yomi"], "reputation": { "yomi": 3 } },
+    { "id": "yomi_marked", "districts": ["waldeck", "yomi"], "reputation": { "yomi": -3 } },
+    { "id": "valdeck_trusted", "districts": ["black_market", "waldeck"], "reputation": { "valdeck": 3 } },
+    { "id": "valdeck_marked", "districts": ["black_market", "waldeck"], "reputation": { "valdeck": -3 } },
+    { "id": "feud_ledger", "districts": ["stalls"], "note": "union.feud" },
+    { "id": "conduit_guard", "districts": ["waldeck", "yomi"], "note": "engineers.substation" },
+    { "id": "stalls_food", "districts": ["stalls"] },
+    { "id": "stalls_rain", "districts": ["stalls"] },
+    { "id": "stalls_wire", "districts": ["stalls"] },
+    { "id": "stalls_patrol", "districts": ["stalls"] },
+    { "id": "stalls_clothes", "districts": ["stalls"] },
+    { "id": "market_parts", "districts": ["black_market"] },
+    { "id": "market_buyer", "districts": ["black_market"] },
+    { "id": "market_fee", "districts": ["black_market"] },
+    { "id": "market_data", "districts": ["black_market"] },
+    { "id": "corp_rivals", "districts": ["waldeck", "yomi"] },
+    { "id": "corp_food", "districts": ["waldeck", "yomi"] },
+    { "id": "corp_power", "districts": ["waldeck", "yomi"] },
+    { "id": "corp_hire", "districts": ["waldeck", "yomi"] }
+  ]
+}

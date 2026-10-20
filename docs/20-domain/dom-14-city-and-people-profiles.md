@@ -126,5 +126,6 @@ implemented_by:
 - (decides) [ADR-0064 置いたまま回収していない伏線の扱いを決める](../50-adr/adr-0064-resolve-loose-threads.md)
 - (decides) [ADR-0068 人物のイベントは、まだ戻っていない断片の中身を先に明かさない](../50-adr/adr-0068-reveal-order-of-character-events.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
+- (depends_on) [DOM-33 街の噂](./dom-33-city-rumors.md)
 
 <!-- graph:auto:end -->

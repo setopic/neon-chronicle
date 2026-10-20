@@ -89,5 +89,6 @@ implemented_by:
 - (decides) [ADR-0063 周をまたいで主人公を見分ける決まりを1つにする](../50-adr/adr-0063-recognizing-across-lives.md)
 - (depends_on) [DOM-23 屋台通りの対立](./dom-23-stall-street-feud.md)
 - (depends_on) [DOM-29 目覚めの日](./dom-29-day-of-waking.md)
+- (depends_on) [DOM-33 街の噂](./dom-33-city-rumors.md)
 
 <!-- graph:auto:end -->

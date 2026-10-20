@@ -48,6 +48,7 @@ tags: [index]
 - [DOM-30 分岐図](./dom-30-branch-chart.md)
 - [DOM-31 話の選び直し](./dom-31-choosing-again.md)
 - [DOM-32 スキルの声](./dom-32-skill-voices.md)
+- [DOM-33 街の噂](./dom-33-city-rumors.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
@@ -394,5 +395,13 @@ python -m tools.graph new --type domain --id DOM-02 --title "..." --slug some-sl
 | スキルの声 | スキルが主人公の頭の中で話す1行の文。スキルの選ぶ条件を持つ選択肢のあるイベントでだけ話す | |
 | 勧める声 | 選ぶ条件を満たしている選択肢について、スキルの声がその選択肢を勧める文 | |
 | からかう声 | 選ぶ条件を満たしていない選択肢について、スキルの声がいまの腕では足りないと言う文 | |
+
+### [DOM-33 街の噂](./dom-33-city-rumors.md)
+
+| 用語 | 意味 | 旧称 |
+| --- | --- | --- |
+| 噂 | 仕事の区画の住人が話している街の様子を、ログに1行で出す文。ゲームの状態を変えない | |
+| 噂の出る評判 | 噂が出るのに要る勢力の評判。正の値は「以上」、負の値は「以下」で比べる。選択肢の[評判の条件](./dom-22-faction-reputation.md)とは別の値 | |
+| 噂の出る追記 | 噂が出るのに要る、資料の[追記](./dom-14-city-and-people-profiles.md) | |
 
 <!-- graph:terms:end -->
