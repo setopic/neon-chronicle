@@ -88,6 +88,7 @@ graph LR
     DOM-30["DOM-30<br/>分岐図"]
     DOM-31["DOM-31<br/>話の選び直し"]
     DOM-32["DOM-32<br/>スキルの声"]
+    DOM-33["DOM-33<br/>街の噂"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -166,6 +167,7 @@ graph LR
     ADR-0071["ADR-0071<br/>記憶ポイントの見込みと伸びを見せ、閉じていた間の成果をログに出す"]
     ADR-0072["ADR-0072<br/>スキルに節目を置き、下の仕事に戻る理由にする"]
     ADR-0073["ADR-0073<br/>スキルを、主人公の頭の中の声としてイベントで話させる"]
+    ADR-0074["ADR-0074<br/>放っておく間のログに、仕事の区画の噂を流す"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -333,6 +335,7 @@ graph LR
   ADR-0071 -.->|decides| DOM-05
   ADR-0072 -.->|decides| DOM-03
   ADR-0073 -.->|decides| DOM-32
+  ADR-0074 -.->|decides| DOM-33
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -437,6 +440,9 @@ graph LR
   DOM-30 -->|depends_on| DOM-29
   DOM-31 -->|depends_on| DOM-30
   DOM-32 -->|depends_on| DOM-27
+  DOM-33 -->|depends_on| DOM-14
+  DOM-33 -->|depends_on| DOM-22
+  DOM-33 -->|depends_on| DOM-24
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04

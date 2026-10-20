@@ -1,6 +1,6 @@
 extends Node
 
-## data/*.json から仕事・スキル・インプラント・永続強化・イベント・記憶の断片・エンディング・体の種類・ジンの依頼・街と人物の資料・縛り・評判を持つ勢力を読み込む。DOM-03〜DOM-06、DOM-08、DOM-11、DOM-12、DOM-14、DOM-21、DOM-22。
+## data/*.json から仕事・スキル・インプラント・永続強化・イベント・記憶の断片・エンディング・体の種類・ジンの依頼・街と人物の資料・縛り・評判を持つ勢力・街の噂を読み込む。DOM-03〜DOM-06、DOM-08、DOM-11、DOM-12、DOM-14、DOM-21、DOM-22、DOM-33。
 ## 各ファイルは {"jobs": [...], "skills": [...], ...} の形。同じ id の項目は後から読んだもの（MOD）で上書きする。
 ## 表示名と説明は言語ファイルのキー "<種類>.<id>.name" / "<種類>.<id>.desc" から引く。
 
@@ -8,7 +8,7 @@ const KEY_PREFIX := {
 	"jobs": "job", "skills": "skill", "implants": "implant", "upgrades": "upgrade", "events": "event",
 	"fragments": "fragment", "endings": "ending", "bodies": "body", "requests": "request",
 	"profiles": "profile", "challenges": "challenge",
-	"factions": "faction",
+	"factions": "faction", "rumors": "rumor",
 }
 
 var jobs := {}
@@ -23,8 +23,9 @@ var requests := {}
 var profiles := {}
 var challenges := {}
 var factions := {}
+var rumors := {}
 ## 種類ごとの表示順（最初に読んだ順）
-var order := {"jobs": [], "skills": [], "implants": [], "upgrades": [], "events": [], "fragments": [], "endings": [], "bodies": [], "requests": [], "profiles": [], "challenges": [], "factions": []}
+var order := {"jobs": [], "skills": [], "implants": [], "upgrades": [], "events": [], "fragments": [], "endings": [], "bodies": [], "requests": [], "profiles": [], "challenges": [], "factions": [], "rumors": []}
 
 
 func _ready() -> void:

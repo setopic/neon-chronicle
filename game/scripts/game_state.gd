@@ -34,6 +34,7 @@ const QUALITY_DECAY := 0.15  # 体の質1段階ごとに、基本の劣化を下
 const IDENTITY_COST := 300.0  # 闇市場で偽の身元を買う値段。DOM-24
 const REPUTATION_LIMIT := 10  # 評判の上限。下限はこれを負にした値。DOM-22
 const QUALITY_CREDITS := 1000.0  # 体の質の式で、前の周で稼いだクレジットを割る値
+const RUMOR_INTERVAL := 120.0  # 同じ仕事をこの秒数だけ続けるごとに、街の噂を1つログに出す。DOM-33
 ## ログやクロニクルの引数のうち、id から表示名に変える項目
 const NAME_ARGS := {
 	"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades", "event": "events",
@@ -58,6 +59,8 @@ var life_xp := 0.0  # その周で得た経験の合計。記憶ポイントの�
 var pending_event := ""  # 待っているイベントのid。無いときは空
 var last_deed := ""  # 最後に選んだ選択肢（"<イベント>.<選択肢>"）。周を終わらせた選択は入れない
 var request_offers: Array = []  # その周に並べたジンの依頼のid。0〜2個。DOM-12
+var life_rumors: Array = []  # その周に聞いた街の噂のid。DOM-33
+var rumor_time := 0.0  # いまの仕事に就いてから、または前の噂から、仕事を続けた秒数
 var request := ""  # その周に受けた依頼のid。まだ受けていないときは空
 var request_done := false
 var challenge := ""  # その周の縛りのid。選ばなかった周は空。DOM-21
@@ -89,6 +92,7 @@ var logs: Array = []  # [{key, args}]。言語を切り替えても訳し直せ�
 var _pending := 0.0
 var _save_timer := 0.0
 var _last_seen := 0.0  # 最後に時間を進めた時刻（Unix時間）。ロードしたときはセーブした時刻
+var _away := false  # 閉じていた時間を進めている間は真。噂を出さない（ADR-0074）
 
 
 func _ready() -> void:
@@ -107,9 +111,11 @@ func _process(delta: float) -> void:
 		away = _advance_away(minf(gap, MAX_AWAY))
 	else:
 		_pending = minf(_pending + delta, MAX_CATCHUP)
+	_away = gap > AWAY_GAP
 	while _pending >= STEP:
 		_pending -= STEP
 		_tick(STEP)
+	_away = false
 	if not away.is_empty():
 		_fill_away_log(away)
 	_save_timer += delta
@@ -166,6 +172,11 @@ func _tick(dt: float) -> void:
 			job_progress -= length
 			_finish_job_round(job, length)
 		danger = job.get("danger", 1.0)
+		rumor_time += dt
+		if rumor_time >= RUMOR_INTERVAL:
+			rumor_time -= RUMOR_INTERVAL
+			if not _away:
+				_tell_rumor()
 		tension = maxf(0.0, tension - TENSION_FADE * dt)
 		if pending_event == "" and randf() < danger * dt / EVENT_INTERVAL * event_rate():
 			_start_event()
@@ -310,6 +321,7 @@ func set_job(job_id: String) -> void:
 		break_challenge("job")
 	current_job = job_id
 	job_progress = 0.0  # 途中の1回の分は入らない（ADR-0051）
+	rumor_time = 0.0
 	_log("log.job", {"job": job_id})
 
 
@@ -754,6 +766,8 @@ func _start_life(body_id := "", challenge_id := "") -> void:
 	request_done = false
 	met_characters = []
 	life_choices = {}
+	life_rumors = []
+	rumor_time = 0.0
 	tension = 0.0
 	challenge = challenge_id if GameData.challenges.has(challenge_id) and life_number > 1 else ""
 	challenge_broken = false
@@ -939,6 +953,53 @@ func revealed(entry: Dictionary) -> bool:
 	return not entry.has("event") or character_choices.has(entry["event"])
 
 
+# --- 街の噂 ---
+
+## 就いている仕事の区画で、いま出せる噂のid。データに並んだ順。DOM-33
+func rumors_here() -> Array:
+	var district: String = GameData.jobs.get(current_job, {}).get("district", "")
+	return GameData.order["rumors"].filter(func(id): return _rumor_open(GameData.rumors[id], district))
+
+
+func _rumor_open(rumor: Dictionary, district: String) -> bool:
+	if not rumor.get("districts", []).has(district):
+		return false
+	var needs: Dictionary = rumor.get("reputation", {})
+	for faction in needs:
+		var value := int(reputation.get(faction, 0))
+		# 正の値は「その値以上」、負の値は「その値以下」の評判で出る
+		if (needs[faction] > 0 and value < needs[faction]) or (needs[faction] < 0 and value > needs[faction]):
+			return false
+	if rumor.has("note"):
+		var parts: PackedStringArray = rumor["note"].split(".")
+		var profile: Dictionary = GameData.profiles.get(parts[0], {})
+		if profile.is_empty() or not revealed(profile):
+			return false
+		for note in profile.get("notes", []):
+			if note["id"] == parts[1]:
+				return revealed(note)
+		return false
+	return true
+
+
+## その周にまだ聞いていない噂から、条件の付いた噂を先に出す。すべて聞いていれば、その区画の噂を聞き直す
+func _tell_rumor() -> void:
+	var here := rumors_here()
+	if here.is_empty():
+		return
+	var fresh := here.filter(func(id): return not life_rumors.has(id))
+	if fresh.is_empty():
+		life_rumors = life_rumors.filter(func(id): return not here.has(id))
+		fresh = here
+	var pick: String = fresh[0]
+	for id in fresh:
+		if GameData.rumors[id].has("reputation") or GameData.rumors[id].has("note"):
+			pick = id
+			break
+	life_rumors.append(pick)
+	_log("log.rumor", {"rumor": pick})
+
+
 # --- ログ ---
 
 func _log(key: String, args := {}) -> void:
@@ -956,6 +1017,8 @@ func format_entry(entry: Dictionary) -> String:
 			args[k] = GameData.name_of(NAME_ARGS[k], args[k]) if args[k] != "" else tr("ui.no_job")
 		elif k == "age":
 			args[k] = format_time(args[k])
+		elif k == "rumor":
+			args[k] = tr("rumor.%s.text" % args[k])
 		elif args[k] is float:
 			args[k] = format_number(args[k])
 	return tr(entry["key"]).format(args)
@@ -985,7 +1048,7 @@ func save_game() -> void:
 		"credits": credits, "life_earned": life_earned, "durability": durability, "age": age,
 		"current_job": current_job, "skill_xp": skill_xp, "skill_level": skill_level,
 		"implants": implants, "job_time": job_time, "job_progress": job_progress, "alive": alive, "body": body, "body_quality": body_quality, "life_xp": life_xp, "pending_event": pending_event,
-		"last_deed": last_deed, "request_offers": request_offers, "request": request, "request_done": request_done,
+		"last_deed": last_deed, "request_offers": request_offers, "life_rumors": life_rumors, "request": request, "request_done": request_done,
 		"challenge": challenge, "challenge_broken": challenge_broken, "identity": identity, "tension": tension, "last_challenge_bonus": last_challenge_bonus, "met_characters": met_characters, "life_number": life_number, "memory_points": memory_points,
 		"last_points_gained": last_points_gained, "last_request_bonus": last_request_bonus, "upgrades": upgrades, "reputation": reputation, "life_choices": life_choices, "last_life_choices": last_life_choices,
 		"chronicle": chronicle, "fragments": fragments, "last_fragments": last_fragments,
@@ -1051,6 +1114,8 @@ func load_game() -> bool:
 	# #91 より前のセーブには、周ごとの選択が無い。前の周の跡のイベントは、次の周から起きうる
 	life_choices = data.get("life_choices", {})
 	last_life_choices = data.get("last_life_choices", {})
+	# #144 より前のセーブの周は、まだ噂を聞いていない
+	life_rumors = data.get("life_rumors", [])
 	chronicle = data.get("chronicle", [])
 	for entry in chronicle:
 		if not entry.has("body"):

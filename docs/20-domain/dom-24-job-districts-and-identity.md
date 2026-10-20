@@ -77,5 +77,6 @@ implemented_by:
 - (decides) [ADR-0039 仕事に区画を持たせ、傭兵の仕事には偽の身元を要る](../50-adr/adr-0039-job-districts-and-identity.md)
 - (decides) [ADR-0060 主人公は体ごとに口座だけの身元を持つことにする](../50-adr/adr-0060-account-only-identity.md)
 - (decides) [ADR-0066 仕事の区画は仕事を請け負う場所とし、イベントの舞台とは分ける](../50-adr/adr-0066-job-district-is-where-hired.md)
+- (depends_on) [DOM-33 街の噂](./dom-33-city-rumors.md)
 
 <!-- graph:auto:end -->
