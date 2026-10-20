@@ -17,6 +17,7 @@ tags: [index]
 
 <!-- graph:children:start -->
 - [ARCH-01 ゲームの全体構成](./arch-01-game-overview.md)
+- [ARCH-02 主題と仕組みの対応](./arch-02-theme-and-mechanics.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
