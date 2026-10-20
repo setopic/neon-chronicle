@@ -74,6 +74,7 @@ tags: [index]
 - [ADR-0055 ハッカーの仕事のミニゲームを、符号の表を縦横にたどる遊びにする](./adr-0055-hacking-minigame.md)
 - [ADR-0056 運び屋の仕事のミニゲームを、追っ手をかわして升目を進む遊びにする](./adr-0056-courier-minigame.md)
 - [ADR-0057 傭兵の仕事のミニゲームを、窓に出る敵を撃つ遊びにする](./adr-0057-mercenary-minigame.md)
+- [ADR-0058 メインの画面の欄を、2つずつ組にして入れ替えられるようにする](./adr-0058-panel-layout-swaps.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

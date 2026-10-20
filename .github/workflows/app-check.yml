@@ -78,3 +78,7 @@ jobs:
       - name: 分岐図を組み立てられるか確かめる
         working-directory: game
         run: timeout 120 ~/godot/godot --headless --path . --script res://ci/chart.gd
+
+      - name: 欄をどう並べ替えても、1280x720に収まるか確かめる
+        working-directory: game
+        run: timeout 120 ~/godot/godot --headless --path . --script res://ci/layout.gd

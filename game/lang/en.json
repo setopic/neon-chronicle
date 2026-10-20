@@ -61,6 +61,11 @@
     "ui.chronicle": "Chronicle",
     "ui.awaken": "Wake up in the {body}",
     "ui.licenses": "Licenses",
+    "ui.layout": "Layout",
+    "ui.layout_swap": "Swap {a} and {b}",
+    "ui.layout_rows": "Swap the Jobs/Body row and the On the job/Log row",
+    "ui.layout_columns": "Swap the Implants column and the other panels",
+    "ui.layout_default": "Restore the default layout",
     "ui.close": "Close",
     "ui.no_job": "drifter",
 

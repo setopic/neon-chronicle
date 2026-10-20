@@ -148,6 +148,7 @@ graph LR
     ADR-0055["ADR-0055<br/>ハッカーの仕事のミニゲームを、符号の表を縦横にたどる遊びにする"]
     ADR-0056["ADR-0056<br/>運び屋の仕事のミニゲームを、追っ手をかわして升目を進む遊びにする"]
     ADR-0057["ADR-0057<br/>傭兵の仕事のミニゲームを、窓に出る敵を撃つ遊びにする"]
+    ADR-0058["ADR-0058<br/>メインの画面の欄を、2つずつ組にして入れ替えられるようにする"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -261,6 +262,7 @@ graph LR
   ADR-0055 -.->|decides| DOM-03
   ADR-0056 -.->|decides| DOM-03
   ADR-0057 -.->|decides| DOM-03
+  ADR-0058 -.->|decides| ARCH-01
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02

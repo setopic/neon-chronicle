@@ -2,6 +2,7 @@ extends Control
 
 ## メイン画面。UI はコードで組み立て、言語の切り替えや転生のたびに作り直す。
 ## 上：3Dの街と状態、左：仕事とスキル、右：体とインプラント、下：ログ。
+## 上の帯より下の欄は、2つずつ組にして入れ替えられる（ADR-0058）。
 
 const City := preload("res://scripts/city.gd")
 
@@ -16,6 +17,8 @@ const FX_KEYS := {"income": "ui.fx_income", "xp": "ui.fx_xp", "decay": "ui.fx_de
 # 使った素材の一覧とライセンスの全文。書き出しに含めるよう export_presets.cfg の include_filter に挙げてある。ADR-0002。
 const CREDITS_PATH := "res://credits.txt"
 const FONT_LICENSE_PATH := "res://fonts/OFL-NotoSansJP.txt"
+# 欄の並びで入れ替えられる組。設定の panel_layout に、入れ替えた組を true で残す。並びが画面に出る順になる（ADR-0058）
+const LAYOUT_SWAPS := ["jobs_body", "scene_log", "rows", "columns"]
 
 var _content: Control
 var _refresh_timer := 0.0
@@ -121,15 +124,19 @@ func _build() -> void:
 	middle_scroll.add_child(middle)
 	middle.add_child(_build_left())
 	middle.add_child(_build_right())
+	_swap_if_chosen(middle, "jobs_body")
 	# 仕事の様子は、ログの左に置く。体の状態の欄は周の始まりに行が増えるので、そこには置かない（ADR-0053）
 	var bottom := HBoxContainer.new()
 	bottom.add_theme_constant_override("separation", 10)
 	main_column.add_child(bottom)
 	bottom.add_child(_build_job_scene())
 	bottom.add_child(_build_log())
+	_swap_if_chosen(bottom, "scene_log")
+	_swap_if_chosen(main_column, "rows")
 	var implants_scroll := _scroll(lower)
 	implants_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	implants_scroll.add_child(_build_implants())
+	_swap_if_chosen(lower, "columns")
 
 	if not Game.alive:
 		var last: Dictionary = Game.chronicle.back() if not Game.chronicle.is_empty() else {}
@@ -144,6 +151,53 @@ func _build() -> void:
 		_content.add_child(_build_minigame())
 	_refresh()
 	_refresh_log()
+
+
+## 利用者が入れ替えた組なら、箱の中の2つの欄の順を逆にする。
+## 欄の大きさは変えずに順だけを変えるので、どの並びでも既定の並びと同じく1280x720に収まる（ADR-0058）
+func _swap_if_chosen(box: Container, key: String) -> void:
+	if _layout_swapped(key):
+		box.move_child(box.get_child(1), 0)
+
+
+func _layout_swapped(key: String) -> bool:
+	var layout: Variant = Loc.setting("panel_layout", {})
+	return layout is Dictionary and layout.get(key, false) == true
+
+
+func _set_layout_swapped(key: String, on: bool) -> void:
+	var layout: Variant = Loc.setting("panel_layout", {})
+	var next: Dictionary = layout.duplicate() if layout is Dictionary else {}
+	next[key] = on
+	Loc.set_setting("panel_layout", next)
+	_build()
+
+
+## 欄の並びを入れ替える画面。並びは設定に残すので、最初からやり直しても変わらない（ADR-0058）
+func _show_layout() -> void:
+	var box := VBoxContainer.new()
+	var toggles: Array[Button] = []
+	for key in LAYOUT_SWAPS:
+		var toggle := _toggle(_layout_text(key), _layout_swapped(key), func(on): _set_layout_swapped(key, on))
+		box.add_child(toggle)
+		toggles.append(toggle)
+	box.add_child(_button(tr("ui.layout_default"), func():
+		Loc.set_setting("panel_layout", {})
+		for toggle in toggles:
+			toggle.set_pressed_no_signal(false)
+		_build()))
+	_show_dialog(tr("ui.layout"), box)
+
+
+func _layout_text(key: String) -> String:
+	match key:
+		"jobs_body":
+			return Loc.t("ui.layout_swap", {"a": tr("ui.jobs"), "b": tr("ui.body")})
+		"scene_log":
+			return Loc.t("ui.layout_swap", {"a": tr("ui.job_scene"), "b": tr("ui.log")})
+		"rows":
+			return tr("ui.layout_rows")
+	return tr("ui.layout_columns")
 
 
 func _scroll(parent: Control) -> ScrollContainer:
@@ -233,6 +287,7 @@ func _build_header() -> Control:
 	menu.add_child(_button(tr("ui.fragments"), _show_fragments))
 	menu.add_child(_button(tr("ui.profiles"), _show_profiles))
 	menu.add_child(_button(tr("ui.licenses"), _show_licenses))
+	menu.add_child(_button(tr("ui.layout"), _show_layout))
 	# 押すとやり直しになるので、ほかのボタンから離して右端に置く
 	var reset := _button(tr("ui.reset"), _confirm_reset)
 	reset.add_theme_color_override("font_color", DANGER)
@@ -970,7 +1025,7 @@ func _show_profiles(tab := 0) -> void:
 		lines.append(GameData.name_of("profiles", id))
 		lines.append("\n".join(paragraphs))
 		lines.append("")
-	# 地図は資料と同じ画面に、タブで分けて置く。上のボタンをこれ以上増やすと、英語では1280の幅に収まらない（ADR-0022）
+	# 地図は資料と同じ画面に、タブで分けて置く（ADR-0022）
 	var tabs := TabContainer.new()
 	tabs.add_child(_text_body("\n".join(lines), CityMap.SIZE, UiStyle.SIZE_BODY))
 	tabs.add_child(CityMap.new())
