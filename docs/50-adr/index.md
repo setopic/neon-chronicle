@@ -83,6 +83,7 @@ tags: [index]
 - [ADR-0064 置いたまま回収していない伏線の扱いを決める](./adr-0064-resolve-loose-threads.md)
 - [ADR-0065 用語と名前の揺れを直す](./adr-0065-terms-and-names.md)
 - [ADR-0066 仕事の区画は仕事を請け負う場所とし、イベントの舞台とは分ける](./adr-0066-job-district-is-where-hired.md)
+- [ADR-0067 1つの周は、世界の中では数日から数週とする](./adr-0067-length-of-a-life.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

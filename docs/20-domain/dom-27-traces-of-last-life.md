@@ -4,7 +4,7 @@ type: domain
 title: 前の周の跡
 status: stable
 tags: [loop, story]
-depends_on: [DOM-07]
+depends_on: [DOM-07, DOM-09]
 related: []
 implemented_by:
   - game/scripts/game_state.gd
@@ -36,7 +36,7 @@ implemented_by:
 | 暗い屋台通り | ハッカー・運び屋 | 盗電の線で、線の場所を売った | 屋台通りの明かりがまだ戻っていない |
 | 保護料泥棒の噂 | 運び屋 | 保護料の運びで、袋を持って逃げた | ザンダー・ファミリーが、袋を持ち逃げした運び屋を探している |
 
-跡が効くのは、1つ前の周だけである。2つ前より古い周の選択は、跡のイベントの条件にならない。記録の物語文（[DOM-07](./dom-07-chronicle-story.md)）は、跡のイベントで選んだ選択肢も、ほかの選択肢と同じく句にする。
+跡が効くのは、1つ前の周だけである。2つ前より古い周の選択は、跡のイベントの条件にならない。[裏通りの診療所](./dom-09-consciousness-copy.md)からは毎周新しい運び屋が来るので、街の人々が比べるのは、すぐ前にいた運び屋だけである。2人前の運び屋までは、主人公と結びつけない（[ADR-0067](../50-adr/adr-0067-length-of-a-life.md)）。記録の物語文（[DOM-07](./dom-07-chronicle-story.md)）は、跡のイベントで選んだ選択肢も、ほかの選択肢と同じく句にする。
 
 ## 不変条件
 
@@ -68,10 +68,12 @@ implemented_by:
 `depends_on`: この文書が成立するために前提となるノード
 
 - [DOM-07 クロニクルの物語](./dom-07-chronicle-story.md)
+- [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
 
 このノードを参照しているノード
 
 - (decides) [ADR-0044 1つ前の周の選択を、次の周の跡のイベントに出す](../50-adr/adr-0044-traces-of-last-life.md)
 - (decides) [ADR-0063 周をまたいで主人公を見分ける決まりを1つにする](../50-adr/adr-0063-recognizing-across-lives.md)
+- (decides) [ADR-0067 1つの周は、世界の中では数日から数週とする](../50-adr/adr-0067-length-of-a-life.md)
 
 <!-- graph:auto:end -->
