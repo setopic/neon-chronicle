@@ -56,6 +56,7 @@ var _room_button: Button
 var _chapter_label: Label
 var _goals_label: Label
 var _pay_buttons := []  # [{button, goal}]。クレジットを払って満たす目標
+var _ally_buttons := {}  # {仲間のid: Button}。押すたびに、任せる仕事を替える
 
 
 func _ready() -> void:
@@ -99,6 +100,7 @@ func _build() -> void:
 	_choice_buttons.clear()
 	_voice_labels.clear()
 	_pay_buttons.clear()
+	_ally_buttons.clear()
 	_minigame_button = null
 	_rest_button = null
 
@@ -429,6 +431,16 @@ func _build_part_two(box: VBoxContainer) -> void:
 	_room_button.tooltip_text = Loc.t("ui.room_note", {"rent": Game.format_number(Game.ROOM_RENT)})
 	_treat_button = _compact_button("", Game.treat)
 	box.add_child(_treat_button)
+	# 仲間は1行に並べる。迎えた仲間だけを出す
+	if not Game.allies.is_empty():
+		var allies := HBoxContainer.new()
+		box.add_child(allies)
+		for id in GameData.order["allies"]:
+			if Game.allies.has(id):
+				var button := _compact_button("", Game.next_ally_job.bind(id))
+				button.autowrap_mode = TextServer.AUTOWRAP_OFF
+				allies.add_child(button)
+				_ally_buttons[id] = button
 	_chapter_label = _label("", PINK, UiStyle.SIZE_TEXT)
 	_chapter_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_chapter_label.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -951,6 +963,11 @@ func _refresh_part_two() -> void:
 	_treat_button.disabled = not Game.can_treat()
 	_room_button.text = tr("ui.room_owned") if Game.has_room else Loc.t("ui.room_rent", {"cost": Game.format_number(Game.ROOM_COST)})
 	_room_button.disabled = not Game.can_rent_room()
+	for ally in _ally_buttons:
+		var job: String = Game.allies.get(ally, "")
+		var args := {"ally": GameData.name_of("allies", ally), "job": GameData.name_of("jobs", job) if job != "" else tr("ui.no_job"), "n": Game.format_number(Game.ally_income(ally))}
+		_ally_buttons[ally].text = Loc.t("ui.ally", args)
+		_ally_buttons[ally].tooltip_text = "%s\n%s" %[GameData.desc_of("allies", ally), Loc.t("ui.ally_note", args)]
 	var id := Game.chapter_id()
 	if id == "":
 		_chapter_label.text = tr("ui.chapter_next")

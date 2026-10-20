@@ -3,15 +3,19 @@ extends "res://ci/playthrough.gd"
 ## エンディング「本当の体」まで ci/playthrough.gd と同じ手順で遊び、そのまま第二部の章を終えるまで自動で遊ぶ。DOM-34。
 ## 第二部では、体調が残りわずかになったら休み、戻りきったら仕事に戻る。仕事は、章の目標のスキルのうち
 ## いちばん低いものを上げる仕事を選ぶ。住まいを借りられるようになったら借り、そのあとは怪我を治せるだけ治す。
-## 怪我を治しきったら、クレジットを払って満たす目標を払う。
+## 怪我を治しきったら、クレジットを払って満たす目標を払う。仲間には、迎えたときの得意な仕事を任せたままにする。
 ## 終えたあと、セーブとロード、第一部への行き来で、第二部の状態が残るかも確かめる。
 ## 章ごとにかかった時間（進めた秒数）を出し、範囲に入らなければ終了コード1で終わる。
-## 人が遊んで第1章に約50分という目安を、第一部の検査と同じ比（ゲーム内の36分で人の約1時間）で換算して確かめる（ADR-0075）。
+## 人が遊んで第1章に約50分、第2章に約90分という目安を、第一部の検査と同じ比（ゲーム内の36分で人の約1時間）で
+## 換算して確かめる（ADR-0075、ADR-0076）。
 ##
 ##   godot --headless --path . --script res://ci/part_two.gd
 
-const CHAPTER_MIN := 20.0 * 60.0  # 第1章がこれより早く終わったら失敗とする（秒）
-const CHAPTER_MAX := 40.0 * 60.0  # 第1章がこれより長くかかったら失敗とする（秒）
+## 章ごとの、かかった時間の範囲（秒）。これより早く終わるか、長くかかったら失敗とする
+const CHAPTER_RANGES := {
+	"heavy_body": [20.0 * 60.0, 40.0 * 60.0],
+	"name": [40.0 * 60.0, 70.0 * 60.0],
+}
 const PART_TWO_LIMIT := 6.0 * 3600.0
 const REST_BELOW := 15.0  # 体調がこれより下がったら休む
 
@@ -35,12 +39,21 @@ func _process(_delta: float) -> bool:
 		return true
 	print("part one: reclaim after %d min, life %d" % [int(_played / 60.0), _game.life_number])
 	_game.enter_part_two()
-	while _part_two_played < PART_TWO_LIMIT and _game.chapter < 1:
-		_step_two()
-	var ok: bool = _game.chapter >= 1 and _part_two_played >= CHAPTER_MIN and _part_two_played <= CHAPTER_MAX
-	print("part two: chapter 1 %s after %d min, day %d, collapses %d, injury %d, credits %d, skills %s" % [
-		"done" if _game.chapter >= 1 else "NOT done", int(_part_two_played / 60.0), _game.day, _collapses,
-		int(_game.injury), int(_game.credits), _game.skill_level])
+	var ok := true
+	for id in _data.order["chapters"]:
+		var start := _part_two_played
+		var number: int = _game.chapter
+		while _part_two_played < PART_TWO_LIMIT and _game.chapter == number:
+			_step_two()
+		var took := _part_two_played - start
+		var range_: Array = CHAPTER_RANGES.get(id, [0.0, PART_TWO_LIMIT])
+		var done: bool = _game.chapter > number
+		ok = ok and done and took >= range_[0] and took <= range_[1]
+		print("part two: chapter %d %s %s after %d min (range %d-%d), day %d, collapses %d, injury %d, credits %d, skills %s, allies %s" % [
+			number + 1, id, "done" if done else "NOT done", int(took / 60.0), int(range_[0] / 60.0), int(range_[1] / 60.0),
+			_game.day, _collapses, int(_game.injury), int(_game.credits), _game.skill_level, _game.allies])
+		if not done:
+			break
 	print("  beats: %s" % str(_game.seen_beats))
 	ok = _check_keep() and ok
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
@@ -98,16 +111,16 @@ func _pick_job_two() -> String:
 ## 第二部の状態が、セーブとロードと、第一部の転生の画面への行き来で失われないか。
 ## クレジットはセーブのJSONで端数が丸まるので、整数にして比べる
 func _check_keep() -> bool:
-	var before := [_game.day, roundi(_game.credits), _game.skill_level.duplicate(), _game.chapter, _game.has_room]
+	var before := [_game.day, roundi(_game.credits), _game.skill_level.duplicate(), _game.chapter, _game.has_room, _game.allies.duplicate()]
 	_game.save_game()
 	_game.load_game()
-	var loaded := [_game.day, roundi(_game.credits), _game.skill_level, _game.chapter, _game.has_room]
+	var loaded := [_game.day, roundi(_game.credits), _game.skill_level, _game.chapter, _game.has_room, _game.allies]
 	_game.leave_part_two()
 	var left: bool = _game.part == 1 and not _game.alive and _game.can_enter_part_two()
 	_game.save_game()
 	_game.load_game()
 	_game.enter_part_two()
-	var back := [_game.day, roundi(_game.credits), _game.skill_level, _game.chapter, _game.has_room]
+	var back := [_game.day, roundi(_game.credits), _game.skill_level, _game.chapter, _game.has_room, _game.allies]
 	var ok: bool = before == loaded and left and before == back and _game.part == 2 and _game.alive
 	print("%s 第二部の状態が、セーブとロードと第一部との行き来で残る %s / %s / %s" % ["ok  " if ok else "NG  ", before, loaded, back])
 	return ok

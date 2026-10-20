@@ -14,7 +14,7 @@ implemented_by:
 
 ## 定義
 
-[主人公](./dom-01-world.md)のほかに、物語に名前を持って出てくる人物である。4人いて、それぞれが[反復計画](./dom-09-consciousness-copy.md)に関わる。ミオ・ジン・レイの3人は、[記憶の断片](./dom-08-memory-fragments-and-endings.md)か[エンディング](./dom-08-memory-fragments-and-endings.md)にも関わる。九条は、反復計画を動かす黒幕で、名前も姿も画面に出さない。
+[主人公](./dom-01-world.md)のほかに、物語に名前を持って出てくる人物のうち、[反復計画](./dom-09-consciousness-copy.md)に関わる4人である。ミオ・ジン・レイの3人は、[記憶の断片](./dom-08-memory-fragments-and-endings.md)か[エンディング](./dom-08-memory-fragments-and-endings.md)にも関わる。九条は、反復計画を動かす黒幕で、名前も姿も画面に出さない。
 
 ## 属性
 
@@ -83,6 +83,7 @@ implemented_by:
 - (decides) [ADR-0064 置いたまま回収していない伏線の扱いを決める](../50-adr/adr-0064-resolve-loose-threads.md)
 - (decides) [ADR-0065 用語と名前の揺れを直す](../50-adr/adr-0065-terms-and-names.md)
 - (decides) [ADR-0068 人物のイベントは、まだ戻っていない断片の中身を先に明かさない](../50-adr/adr-0068-reveal-order-of-character-events.md)
+- (decides) [ADR-0076 第二部の第2章で、昔の仲間を迎えて仕事を任せる](../50-adr/adr-0076-part-two-chapter-name.md)
 - (depends_on) [DOM-11 体の種類](./dom-11-body-types.md)
 - (depends_on) [DOM-12 ジンの依頼](./dom-12-jin-requests.md)
 - (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)

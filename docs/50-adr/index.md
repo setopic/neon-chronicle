@@ -92,6 +92,7 @@ tags: [index]
 - [ADR-0073 スキルを、主人公の頭の中の声としてイベントで話させる](./adr-0073-skill-voices.md)
 - [ADR-0074 放っておく間のログに、仕事の区画の噂を流す](./adr-0074-city-rumors.md)
 - [ADR-0075 本当の体のあとに、転生の無い第二部を章で足す](./adr-0075-part-two-after-reclaim.md)
+- [ADR-0076 第二部の第2章で、昔の仲間を迎えて仕事を任せる](./adr-0076-part-two-chapter-name.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
