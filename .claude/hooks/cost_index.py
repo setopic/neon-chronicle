@@ -66,6 +66,13 @@ def current_session():
     named = os.environ.get("CLAUDE_CODE_SESSION_ID")
     if named and (d / named).is_file():
         return named, Path((d / named).read_text(encoding="utf-8").strip())
+    # 別のフォルダで始めたセッションが、このクローンでコミットしたときは、ここに記録が残っていない。
+    # 記録の置き場所から探す。
+    if named:
+        config = Path(os.environ.get("CLAUDE_CONFIG_DIR") or Path.home() / ".claude")
+        found = sorted(config.glob(f"projects/*/{named}.jsonl"))
+        if found:
+            return named, found[0]
     files = sorted(d.glob("*"), key=lambda p: p.stat().st_mtime) if d.is_dir() else []
     if not files:
         return None, None
