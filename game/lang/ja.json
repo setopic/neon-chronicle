@@ -61,6 +61,11 @@
     "ui.chronicle": "クロニクル",
     "ui.awaken": "{body}で目覚める",
     "ui.licenses": "ライセンス",
+    "ui.layout": "並べ替え",
+    "ui.layout_swap": "{a}と{b}を入れ替える",
+    "ui.layout_rows": "仕事・体の状態の段と、仕事の様子・ログの段を入れ替える",
+    "ui.layout_columns": "インプラントの列と、ほかの欄を入れ替える",
+    "ui.layout_default": "既定の並びに戻す",
     "ui.close": "閉じる",
     "ui.no_job": "無職",
 
