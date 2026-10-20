@@ -4,7 +4,7 @@ type: domain
 title: 目覚めの日
 status: stable
 tags: [story]
-depends_on: [DOM-08, DOM-13, DOM-20, DOM-22]
+depends_on: [DOM-08, DOM-13, DOM-17, DOM-20, DOM-22]
 related: []
 implemented_by:
   - game/scripts/game_state.gd
@@ -16,6 +16,10 @@ implemented_by:
 ## 定義
 
 目覚めの日は、3つ目の[エンディング](./dom-08-memory-fragments-and-endings.md)である。主人公は[レイ](./dom-13-character-events.md)との約束を果たし、中枢サーバーの奥で眠らされている[被験体](./dom-20-test-subjects-origin.md)の体を、自分の体と一緒にすべて目覚めさせる。目覚めた人々は、[屋台組合](./dom-22-faction-reputation.md)が下層街の奥に迎え入れる。
+
+目覚めさせるときは、[本当の体](./dom-08-memory-fragments-and-endings.md)と同じく、各被験体の[意識の写し](./dom-09-consciousness-copy.md)を、それぞれの体へ読み込み直す。写しと体は、レイと抜き取った被験体の名簿で結ぶ。写しが離れた施設の使い捨ての体は止まる。目覚めた人々は、[オルセンの管路](./dom-17-city-history.md)を通って、[橋の検問](./dom-18-resident-classes.md)を通らずに本社の地下から裏通りへ出る。
+
+レイとの約束を話の進み具合に持っていても、「中枢の扉」でほかの2つのエンディングを選べる。エンディングの文は書き分けない。本当の体を選ぶと、レイとの約束は果たされないまま物語が終わる。
 
 ## 属性
 
@@ -64,12 +68,14 @@ implemented_by:
 
 - [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 - [DOM-13 人物のイベント](./dom-13-character-events.md)
+- [DOM-17 街の歴史](./dom-17-city-history.md)
 - [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
 - [DOM-22 勢力の評判](./dom-22-faction-reputation.md)
 
 このノードを参照しているノード
 
 - (decides) [ADR-0046 レイとの約束と屋台組合の評判で開く、3つ目のエンディングを足す](../50-adr/adr-0046-third-ending.md)
+- (decides) [ADR-0064 置いたまま回収していない伏線の扱いを決める](../50-adr/adr-0064-resolve-loose-threads.md)
 - (depends_on) [DOM-30 分岐図](./dom-30-branch-chart.md)
 
 <!-- graph:auto:end -->

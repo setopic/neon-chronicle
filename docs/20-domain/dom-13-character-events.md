@@ -70,6 +70,8 @@ implemented_by:
 3. 選択肢を選ぶと、その段で選んだ選択肢が話の進み具合に入る。選ぶ前に周が終わったら、その段は進まず、次の周にまた起きうる
 4. 次の周から、その人物の次の段が起きうる
 
+ミオの3段目の追跡は、どの選択肢を選んでも、3段目で片が付く。次の周も主人公は裏通りの診療所で目覚め、目覚めとエンディングは変わらない。
+
 ジンは前の周の主人公を覚えていないので（[DOM-10](./dom-10-characters.md)）、ジンの段の書き分けは、主人公が前の体で覚えていることとして書く。レイは前の周を覚えているので、レイの台詞で前の段に触れる。
 
 ## 用語
@@ -100,6 +102,7 @@ implemented_by:
 
 - (decides) [ADR-0014 人物のイベントを1周に1段ずつ進め、前の段の選択で文と選択肢を変える](../50-adr/adr-0014-character-events-across-lives.md)
 - (decides) [ADR-0043 ミオにも3段の人物のイベントを持たせる](../50-adr/adr-0043-mio-character-events.md)
+- (decides) [ADR-0064 置いたまま回収していない伏線の扱いを決める](../50-adr/adr-0064-resolve-loose-threads.md)
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 - (depends_on) [DOM-23 屋台通りの対立](./dom-23-stall-street-feud.md)
 - (depends_on) [DOM-29 目覚めの日](./dom-29-day-of-waking.md)

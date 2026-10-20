@@ -2,7 +2,7 @@
 id: ADR-0009
 type: adr
 title: 生き直しを闇医者が乗っ取った企業の計画として説明し、4人の人物を置く
-status: stable
+status: deprecated
 tags: [world, story]
 decides:
   - DOM-09
@@ -15,7 +15,7 @@ related: []
 # 生き直しを闇医者が乗っ取った企業の計画として説明し、4人の人物を置く
 
 - 日付: 2026-10-18
-- 状態: stable
+- 状態: deprecated（[ADR-0064](./adr-0064-resolve-loose-threads.md)が置き換えた）
 
 ## 背景
 
@@ -70,5 +70,9 @@ related: []
 - [DOM-01 世界観](../20-domain/dom-01-world.md)
 - [DOM-09 意識の写しと目覚め](../20-domain/dom-09-consciousness-copy.md)
 - [DOM-10 登場人物](../20-domain/dom-10-characters.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0064 置いたまま回収していない伏線の扱いを決める](./adr-0064-resolve-loose-threads.md)
 
 <!-- graph:auto:end -->
