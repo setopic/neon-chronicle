@@ -125,5 +125,6 @@ implemented_by:
 - (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)
 - (depends_on) [DOM-21 縛りの周](./dom-21-challenges.md)
 - (depends_on) [DOM-22 勢力の評判](./dom-22-faction-reputation.md)
+- (depends_on) [DOM-34 第二部の暮らし](./dom-34-part-two-life.md)
 
 <!-- graph:auto:end -->

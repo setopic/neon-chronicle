@@ -91,6 +91,7 @@ tags: [index]
 - [ADR-0072 スキルに節目を置き、下の仕事に戻る理由にする](./adr-0072-skill-milestones.md)
 - [ADR-0073 スキルを、主人公の頭の中の声としてイベントで話させる](./adr-0073-skill-voices.md)
 - [ADR-0074 放っておく間のログに、仕事の区画の噂を流す](./adr-0074-city-rumors.md)
+- [ADR-0075 本当の体のあとに、転生の無い第二部を章で足す](./adr-0075-part-two-after-reclaim.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

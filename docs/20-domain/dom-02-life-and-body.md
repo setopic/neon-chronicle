@@ -80,5 +80,6 @@ implemented_by:
 - (depends_on) [DOM-08 記憶の断片とエンディング](./dom-08-memory-fragments-and-endings.md)
 - (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
 - (depends_on) [DOM-11 体の種類](./dom-11-body-types.md)
+- (depends_on) [DOM-34 第二部の暮らし](./dom-34-part-two-life.md)
 
 <!-- graph:auto:end -->

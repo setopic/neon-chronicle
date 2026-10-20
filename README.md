@@ -89,6 +89,7 @@ graph LR
     DOM-31["DOM-31<br/>話の選び直し"]
     DOM-32["DOM-32<br/>スキルの声"]
     DOM-33["DOM-33<br/>街の噂"]
+    DOM-34["DOM-34<br/>第二部の暮らし"]
   end
   subgraph usecase["ユースケース"]
     UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
@@ -168,6 +169,7 @@ graph LR
     ADR-0072["ADR-0072<br/>スキルに節目を置き、下の仕事に戻る理由にする"]
     ADR-0073["ADR-0073<br/>スキルを、主人公の頭の中の声としてイベントで話させる"]
     ADR-0074["ADR-0074<br/>放っておく間のログに、仕事の区画の噂を流す"]
+    ADR-0075["ADR-0075<br/>本当の体のあとに、転生の無い第二部を章で足す"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -336,6 +338,8 @@ graph LR
   ADR-0072 -.->|decides| DOM-03
   ADR-0073 -.->|decides| DOM-32
   ADR-0074 -.->|decides| DOM-33
+  ADR-0075 -.->|decides| DOM-34
+  ADR-0075 -.->|decides| DOM-08
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -443,6 +447,16 @@ graph LR
   DOM-33 -->|depends_on| DOM-14
   DOM-33 -->|depends_on| DOM-22
   DOM-33 -->|depends_on| DOM-24
+  DOM-34 -->|depends_on| DOM-01
+  DOM-34 -->|depends_on| DOM-02
+  DOM-34 -->|depends_on| DOM-03
+  DOM-34 -->|depends_on| DOM-04
+  DOM-34 -->|depends_on| DOM-05
+  DOM-34 -->|depends_on| DOM-06
+  DOM-34 -->|depends_on| DOM-08
+  DOM-34 -->|depends_on| DOM-09
+  DOM-34 -->|depends_on| DOM-10
+  DOM-34 -->|depends_on| DOM-24
   META-01 -.->|related| META-02
   META-01 -.->|related| META-03
   META-01 -.->|related| META-04

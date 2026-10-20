@@ -72,5 +72,6 @@ implemented_by:
 - (depends_on) [DOM-19 住民の生まれから死まで](./dom-19-resident-life-course.md)
 - (depends_on) [DOM-21 縛りの周](./dom-21-challenges.md)
 - (depends_on) [DOM-26 体の容量とインプラントの取り外し](./dom-26-body-capacity.md)
+- (depends_on) [DOM-34 第二部の暮らし](./dom-34-part-two-life.md)
 
 <!-- graph:auto:end -->

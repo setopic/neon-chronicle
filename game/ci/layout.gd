@@ -3,6 +3,7 @@ extends SceneTree
 ## メインの画面の欄の並びを入れ替えても、1280x720に収まるかを確かめる。ADR-0058。
 ## 日本語と英語で、入れ替えられる4組のすべての組み合わせを組み立てて、欄が画面の中にあるかを見る。
 ## 何も入れ替えていなければ既定の並びになることと、入れ替えた並びが設定のファイルに残ることも見る。
+## 第二部の画面は体の状態の欄に行が増えるので、第二部でもすべての組み合わせを見る（DOM-34）。
 ## 設定とセーブは確かめたあとに元へ戻すので、手元の設定とセーブは変わらない。
 ##
 ##   godot --headless --path . --script res://ci/layout.gd
@@ -17,6 +18,7 @@ var _settings_file: Variant = null  # 確かめる前の設定のファイルの
 var _cases: Array = []  # [locale, 入れ替える組の辞書]
 var _wait := 0
 var _failed := false
+var _part_two := false  # 第二部の画面を確かめているか
 
 
 func _process(_delta: float) -> bool:
@@ -28,12 +30,7 @@ func _process(_delta: float) -> bool:
 		_loc = root.get_node("Loc")
 		if FileAccess.file_exists(_loc.SETTINGS_PATH):
 			_settings_file = FileAccess.get_file_as_string(_loc.SETTINGS_PATH)
-		for locale in ["ja", "en"]:
-			for bits in 16:
-				var layout := {}
-				for i in _main_swaps().size():
-					layout[_main_swaps()[i]] = bits & (1 << i) != 0
-				_cases.append([locale, layout])
+		_add_cases()
 		root.size = Vector2i(SCREEN.size)
 		_loc._settings.erase("panel_layout")
 		_main = load("res://scenes/main.tscn").instantiate()
@@ -43,6 +40,14 @@ func _process(_delta: float) -> bool:
 	if _wait > 0:
 		_wait -= 1
 		return false
+	if _cases.is_empty() and not _part_two:
+		_part_two = true
+		var game := root.get_node("Game")
+		game.part = 2
+		game._start_part_two()
+		_add_cases()
+		_next_case()
+		return false
 	if _cases.is_empty():
 		_check_saved()
 		_finish()
@@ -51,6 +56,15 @@ func _process(_delta: float) -> bool:
 	_check(case[0], case[1])
 	_next_case()
 	return false
+
+
+func _add_cases() -> void:
+	for locale in ["ja", "en"]:
+		for bits in 16:
+			var layout := {}
+			for i in _main_swaps().size():
+				layout[_main_swaps()[i]] = bits & (1 << i) != 0
+			_cases.append([locale, layout])
 
 
 func _main_swaps() -> Array:
@@ -86,7 +100,7 @@ func _check(locale: String, layout: Dictionary) -> void:
 		_cases.push_front([locale, {}])
 		_next_case()
 		return
-	var name := "%s %s" % [locale, layout]
+	var name := "%s%s %s" % ["第二部 " if _part_two else "", locale, layout]
 	var rects := _rects()
 	var inside := true
 	for key in PANELS:

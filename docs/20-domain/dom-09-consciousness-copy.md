@@ -115,5 +115,6 @@ related: []
 - (depends_on) [DOM-18 住民の階級と暮らし](./dom-18-resident-classes.md)
 - (depends_on) [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
 - (depends_on) [DOM-27 前の周の跡](./dom-27-traces-of-last-life.md)
+- (depends_on) [DOM-34 第二部の暮らし](./dom-34-part-two-life.md)
 
 <!-- graph:auto:end -->

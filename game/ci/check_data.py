@@ -25,6 +25,8 @@ CIの app-check.yml から呼ぶ。Godotを使わずに分かる抜けだけを�
     各スキルに、条件を満たしていないときの声の文のキー（skill.<id>.voice）がある（DOM-32）
 16. 街の噂は、仕事の区画と勢力と資料の追記のうち、data にあるものを指す。
     各噂に、文のキー（rumor.<id>.text）がある（DOM-33）
+17. 第二部の章の出来事は、data にある第二部のイベントを指す。章の目標ごとに、文のキー（chapter.<id>.goal.<目標>）がある。
+    第二部のイベントは周の記録に残らないので、選択肢の物語の句は要らない（DOM-34）
 
 ゲームは足りないキーを英語で補うので（loc.gd）、抜けは画面にキーのまま出るまで気づけない。
 """
@@ -40,7 +42,7 @@ BASE_LOCALE = "en"
 KEY_PREFIX = {
     "jobs": "job", "skills": "skill", "implants": "implant", "upgrades": "upgrade", "events": "event",
     "fragments": "fragment", "endings": "ending", "bodies": "body", "profiles": "profile",
-    "challenges": "challenge", "factions": "faction",
+    "challenges": "challenge", "factions": "faction", "chapters": "chapter",
 }
 # game_state.gd の mio_line_key と同じ組
 MIO_REASONS = ("decay", "event")
@@ -128,7 +130,8 @@ def main():
             for choice in choices:
                 if "ending" in choice and choice["ending"] not in endings:
                     errors.append(f"{path.relative_to(GAME)}: 無いエンディングを指している: event.{event.get('id')}.{choice.get('id')}")
-                suffixes = ("name", "result") if "ending" in choice else ("name", "result", "chronicle")
+                no_chronicle = "ending" in choice or event.get("part") == 2
+                suffixes = ("name", "result") if no_chronicle else ("name", "result", "chronicle")
                 if choice.get("requires"):
                     suffixes += ("voice",)
                 for suffix in suffixes:
@@ -219,6 +222,19 @@ def main():
             key = f"rumor.{rumor.get('id')}.text"
             if key not in base:
                 errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+
+        for chapter in data.get("chapters", []):
+            where = f"{path.relative_to(GAME)}: chapter.{chapter.get('id')}"
+            for goal in chapter.get("goals", []):
+                key = f"chapter.{chapter.get('id')}.goal.{goal.get('id')}"
+                if key not in base:
+                    errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+            goal_ids = {g.get("id") for g in chapter.get("goals", [])}
+            for beat in chapter.get("beats", []):
+                if events.get(beat.get("event"), {}).get("part") != 2:
+                    errors.append(f"{where}: 第二部のイベントではない出来事を指している: {beat.get('event')}")
+                if "goal" in beat and beat["goal"] not in goal_ids:
+                    errors.append(f"{where}: 無い目標を指している: {beat['goal']}")
 
         for ending in data.get("endings", []):
             key = f"ending.{ending.get('id')}.chronicle"

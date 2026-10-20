@@ -63,6 +63,7 @@ implemented_by:
 2. 記憶の断片がすべて戻ると、最後の仕事に就けるようになる
 3. 最後の仕事の間に起きるイベントで、エンディングの選択肢を選ぶ。その周が終わり、記録にたどり着いたエンディングが入る
 4. エンディングを見たあとも、転生して次の周を遊べる。ほかのエンディングを選ぶこともできる
+5. エンディング「本当の体」にたどり着いたあとは、転生の画面から[第二部](./dom-34-part-two-life.md)へ進める
 
 ## 用語
 
@@ -97,6 +98,7 @@ implemented_by:
 - (decides) [ADR-0006 記憶の断片を順に戻し、最後の仕事の選択でエンディングを分ける](../50-adr/adr-0006-fragments-and-endings.md)
 - (decides) [ADR-0046 レイとの約束と屋台組合の評判で開く、3つ目のエンディングを足す](../50-adr/adr-0046-third-ending.md)
 - (decides) [ADR-0059 意識を抜き取るとは、写しを取って体を眠らせることにする](../50-adr/adr-0059-extraction-means-copy-and-sleep.md)
+- (decides) [ADR-0075 本当の体のあとに、転生の無い第二部を章で足す](../50-adr/adr-0075-part-two-after-reclaim.md)
 - (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
 - (depends_on) [DOM-10 登場人物](./dom-10-characters.md)
 - (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)
@@ -105,5 +107,6 @@ implemented_by:
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 - (depends_on) [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
 - (depends_on) [DOM-29 目覚めの日](./dom-29-day-of-waking.md)
+- (depends_on) [DOM-34 第二部の暮らし](./dom-34-part-two-life.md)
 
 <!-- graph:auto:end -->
