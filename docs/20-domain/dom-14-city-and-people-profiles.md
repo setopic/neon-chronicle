@@ -43,7 +43,7 @@ implemented_by:
 | --- | --- | --- | --- | --- |
 | イベント | 選んだ選択肢を残す | 真偽 | | 真なら、人物のイベントと同じく、選んだ選択肢を[話の進み具合](./dom-13-character-events.md)に残す。資料と追記の出るイベントに使う |
 
-載せる資料は次のとおりである。九条は、まだ名前で画面に出ないので、資料を置かない。
+載せる資料は次のとおりである。九条は画面に出さないので（[DOM-10](./dom-10-characters.md)）、資料を置かない。
 
 | 資料 | 出るイベント | 追記の要る断片・出るイベント |
 | --- | --- | --- |
@@ -121,6 +121,7 @@ implemented_by:
 - (decides) [ADR-0038 ザンダー・ファミリーと屋台組合の対立を、3段の勢力の話にする](../50-adr/adr-0038-stall-street-feud.md)
 - (decides) [ADR-0041 体の元の持ち主の記憶を、体ごとの2段の話にする](../50-adr/adr-0041-former-owner-memories.md)
 - (decides) [ADR-0043 ミオにも3段の人物のイベントを持たせる](../50-adr/adr-0043-mio-character-events.md)
+- (decides) [ADR-0064 置いたまま回収していない伏線の扱いを決める](../50-adr/adr-0064-resolve-loose-threads.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 
 <!-- graph:auto:end -->
