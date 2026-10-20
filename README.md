@@ -159,6 +159,7 @@ graph LR
     ADR-0066["ADR-0066<br/>仕事の区画は仕事を請け負う場所とし、イベントの舞台とは分ける"]
     ADR-0067["ADR-0067<br/>1つの周は、世界の中では数日から数週とする"]
     ADR-0068["ADR-0068<br/>人物のイベントは、まだ戻っていない断片の中身を先に明かさない"]
+    ADR-0069["ADR-0069<br/>遊ぶ人の側の仕組みを挙げ、街の歴史の穴を埋める"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -320,6 +321,8 @@ graph LR
   ADR-0068 -.->|decides| DOM-13
   ADR-0068 -.->|decides| DOM-10
   ADR-0068 -.->|decides| DOM-14
+  ADR-0069 -.->|decides| DOM-09
+  ADR-0069 -.->|decides| DOM-17
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02

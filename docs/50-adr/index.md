@@ -85,6 +85,7 @@ tags: [index]
 - [ADR-0066 仕事の区画は仕事を請け負う場所とし、イベントの舞台とは分ける](./adr-0066-job-district-is-where-hired.md)
 - [ADR-0067 1つの周は、世界の中では数日から数週とする](./adr-0067-length-of-a-life.md)
 - [ADR-0068 人物のイベントは、まだ戻っていない断片の中身を先に明かさない](./adr-0068-reveal-order-of-character-events.md)
+- [ADR-0069 遊ぶ人の側の仕組みを挙げ、街の歴史の穴を埋める](./adr-0069-meta-mechanics-and-city-history-gaps.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

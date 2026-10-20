@@ -49,6 +49,14 @@ related: []
 
 永続強化は、どれも意識の写しの改良であり、体の劣化は変えない。
 
+次の仕組みは、遊ぶ人の側の仕組みとし、世界の中では説明しない。どれも、物語の外で遊び方を選ぶためのものである。
+
+| 仕組み | 扱い |
+| --- | --- |
+| エンディングのあとも転生して遊び続けられること（[DOM-08](./dom-08-memory-fragments-and-endings.md)） | 本当の体に戻っても、全員が目覚めても、次の周は使い捨ての体で目覚める。その理由は世界の中で決めない |
+| [縛りの上乗せ](./dom-21-challenges.md) | 縛りを守り通した周に記憶ポイントが増える理由は、世界の中で決めない |
+| [話の選び直し](./dom-31-choosing-again.md) | すでに選んだ選択をやり直せる理由は、世界の中で決めない |
+
 ## 不変条件
 
 - [ ] 意識の写しは1つである。同じ主人公が、2つの体で同時に目覚めることはない
@@ -98,6 +106,7 @@ related: []
 - (decides) [ADR-0060 主人公は体ごとに口座だけの身元を持つことにする](../50-adr/adr-0060-account-only-identity.md)
 - (decides) [ADR-0062 主人公の写しは廃棄した写しとして記録され、ミオは死んだことになっている](../50-adr/adr-0062-discarded-copy-and-dead-engineer.md)
 - (decides) [ADR-0063 周をまたいで主人公を見分ける決まりを1つにする](../50-adr/adr-0063-recognizing-across-lives.md)
+- (decides) [ADR-0069 遊ぶ人の側の仕組みを挙げ、街の歴史の穴を埋める](../50-adr/adr-0069-meta-mechanics-and-city-history-gaps.md)
 - (depends_on) [DOM-10 登場人物](./dom-10-characters.md)
 - (depends_on) [DOM-11 体の種類](./dom-11-body-types.md)
 - (depends_on) [DOM-12 ジンの依頼](./dom-12-jin-requests.md)
