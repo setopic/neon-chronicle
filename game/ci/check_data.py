@@ -21,6 +21,8 @@ CIの app-check.yml から呼ぶ。Godotを使わずに分かる抜けだけを�
     要る断片は data にある断片を指す（DOM-13）
 14. 街と人物の資料の出るイベントと、追記の要る断片・出るイベントは、data にあるものを指す。
     追記は要る断片と出るイベントのどちらか一方を持ち、文のキー（profile.<id>.<追記>）がある（DOM-14）
+15. スキルの条件のある選択肢に、声の文のキー（event.<id>.<選択肢>.voice）がある。
+    各スキルに、条件を満たしていないときの声の文のキー（skill.<id>.voice）がある（DOM-32）
 
 ゲームは足りないキーを英語で補うので（loc.gd）、抜けは画面にキーのまま出るまで気づけない。
 """
@@ -95,6 +97,10 @@ def main():
                     key = f"{prefix}.{entry.get('id')}.{suffix}"
                     if key not in base:
                         errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
+        for skill in data.get("skills", []):
+            key = f"skill.{skill.get('id')}.voice"
+            if key not in base:
+                errors.append(f"{path.relative_to(GAME)}: {BASE_LOCALE} にキーが無い: {key}")
         for job in data.get("jobs", []):
             key = f"job.{job.get('id')}.chronicle"
             if key not in base:
@@ -118,6 +124,8 @@ def main():
                 if "ending" in choice and choice["ending"] not in endings:
                     errors.append(f"{path.relative_to(GAME)}: 無いエンディングを指している: event.{event.get('id')}.{choice.get('id')}")
                 suffixes = ("name", "result") if "ending" in choice else ("name", "result", "chronicle")
+                if choice.get("requires"):
+                    suffixes += ("voice",)
                 for suffix in suffixes:
                     key = f"event.{event.get('id')}.{choice.get('id')}.{suffix}"
                     if key not in base:

@@ -46,6 +46,7 @@ var _log_label: RichTextLabel
 var _upgrade_buttons := {}
 var _refund_buttons := {}
 var _choice_buttons := {}  # 選択肢のid -> ボタン
+var _voice_labels := {}  # スキルの条件のある選択肢のid -> 声の行。DOM-32
 var _minigame_button: Button  # 就いている仕事の1回を、ミニゲームで終える。ADR-0054
 var _story_closed_life := 0  # 戻った記憶の断片やエンディングの画面を閉じた周の番号。DOM-08
 
@@ -89,6 +90,7 @@ func _build() -> void:
 	_refund_buttons.clear()
 	_request_buttons.clear()
 	_choice_buttons.clear()
+	_voice_labels.clear()
 	_minigame_button = null
 
 	_content = Control.new()
@@ -685,6 +687,14 @@ func _build_event() -> Control:
 	var text := _label(Game.event_desc(Game.pending_event), UiStyle.TEXT, UiStyle.SIZE_LEAD)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(text)
+	# スキルの条件のある選択肢ごとに、そのスキルの声を1行出す。文は、条件を満たしているかで _refresh が選ぶ（DOM-32）
+	for choice in Game.event_choices():
+		if choice.get("requires", {}).is_empty():
+			continue
+		var voice := _label("", DIM, UiStyle.SIZE_SMALL)
+		voice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		box.add_child(voice)
+		_voice_labels[choice["id"]] = voice
 	for choice in Game.event_choices():
 		var button := Button.new()
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -836,6 +846,9 @@ func _refresh() -> void:
 			parts.append(_requirement_text(choice.get("requires", {}), _reputation_items(choice.get("requires_reputation", {}))))
 			button.disabled = true
 		button.text = "    ".join(parts)
+		var voice: Label = _voice_labels.get(choice["id"])
+		if voice != null:
+			voice.text = _voice_text(choice)
 	for id in _refund_buttons:
 		var refund: Button = _refund_buttons[id]
 		refund.visible = Game.upgrades.get(id, 0) > 0
@@ -929,6 +942,14 @@ func _fragment_progress() -> String:
 
 
 ## 「必要」を1つだけ付けて、条件を「、」でつなぐ。items は先に並べる条件
+## スキルの声の1行。条件を満たしていればその選択肢の文で勧め、満たしていなければスキルごとの文でからかう（DOM-32）
+func _voice_text(choice: Dictionary) -> String:
+	var requires: Dictionary = choice["requires"]
+	var skill: String = requires.keys()[0]
+	var key := "event.%s.%s.voice" % [Game.pending_event, choice["id"]] if Game.meets(requires) else "skill.%s.voice" % skill
+	return Loc.t("ui.voice", {"skill": GameData.name_of("skills", skill), "line": tr(key)})
+
+
 func _requirement_text(requires: Dictionary, items := PackedStringArray()) -> String:
 	for skill in requires:
 		items.append(Loc.t("ui.skill_at", {"skill": GameData.name_of("skills", skill), "level": int(requires[skill])}))
