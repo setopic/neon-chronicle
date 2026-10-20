@@ -2,7 +2,7 @@
 id: ADR-0039
 type: adr
 title: 仕事に区画を持たせ、傭兵の仕事には偽の身元を要る
-status: stable
+status: deprecated
 tags: [loop, city]
 decides:
   - DOM-24
@@ -13,7 +13,7 @@ related: []
 # 仕事に区画を持たせ、傭兵の仕事には偽の身元を要る
 
 - 日付: 2026-10-20
-- 状態: stable
+- 状態: deprecated（[ADR-0066](./adr-0066-job-district-is-where-hired.md)が置き換えた）
 
 ## 背景
 
@@ -67,5 +67,9 @@ DOM-24を新しく起こし、仕事の区画・身元が要る仕事・偽の�
 `decides`: この決定が影響を与えるノード（ADR用）
 
 - [DOM-24 仕事の区画と身元](../20-domain/dom-24-job-districts-and-identity.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0066 仕事の区画は仕事を請け負う場所とし、イベントの舞台とは分ける](./adr-0066-job-district-is-where-hired.md)
 
 <!-- graph:auto:end -->
