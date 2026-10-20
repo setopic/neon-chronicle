@@ -16,7 +16,7 @@ implemented_by:
 
 ## 定義
 
-[仕事](./dom-03-jobs-and-skills.md)の区画は、その仕事をする場所である[区画](./dom-15-city-places-and-powers.md)である。仕事ごとに1つ決まっていて、[街の地図](./dom-16-city-map.md)に、いまの仕事の区画が示される。橋の向こうの区画で働く仕事には、橋を渡れる[身元](./dom-18-resident-classes.md)が要る。主人公は社の身元を持たないので、闇市場で偽の身元を買って橋を渡る。
+[仕事](./dom-03-jobs-and-skills.md)の区画は、その仕事をする場所である[区画](./dom-15-city-places-and-powers.md)である。仕事ごとに1つ決まっていて、[街の地図](./dom-16-city-map.md)に、いまの仕事の区画が示される。橋の向こうの区画で働く仕事には、橋を渡れる[身元](./dom-18-resident-classes.md)が要る。主人公の口座だけの身元では橋の検問を通れないので、闇市場で偽の身元を買って橋を渡る。
 
 ## 属性
 
@@ -73,5 +73,6 @@ implemented_by:
 このノードを参照しているノード
 
 - (decides) [ADR-0039 仕事に区画を持たせ、傭兵の仕事には偽の身元を要る](../50-adr/adr-0039-job-districts-and-identity.md)
+- (decides) [ADR-0060 主人公は体ごとに口座だけの身元を持つことにする](../50-adr/adr-0060-account-only-identity.md)
 
 <!-- graph:auto:end -->

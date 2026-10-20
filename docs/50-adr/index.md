@@ -76,6 +76,7 @@ tags: [index]
 - [ADR-0057 傭兵の仕事のミニゲームを、窓に出る敵を撃つ遊びにする](./adr-0057-mercenary-minigame.md)
 - [ADR-0058 メインの画面の欄を、2つずつ組にして入れ替えられるようにする](./adr-0058-panel-layout-swaps.md)
 - [ADR-0059 意識を抜き取るとは、写しを取って体を眠らせることにする](./adr-0059-extraction-means-copy-and-sleep.md)
+- [ADR-0060 主人公は体ごとに口座だけの身元を持つことにする](./adr-0060-account-only-identity.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

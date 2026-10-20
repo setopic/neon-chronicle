@@ -28,7 +28,7 @@ related: []
 | スキルが[開始レベル](./dom-03-jobs-and-skills.md)に戻る | 腕前のうち、知っていることと手順は意識の写しに残る。手の速さは体の神経に焼き付いたもので、体と一緒に失われる。スキルのレベルは、この神経の慣れの度合いである |
 | [クレジット](./dom-03-jobs-and-skills.md)が0に戻る | 体ごとに身元が新しくなり、前の身元の口座はヨミ・システムズに凍結される |
 | 前の体と、その体のインプラントが戻らない | 倒れた体は、倒れた場所に残される。体と[インプラント](./dom-04-implants.md)は拾った者が闇市場へ売り、裏通りの診療所には戻らない |
-| [残るインプラント](./dom-04-implants.md)が残る | 体ではなく、ネット上の身元に組み込むものだから |
+| [残るインプラント](./dom-04-implants.md)が残る | 体ではなく、稼ぎを受け取る裏通りの診療所の口座の取引記録に組み込むものだから |
 | [記憶の断片](./dom-08-memory-fragments-and-endings.md)が戻る | 意識を抜き取られる前の記憶は、写しの奥に壊れたまま残っている。腕前が当時に近づくと、同期のときにつながって戻る |
 
 永続強化ごとの説明は次のとおりである。
@@ -90,6 +90,7 @@ related: []
 - (decides) [ADR-0032 体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す](../50-adr/adr-0032-body-quality-and-memory-software.md)
 - (decides) [ADR-0033 永続強化を増やし、どちらか一方しか取れない組を作る](../50-adr/adr-0033-upgrade-groups.md)
 - (decides) [ADR-0059 意識を抜き取るとは、写しを取って体を眠らせることにする](../50-adr/adr-0059-extraction-means-copy-and-sleep.md)
+- (decides) [ADR-0060 主人公は体ごとに口座だけの身元を持つことにする](../50-adr/adr-0060-account-only-identity.md)
 - (depends_on) [DOM-10 登場人物](./dom-10-characters.md)
 - (depends_on) [DOM-11 体の種類](./dom-11-body-types.md)
 - (depends_on) [DOM-12 ジンの依頼](./dom-12-jin-requests.md)
