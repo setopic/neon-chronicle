@@ -61,6 +61,8 @@ implemented_by:
 
 ## ライフサイクル
 
+ネオン・シティという呼び名は、市の時代からのものである。企業が街を分け合ってからも、呼び名は変わっていない。
+
 街の歴史は、周をまたいでも変わらない。
 
 ## 用語
@@ -90,6 +92,7 @@ implemented_by:
 
 - (decides) [ADR-0025 企業の時代より前の街を市とし、市の財政破綻で企業の時代が始まったことにする](../50-adr/adr-0025-city-history-before-corporations.md)
 - (decides) [ADR-0064 置いたまま回収していない伏線の扱いを決める](../50-adr/adr-0064-resolve-loose-threads.md)
+- (decides) [ADR-0065 用語と名前の揺れを直す](../50-adr/adr-0065-terms-and-names.md)
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 - (depends_on) [DOM-18 住民の階級と暮らし](./dom-18-resident-classes.md)
 - (depends_on) [DOM-29 目覚めの日](./dom-29-day-of-waking.md)

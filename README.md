@@ -155,6 +155,7 @@ graph LR
     ADR-0062["ADR-0062<br/>主人公の写しは廃棄した写しとして記録され、ミオは死んだことになっている"]
     ADR-0063["ADR-0063<br/>周をまたいで主人公を見分ける決まりを1つにする"]
     ADR-0064["ADR-0064<br/>置いたまま回収していない伏線の扱いを決める"]
+    ADR-0065["ADR-0065<br/>用語と名前の揺れを直す"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -300,6 +301,13 @@ graph LR
   ADR-0064 -.->|decides| DOM-14
   ADR-0064 -.->|decides| DOM-17
   ADR-0064 -.->|decides| DOM-29
+  ADR-0065 -.->|decides| DOM-03
+  ADR-0065 -.->|decides| DOM-04
+  ADR-0065 -.->|decides| DOM-10
+  ADR-0065 -.->|decides| DOM-15
+  ADR-0065 -.->|decides| DOM-17
+  ADR-0065 -.->|decides| DOM-23
+  ADR-0065 -.->|decides| DOM-25
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02

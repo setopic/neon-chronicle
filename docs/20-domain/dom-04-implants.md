@@ -48,7 +48,7 @@ implemented_by:
 | 用語 | 意味 | 旧称 |
 | --- | --- | --- |
 | インプラント | クレジットで買って体に組み込む強化の部品。組み込んでいる間、効果が働く | |
-| 組み込む | クレジットを払って、インプラントを体に入れること。外すことはできない | |
+| 組み込む | クレジットを払って、インプラントを体に入れること | |
 | 残るインプラント | 周が終わっても失われず、次の周の体にも組み込まれたままのインプラント | |
 
 ---
@@ -66,6 +66,7 @@ implemented_by:
 
 - (decides) [ADR-0003 物語の文書を既定の種別で書く](../50-adr/adr-0003-story-docs-default-types.md)
 - (decides) [ADR-0016 インプラントと体の種類の効果を画面の文に出す](../50-adr/adr-0016-show-effects-on-screen.md)
+- (decides) [ADR-0065 用語と名前の揺れを直す](../50-adr/adr-0065-terms-and-names.md)
 - (depends_on) [DOM-05 転生と永続強化](./dom-05-rebirth.md)
 - (depends_on) [DOM-09 意識の写しと目覚め](./dom-09-consciousness-copy.md)
 - (depends_on) [DOM-19 住民の生まれから死まで](./dom-19-resident-life-course.md)
