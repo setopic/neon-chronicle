@@ -16,6 +16,8 @@ implemented_by:
 
 周は、[主人公](./dom-01-world.md)が1つの体で目覚めてから、その体の耐久が0になるまでの期間である。体は時間とともに劣化し、耐久が0になると周が終わる。
 
+1つの周は、世界の中では数日から数週にあたる。ゲームの秒は、世界の中の時間を縮めたものである。秒と日の換算の比は決めていない。画面に出す時間は、ゲームの秒で数える（[ADR-0067](../50-adr/adr-0067-length-of-a-life.md)）。
+
 時間は、ゲームを閉じているあいだも進む。開いたときに、閉じていた時間を8時間まで、開いているときと同じ規則でまとめて進める（[ADR-0007](../50-adr/adr-0007-away-progress.md)）。閉じているあいだに周が終わっても、新しい体では目覚めない。
 
 ## 属性
@@ -69,6 +71,7 @@ implemented_by:
 
 - (decides) [ADR-0003 物語の文書を既定の種別で書く](../50-adr/adr-0003-story-docs-default-types.md)
 - (decides) [ADR-0007 閉じていた時間を、開いたときにまとめて進める](../50-adr/adr-0007-away-progress.md)
+- (decides) [ADR-0067 1つの周は、世界の中では数日から数週とする](../50-adr/adr-0067-length-of-a-life.md)
 - (depends_on) [DOM-03 仕事とスキル](./dom-03-jobs-and-skills.md)
 - (depends_on) [DOM-04 インプラント](./dom-04-implants.md)
 - (depends_on) [DOM-05 転生と永続強化](./dom-05-rebirth.md)
