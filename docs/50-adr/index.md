@@ -79,6 +79,7 @@ tags: [index]
 - [ADR-0060 主人公は体ごとに口座だけの身元を持つことにする](./adr-0060-account-only-identity.md)
 - [ADR-0061 体の元の持ち主から取ったのは神経の型とする](./adr-0061-nerve-pattern-of-former-owners.md)
 - [ADR-0062 主人公の写しは廃棄した写しとして記録され、ミオは死んだことになっている](./adr-0062-discarded-copy-and-dead-engineer.md)
+- [ADR-0063 周をまたいで主人公を見分ける決まりを1つにする](./adr-0063-recognizing-across-lives.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

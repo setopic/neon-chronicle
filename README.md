@@ -153,6 +153,7 @@ graph LR
     ADR-0060["ADR-0060<br/>主人公は体ごとに口座だけの身元を持つことにする"]
     ADR-0061["ADR-0061<br/>体の元の持ち主から取ったのは神経の型とする"]
     ADR-0062["ADR-0062<br/>主人公の写しは廃棄した写しとして記録され、ミオは死んだことになっている"]
+    ADR-0063["ADR-0063<br/>周をまたいで主人公を見分ける決まりを1つにする"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -283,6 +284,14 @@ graph LR
   ADR-0062 -.->|decides| DOM-09
   ADR-0062 -.->|decides| DOM-10
   ADR-0062 -.->|decides| DOM-20
+  ADR-0063 ==>|supersedes| ADR-0023
+  ADR-0063 ==>|supersedes| ADR-0044
+  ADR-0063 -.->|decides| DOM-09
+  ADR-0063 -.->|decides| DOM-10
+  ADR-0063 -.->|decides| DOM-15
+  ADR-0063 -.->|decides| DOM-16
+  ADR-0063 -.->|decides| DOM-22
+  ADR-0063 -.->|decides| DOM-27
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -403,7 +412,7 @@ graph LR
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
-  class ADR-0004,ADR-0005,ADR-0006,ADR-0010,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0024,ADR-0033,ADR-0040,ADR-0048 deprecated;
+  class ADR-0004,ADR-0005,ADR-0006,ADR-0010,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0023,ADR-0024,ADR-0033,ADR-0040,ADR-0044,ADR-0048 deprecated;
 ```
 
 <!-- graph:diagram:end -->
