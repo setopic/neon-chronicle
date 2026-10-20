@@ -57,6 +57,7 @@ const STREET_DRAIN := 10.0  # 宿代を払えず、路上で寝た日に減る�
 const SUBJECT_INTERVAL := 2  # 寝床に空きがあるとき、被験体が逃げてくる間隔（日）
 const SUBJECT_INCOME := 3.0  # 匿った被験体1人が、屋台を手伝って1秒ごとに稼ぐクレジット
 const SUBJECT_UPKEEP := 30.0  # 匿った被験体1人の、1日の食べる分の代金
+const OPERATION := "operation"  # 仲間に任せる先のうち、作戦に付けること。付けている間、その仲間は稼がない（ADR-0078）
 ## ログやクロニクルの引数のうち、id から表示名に変える項目
 const NAME_ARGS := {
 	"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades", "event": "events",
@@ -126,6 +127,7 @@ var has_base := false  # 隠れ家（拠点）を持っているか
 var facilities := {}  # 拠点に足した設備の段。{設備のid: 段}
 var hidden := 0  # 匿っている被験体の人数
 var next_subject_day := 0  # 次に被験体が逃げてくる日
+var stages := 0  # 作戦で越えた段階の数
 var _part_two_stash := {}  # 第一部に戻っている間の、第二部の状態
 
 var _pending := 0.0
@@ -1099,6 +1101,8 @@ func format_entry(entry: Dictionary) -> String:
 			args[k] = GameData.name_of(NAME_ARGS[k], args[k]) if args[k] != "" else tr("ui.no_job")
 		elif k == "age":
 			args[k] = format_time(args[k])
+		elif k == "stage":
+			args[k] = tr("stage.%s.name" % args[k])
 		elif k == "rumor":
 			args[k] = tr("rumor.%s.text" % args[k])
 		elif args[k] is float:
@@ -1203,6 +1207,7 @@ func _start_part_two() -> void:
 	facilities = {}
 	hidden = 0
 	next_subject_day = 0
+	stages = 0
 	alive = true
 	_log("log.part_two_start")
 
@@ -1217,6 +1222,7 @@ func _part_two_state() -> Dictionary:
 		"injury": injury, "day": day, "day_time": day_time, "has_room": has_room, "allies": allies, "paid_goals": paid_goals,
 		"chapter": chapter, "seen_beats": seen_beats, "pending_event": pending_event,
 		"has_base": has_base, "facilities": facilities, "hidden": hidden, "next_subject_day": next_subject_day,
+		"stages": stages,
 	}
 
 
@@ -1246,6 +1252,7 @@ func _apply_part_two_state(data: Dictionary) -> void:
 	facilities = _int_values(data.get("facilities", {}))
 	hidden = int(data.get("hidden", 0))
 	next_subject_day = int(data.get("next_subject_day", 0))
+	stages = int(data.get("stages", 0))
 	pending_event = data.get("pending_event", "")
 	if not GameData.events.has(pending_event):
 		pending_event = ""
@@ -1391,7 +1398,7 @@ func ally_can_take(ally_id: String, job_id: String) -> bool:
 
 
 func assign_ally(ally_id: String, job_id: String) -> void:
-	if allies.has(ally_id) and (job_id == "" or ally_can_take(ally_id, job_id)):
+	if allies.has(ally_id) and (job_id == "" or ally_can_take(ally_id, job_id) or (job_id == OPERATION and not current_stage().is_empty())):
 		allies[ally_id] = job_id
 
 
@@ -1401,6 +1408,8 @@ func next_ally_job(ally_id: String) -> void:
 	for id in GameData.order["jobs"]:
 		if ally_can_take(ally_id, id):
 			choices.append(id)
+	if not current_stage().is_empty():
+		choices.append(OPERATION)
 	assign_ally(ally_id, choices[(choices.find(allies.get(ally_id, "")) + 1) % choices.size()])
 
 
@@ -1498,6 +1507,8 @@ func goal_met(goal: Dictionary) -> bool:
 			return false
 	if hidden < int(goal.get("hidden", 0)):
 		return false
+	if goal.get("operation", false) and (operation().is_empty() or stages < operation().size()):
+		return false
 	return true
 
 
@@ -1521,9 +1532,11 @@ func goals_met() -> bool:
 	return true
 
 
-## 章の出来事は、data に並んだ順に、条件がそろったところで起きる。条件は日・目標・すべての目標のどれか
+## 章の出来事は、data に並んだ順に、条件がそろったところで起きる。条件は日・目標・すべての目標・越えた段階の数のどれか
 func _beat_ready(beat: Dictionary) -> bool:
 	if day < int(beat.get("day", 0)):
+		return false
+	if stages < int(beat.get("stages", 0)):
 		return false
 	if beat.has("goal"):
 		for goal in GameData.chapters[chapter_id()].get("goals", []):
@@ -1555,6 +1568,59 @@ func _after_part_two_choice(event_id: String) -> void:
 		chapter += 1
 	if durability <= 0.0:
 		_collapse()
+
+
+# 作戦。章の最後の大きな仕事を、data に並んだ段階の順に挑む。乱数は使わず、挑んだときの体調が足りなければしくじる（ADR-0078）
+
+func operation() -> Array:
+	return GameData.chapters.get(chapter_id(), {}).get("operation", [])
+
+
+## いま挑む段階。作戦の無い章か、すべての段階を越えていれば空
+func current_stage() -> Dictionary:
+	var all := operation()
+	return all[stages] if stages < all.size() else {}
+
+
+## 段階に要るスキルのレベル。その段階に合う仲間を作戦に付けていれば下がる
+func stage_level(stage: Dictionary) -> int:
+	var level := int(stage.get("level", 0))
+	if allies.get(stage.get("ally", ""), "") == OPERATION:
+		level -= int(stage.get("help", 0))
+	return level
+
+
+## 作戦には、その章のクレジットを払う目標（手はず）を払い終えてから挑む
+func can_attempt_stage() -> bool:
+	var stage := current_stage()
+	if part != 2 or stage.is_empty() or pending_event != "" or minigame_active:
+		return false
+	for goal in GameData.chapters[chapter_id()].get("goals", []):
+		if goal.has("pay") and not paid_goals.has(goal.get("id")):
+			return false
+	return skill_level.get(stage.get("skill", ""), 0) >= stage_level(stage)
+
+
+## 段階に挑む。体調が足りれば越え、足りなければ倒れて、その段階をやり直す。
+## 倒れたときは、ふだんの倒れ方と同じく怪我を負い、クレジットの一部を失う。越えた段階は残る
+func attempt_stage() -> void:
+	if not can_attempt_stage():
+		return
+	var stage := current_stage()
+	current_job = ""
+	job_progress = 0.0
+	durability -= float(stage.get("durability", 0.0))
+	if durability <= 0.0:
+		_log("log.stage_failed", {"stage": stage["id"]})
+		_collapse()
+		return
+	stages += 1
+	_log("log.stage_done", {"stage": stage["id"]})
+	if current_stage().is_empty():
+		for id in allies:
+			if allies[id] == OPERATION:
+				assign_ally(id, GameData.allies[id].get("job", ""))
+	_check_beats()
 
 
 # --- セーブとロード ---

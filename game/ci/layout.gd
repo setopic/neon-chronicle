@@ -45,8 +45,9 @@ func _process(_delta: float) -> bool:
 		var game := root.get_node("Game")
 		game.part = 2
 		game._start_part_two()
-		# 仲間を3人とも迎え、拠点の設備の行も出る第3章の画面を見る。払う目標は第2章より1つ少ないが、設備の行が1つ増える
-		game.chapter = root.get_node("GameData").order["chapters"].find("shelter")
+		# 仲間を3人とも迎え、拠点の設備の行も出る第4章の画面を見る。手はずを払い終え、払うボタンの代わりに、作戦の段階に挑むボタンが出ている
+		game.chapter = root.get_node("GameData").order["chapters"].find("copy")
+		game.paid_goals.append("gear")
 		for id in root.get_node("GameData").order["allies"]:
 			game._welcome_ally(id)
 		game._found_base()
