@@ -6,12 +6,15 @@ extends SceneTree
 ## 転生するときは、説明に書いてある効果を見て、経験がいちばん増える体を選ぶ。
 ## ジンの依頼は狙わない。果たした依頼の数だけを出す（ADR-0013）。
 ## 人物のイベントも狙わない。エンディングまでに選んだ選択肢を出す（DOM-13）。
-## 遊んだ時間（進めた秒数）を出し、制限時間までにたどり着かなければ終了コード1で終わる。
+## 遊んだ時間（進めた秒数）を出し、25〜45分の範囲でたどり着かなければ終了コード1で終わる。
+## 人が遊んで約1時間という目安を、この範囲で確かめる（ADR-0006、ADR-0072）。
 ## セーブは別のファイルに書くので、手元のセーブは消えない。
 ##
 ##   godot --headless --path . --script res://ci/playthrough.gd
 
-const LIMIT := 3.0 * 3600.0  # これより長くかかったら失敗とする（秒）
+const MIN_PLAYED := 25.0 * 60.0  # これより早くたどり着いたら失敗とする（秒）
+const MAX_PLAYED := 45.0 * 60.0  # これより長くかかったら失敗とする（秒）
+const LIMIT := 3.0 * 3600.0  # 範囲を外れたときに、どこまでかかるかを出すために進める上限（秒）
 const SAVE_PATH := "user://playthrough.json"
 
 var _game: Node
@@ -30,7 +33,7 @@ func _process(_delta: float) -> bool:
 	while _played < LIMIT:
 		_step()
 		if not _game.endings_reached().is_empty():
-			_finish(0)
+			_finish(0 if _played >= MIN_PLAYED and _played <= MAX_PLAYED else 1)
 			return true
 	_finish(1)
 	return true
