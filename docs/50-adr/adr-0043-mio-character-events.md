@@ -2,7 +2,7 @@
 id: ADR-0043
 type: adr
 title: ミオにも3段の人物のイベントを持たせる
-status: stable
+status: deprecated
 tags: [story]
 decides:
   - DOM-13
@@ -16,7 +16,7 @@ related: []
 # ミオにも3段の人物のイベントを持たせる
 
 - 日付: 2026-10-20
-- 状態: stable
+- 状態: deprecated（[ADR-0068](./adr-0068-reveal-order-of-character-events.md)が置き換えた）
 
 ## 背景
 
@@ -86,5 +86,9 @@ DOM-13の人物のイベントの一覧に、ミオの3段を足す。DOM-10の�
 - [DOM-10 登場人物](../20-domain/dom-10-characters.md)
 - [DOM-13 人物のイベント](../20-domain/dom-13-character-events.md)
 - [DOM-14 街と人物の資料](../20-domain/dom-14-city-and-people-profiles.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0068 人物のイベントは、まだ戻っていない断片の中身を先に明かさない](./adr-0068-reveal-order-of-character-events.md)
 
 <!-- graph:auto:end -->

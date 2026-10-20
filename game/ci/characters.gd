@@ -20,12 +20,16 @@ func _process(_delta: float) -> bool:
 	_game.reset_game()
 
 	_game.current_job = "hacker"
-	_expect(_roll("rei") == "rei_1", "最初は、レイの1段目が起きる")
+	_expect(_roll("rei") == "", "記憶の断片「白い部屋」が戻るまで、レイの1段目は起きない")
+	_game.fragments = ["white_room"]
+	_expect(_roll("rei") == "rei_1", "記憶の断片「白い部屋」が戻ったら、レイの1段目が起きる")
 	_game.choose("refuse")
 	_expect(_roll("rei") == "", "同じ周では、レイの話は1段しか進まない")
 
 	_next_life("hacker")
-	_expect(_roll("rei") == "rei_2", "次の周に、レイの2段目が起きる")
+	_expect(_roll("rei") == "", "記憶の断片「契約書」が戻るまで、レイの2段目は起きない")
+	_game.fragments = ["white_room", "contract"]
+	_expect(_roll("rei") == "rei_2", "記憶の断片「契約書」が戻ったら、レイの2段目が起きる")
 	_expect(_game.event_desc("rei_2") == TranslationServer.translate("event.rei_2.desc.refuse"), "2段目の説明が、1段目の選択で変わる")
 	_game.skill_level["hacking"] = 6
 	_game.choose("help")
