@@ -54,11 +54,14 @@ const COLLAPSE_INJURY := 10.0  # 倒れたときに負う怪我
 const COLLAPSE_LOSS := 0.2  # 倒れたときに失うクレジットの割合
 const ALLY_SHARE := 0.4  # 仲間に任せた仕事の稼ぎのうち、分け前として仲間が取る割合
 const STREET_DRAIN := 10.0  # 宿代を払えず、路上で寝た日に減る体調
+const SUBJECT_INTERVAL := 2  # 寝床に空きがあるとき、被験体が逃げてくる間隔（日）
+const SUBJECT_INCOME := 3.0  # 匿った被験体1人が、屋台を手伝って1秒ごとに稼ぐクレジット
+const SUBJECT_UPKEEP := 30.0  # 匿った被験体1人の、1日の食べる分の代金
 ## ログやクロニクルの引数のうち、id から表示名に変える項目
 const NAME_ARGS := {
 	"job": "jobs", "skill": "skills", "implant": "implants", "upgrade": "upgrades", "event": "events",
 	"fragment": "fragments", "ending": "endings", "body": "bodies", "challenge": "challenges", "faction": "factions",
-	"chapter": "chapters", "ally": "allies",
+	"chapter": "chapters", "ally": "allies", "facility": "facilities",
 }
 
 # --- 1人生の状態 ---
@@ -119,6 +122,10 @@ var allies := {}  # 迎えた仲間と、任せた仕事。{仲間のid: 仕事�
 var paid_goals: Array = []  # クレジットを払って満たした章の目標のid
 var chapter := 0  # 進めている章の、data に並んだ順の番号。すべて終えたら章の数になる
 var seen_beats: Array = []  # 起きた章の出来事のイベントのid
+var has_base := false  # 隠れ家（拠点）を持っているか
+var facilities := {}  # 拠点に足した設備の段。{設備のid: 段}
+var hidden := 0  # 匿っている被験体の人数
+var next_subject_day := 0  # 次に被験体が逃げてくる日
 var _part_two_stash := {}  # 第一部に戻っている間の、第二部の状態
 
 var _pending := 0.0
@@ -715,6 +722,8 @@ func choose(choice_id: String) -> void:
 	if part == 2:
 		if choice.has("ally"):
 			_welcome_ally(choice["ally"])
+		if choice.get("base", false):
+			_found_base()
 		_after_part_two_choice(event_id)
 		event_changed.emit()
 		return
@@ -1190,6 +1199,10 @@ func _start_part_two() -> void:
 	paid_goals = []
 	chapter = 0
 	seen_beats = []
+	has_base = false
+	facilities = {}
+	hidden = 0
+	next_subject_day = 0
 	alive = true
 	_log("log.part_two_start")
 
@@ -1203,6 +1216,7 @@ func _part_two_state() -> Dictionary:
 		"met_characters": met_characters, "life_rumors": life_rumors,
 		"injury": injury, "day": day, "day_time": day_time, "has_room": has_room, "allies": allies, "paid_goals": paid_goals,
 		"chapter": chapter, "seen_beats": seen_beats, "pending_event": pending_event,
+		"has_base": has_base, "facilities": facilities, "hidden": hidden, "next_subject_day": next_subject_day,
 	}
 
 
@@ -1228,6 +1242,10 @@ func _apply_part_two_state(data: Dictionary) -> void:
 	paid_goals = data.get("paid_goals", [])
 	chapter = int(data.get("chapter", 0))
 	seen_beats = data.get("seen_beats", [])
+	has_base = data.get("has_base", false)
+	facilities = _int_values(data.get("facilities", {}))
+	hidden = int(data.get("hidden", 0))
+	next_subject_day = int(data.get("next_subject_day", 0))
 	pending_event = data.get("pending_event", "")
 	if not GameData.events.has(pending_event):
 		pending_event = ""
@@ -1249,6 +1267,7 @@ func _tick_part_two(danger: float, dt: float) -> void:
 		durability -= condition_drain(danger) * dt
 	else:
 		durability = minf(max_condition(), durability + rest_rate() * dt)
+		injury = maxf(0.0, injury - facility_value("clinic", "heal", 0.0) * dt)
 	if before > LOW_DURABILITY and durability <= LOW_DURABILITY:
 		_log("log.condition_low")
 	day_time += dt
@@ -1273,12 +1292,12 @@ func condition_drain(danger: float) -> float:
 
 
 func rest_rate() -> float:
-	return REST_RATE * (ROOM_REST if has_room else 1.0)
+	return REST_RATE * facility_value("bed", "rest", ROOM_REST if has_room else 1.0)
 
 
-## 1日の暮らしにかかるクレジット
+## 1日の暮らしにかかるクレジット。盗電の線を引くと住まいの代金が無くなり、匿った被験体の食べる分だけが残る
 func living_cost() -> float:
-	return ROOM_RENT if has_room else LODGING_COST
+	return facility_value("wire", "living", ROOM_RENT if has_room else LODGING_COST) + hidden * SUBJECT_UPKEEP
 
 
 ## 日が替わる。暮らしの代金を払い、人物の話がまた進めるようになる。払えなければ路上で寝て、体調が減る
@@ -1292,6 +1311,7 @@ func _new_day() -> void:
 		credits = 0.0
 		durability = maxf(0.0, durability - STREET_DRAIN)
 		_log("log.street_night")
+	_subject_arrives()
 
 
 ## 体調が0になった。周は終わらず、診療所に運ばれて休んでいる状態から続ける
@@ -1390,14 +1410,73 @@ func ally_income(ally_id: String) -> float:
 	if job.is_empty():
 		return 0.0
 	var level: int = GameData.allies[ally_id].get("skills", {}).get(job.get("skill", ""), 0)
-	return job.get("income", 0.0) * (1.0 + job.get("skill_bonus", 0.1) * level) * (1.0 - ALLY_SHARE)
+	return job.get("income", 0.0) * (1.0 + job.get("skill_bonus", 0.1) * level) * (1.0 - ally_share())
 
 
+## 分け前の割合。拠点に作業場があると下がる
+func ally_share() -> float:
+	return facility_value("workshop", "share", ALLY_SHARE)
+
+
+## 仲間と、匿った被験体の稼ぎ。どちらも主人公が休んでいる間も入る
 func allies_income() -> float:
-	var total := 0.0
+	var total := hidden * SUBJECT_INCOME
 	for id in allies:
 		total += ally_income(id)
 	return total
+
+
+# 拠点。屋台組合の台帳に載せてもらった場所に、設備をクレジットで足していく。逃げてきた被験体を、寝床の数だけ匿う
+
+## 拠点を得る。被験体は、得た日から SUBJECT_INTERVAL 日ごとに逃げてくる
+func _found_base() -> void:
+	if has_base:
+		return
+	has_base = true
+	next_subject_day = day + SUBJECT_INTERVAL
+	_log("log.base")
+
+
+## 設備の効き目。設備が無ければ fallback。段ごとに値が違う効き目は、並びのいまの段の値を返す
+func facility_value(facility_id: String, key: String, fallback: Variant) -> Variant:
+	var level: int = facilities.get(facility_id, 0)
+	if level <= 0:
+		return fallback
+	var value: Variant = GameData.facilities.get(facility_id, {}).get(key, fallback)
+	return value[level - 1] if value is Array else value
+
+
+## 設備を次の段にする値段。いちばん上の段なら負
+func facility_cost(facility_id: String) -> float:
+	var costs: Array = GameData.facilities.get(facility_id, {}).get("costs", [])
+	var level: int = facilities.get(facility_id, 0)
+	return float(costs[level]) if level < costs.size() else -1.0
+
+
+func can_build(facility_id: String) -> bool:
+	var cost := facility_cost(facility_id)
+	return part == 2 and has_base and cost >= 0.0 and credits >= cost
+
+
+func build(facility_id: String) -> void:
+	if not can_build(facility_id):
+		return
+	credits -= facility_cost(facility_id)
+	facilities[facility_id] = facilities.get(facility_id, 0) + 1
+	_log("log.facility", {"facility": facility_id, "n": facilities[facility_id]})
+
+
+## 匿える人数。寝床の段で決まる
+func shelter_capacity() -> int:
+	return int(facility_value("bed", "beds", 0))
+
+
+func _subject_arrives() -> void:
+	if not has_base or day < next_subject_day or hidden >= shelter_capacity():
+		return
+	hidden += 1
+	next_subject_day = day + SUBJECT_INTERVAL
+	_log("log.subject", {"n": hidden})
 
 
 ## 進めている章のid。すべて終えていれば空
@@ -1413,6 +1492,11 @@ func goal_met(goal: Dictionary) -> bool:
 	if goal.get("healed", false) and injury > 0.0:
 		return false
 	if goal.has("pay") and not paid_goals.has(goal.get("id")):
+		return false
+	for id in goal.get("facilities", {}):
+		if facilities.get(id, 0) < int(goal["facilities"][id]):
+			return false
+	if hidden < int(goal.get("hidden", 0)):
 		return false
 	return true
 

@@ -31,6 +31,22 @@
         { "event": "p2_towa", "goal": "hacker" },
         { "event": "p2_name_end", "goals": true }
       ]
+    },
+    {
+      "id": "shelter",
+      "goals": [
+        { "id": "place", "pay": 100000 },
+        { "id": "guard", "skills": { "combat": 24 } },
+        { "id": "beds", "facilities": { "bed": 3 } },
+        { "id": "hidden", "hidden": 6 }
+      ],
+      "beats": [
+        { "event": "p2_union" },
+        { "event": "p2_shelter", "goal": "place" },
+        { "event": "p2_raid", "goal": "guard" },
+        { "event": "p2_runaway", "goal": "beds" },
+        { "event": "p2_shelter_end", "goals": true }
+      ]
     }
   ],
   "allies": [
@@ -38,7 +54,58 @@
     { "id": "gou", "job": "mercenary", "skills": { "combat": 25, "negotiation": 8, "hacking": 1 } },
     { "id": "towa", "job": "hacker", "skills": { "hacking": 25, "negotiation": 10, "combat": 2 } }
   ],
+  "facilities": [
+    { "id": "bed", "costs": [150000, 400000, 1000000], "beds": [2, 4, 6], "rest": 3.0 },
+    { "id": "clinic", "costs": [250000], "heal": 0.1 },
+    { "id": "workshop", "costs": [600000], "share": 0.2 },
+    { "id": "wire", "costs": [5000], "living": 0.0 }
+  ],
   "events": [
+    {
+      "id": "p2_union",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "agree" },
+        { "id": "terms", "xp": { "negotiation": 8 } }
+      ]
+    },
+    {
+      "id": "p2_shelter",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "build", "base": true },
+        { "id": "hide_deep", "base": true, "durability": -8, "xp": { "combat": 6 } }
+      ]
+    },
+    {
+      "id": "p2_raid",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "fight", "durability": -20, "xp": { "combat": 12 } },
+        { "id": "lure", "requires": { "negotiation": 20 }, "xp": { "negotiation": 10 } },
+        { "id": "jam", "requires": { "hacking": 24 }, "xp": { "hacking": 10 } }
+      ]
+    },
+    {
+      "id": "p2_runaway",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "listen" },
+        { "id": "ask_body", "xp": { "negotiation": 6 } }
+      ]
+    },
+    {
+      "id": "p2_shelter_end",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "look" }
+      ]
+    },
     {
       "id": "p2_wake",
       "part": 2,
