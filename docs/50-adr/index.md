@@ -81,6 +81,7 @@ tags: [index]
 - [ADR-0062 主人公の写しは廃棄した写しとして記録され、ミオは死んだことになっている](./adr-0062-discarded-copy-and-dead-engineer.md)
 - [ADR-0063 周をまたいで主人公を見分ける決まりを1つにする](./adr-0063-recognizing-across-lives.md)
 - [ADR-0064 置いたまま回収していない伏線の扱いを決める](./adr-0064-resolve-loose-threads.md)
+- [ADR-0065 用語と名前の揺れを直す](./adr-0065-terms-and-names.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

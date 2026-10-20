@@ -38,6 +38,8 @@ implemented_by:
 
 ミオ・ジン・レイは、[DOM-14](./dom-14-city-and-people-profiles.md)の資料にも出る。九条の資料は無い。
 
+名前の系統は、企業に属するかどうかで決まる。九条はヨミ・システムズの人物なので、アジアの名前で漢字で書く。ミオ・ジン・レイは、いまはどの企業にも属さない下層街の人物で、ヨミ・システムズのほかの企業の人物のように欧米の名前にはそろえない。
+
 ミオの一言は、倒れた理由（体の限界かイベントか）と周の番号（第1周・第9周まで・第10周から）で変わる。エンディングにたどり着いた周には出ない。
 
 ## 不変条件
@@ -79,6 +81,7 @@ implemented_by:
 - (decides) [ADR-0062 主人公の写しは廃棄した写しとして記録され、ミオは死んだことになっている](../50-adr/adr-0062-discarded-copy-and-dead-engineer.md)
 - (decides) [ADR-0063 周をまたいで主人公を見分ける決まりを1つにする](../50-adr/adr-0063-recognizing-across-lives.md)
 - (decides) [ADR-0064 置いたまま回収していない伏線の扱いを決める](../50-adr/adr-0064-resolve-loose-threads.md)
+- (decides) [ADR-0065 用語と名前の揺れを直す](../50-adr/adr-0065-terms-and-names.md)
 - (depends_on) [DOM-11 体の種類](./dom-11-body-types.md)
 - (depends_on) [DOM-12 ジンの依頼](./dom-12-jin-requests.md)
 - (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)
