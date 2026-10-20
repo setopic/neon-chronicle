@@ -158,6 +158,7 @@ graph LR
     ADR-0065["ADR-0065<br/>用語と名前の揺れを直す"]
     ADR-0066["ADR-0066<br/>仕事の区画は仕事を請け負う場所とし、イベントの舞台とは分ける"]
     ADR-0067["ADR-0067<br/>1つの周は、世界の中では数日から数週とする"]
+    ADR-0068["ADR-0068<br/>人物のイベントは、まだ戻っていない断片の中身を先に明かさない"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -315,6 +316,10 @@ graph LR
   ADR-0066 -.->|decides| DOM-24
   ADR-0067 -.->|decides| DOM-02
   ADR-0067 -.->|decides| DOM-27
+  ADR-0068 ==>|supersedes| ADR-0043
+  ADR-0068 -.->|decides| DOM-13
+  ADR-0068 -.->|decides| DOM-10
+  ADR-0068 -.->|decides| DOM-14
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -437,7 +442,7 @@ graph LR
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
-  class ADR-0004,ADR-0005,ADR-0006,ADR-0009,ADR-0010,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0023,ADR-0024,ADR-0033,ADR-0036,ADR-0039,ADR-0040,ADR-0044,ADR-0048 deprecated;
+  class ADR-0004,ADR-0005,ADR-0006,ADR-0009,ADR-0010,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0023,ADR-0024,ADR-0033,ADR-0036,ADR-0039,ADR-0040,ADR-0043,ADR-0044,ADR-0048 deprecated;
 ```
 
 <!-- graph:diagram:end -->

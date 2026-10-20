@@ -65,6 +65,8 @@ implemented_by:
 | ジン | | 「名前」 |
 | レイ | レイの1段目 | レイの2段目。[被験体の出どころ](./dom-20-test-subjects-origin.md)の追記と、名簿の追記の2つ |
 
+被験体を借金の契約で集めることは、どの記憶の断片の文にも書いていない。そのため、資料「ネオン・シティ」の追記より先に、レイの2段目と資料「レイ」の追記で分かってもよい。
+
 ## 不変条件
 
 - [ ] 記憶の断片で明かすことは、その断片が戻るまで、どの資料にも出ない
@@ -122,6 +124,7 @@ implemented_by:
 - (decides) [ADR-0041 体の元の持ち主の記憶を、体ごとの2段の話にする](../50-adr/adr-0041-former-owner-memories.md)
 - (decides) [ADR-0043 ミオにも3段の人物のイベントを持たせる](../50-adr/adr-0043-mio-character-events.md)
 - (decides) [ADR-0064 置いたまま回収していない伏線の扱いを決める](../50-adr/adr-0064-resolve-loose-threads.md)
+- (decides) [ADR-0068 人物のイベントは、まだ戻っていない断片の中身を先に明かさない](../50-adr/adr-0068-reveal-order-of-character-events.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 
 <!-- graph:auto:end -->
