@@ -1,0 +1,96 @@
+{
+  "chapters": [
+    {
+      "id": "heavy_body",
+      "goals": [
+        { "id": "steady", "skills": { "hacking": 15, "combat": 15, "negotiation": 15 } },
+        { "id": "room", "room": true },
+        { "id": "healed", "healed": true },
+        { "id": "debt", "pay": 20000 }
+      ],
+      "beats": [
+        { "event": "p2_wake" },
+        { "event": "p2_jin", "day": 3 },
+        { "event": "p2_hunters", "goal": "room" },
+        { "event": "p2_mio_debt", "goal": "debt" },
+        { "event": "p2_heavy_body_end", "goals": true }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "id": "p2_wake",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "slowly" },
+        { "id": "ask" }
+      ]
+    },
+    {
+      "id": "p2_jin",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "tell", "xp": { "negotiation": 6 } },
+        { "id": "deny" }
+      ]
+    },
+    {
+      "id": "p2_hunters",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "hide", "durability": -10 },
+        { "id": "pay", "credits": -60 },
+        { "id": "mislead", "requires": { "negotiation": 6 }, "xp": { "negotiation": 10 } }
+      ]
+    },
+    {
+      "id": "p2_mio_debt",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "thank" },
+        { "id": "ask_why", "xp": { "negotiation": 6 } }
+      ]
+    },
+    {
+      "id": "p2_heavy_body_end",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "listen" }
+      ]
+    },
+    {
+      "id": "p2_shaking_hands",
+      "part": 2,
+      "jobs": ["courier"],
+      "choices": [
+        { "id": "push", "credits": 30, "durability": -8 },
+        { "id": "slow", "xp": { "combat": 4 } }
+      ]
+    },
+    {
+      "id": "p2_lost_code",
+      "part": 2,
+      "jobs": ["hacker"],
+      "choices": [
+        { "id": "guess", "credits": 40, "durability": -10 },
+        { "id": "relearn", "xp": { "hacking": 8 } },
+        { "id": "recall", "requires": { "hacking": 6 }, "credits": 80, "xp": { "hacking": 10 } }
+      ]
+    },
+    {
+      "id": "p2_one_body",
+      "part": 2,
+      "jobs": ["mercenary"],
+      "choices": [
+        { "id": "charge", "credits": 60, "durability": -20 },
+        { "id": "cover", "durability": -6, "xp": { "combat": 6 } },
+        { "id": "read", "requires": { "combat": 10 }, "credits": 90, "xp": { "combat": 10 } }
+      ]
+    }
+  ]
+}

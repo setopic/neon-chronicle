@@ -49,6 +49,13 @@ var _choice_buttons := {}  # 選択肢のid -> ボタン
 var _voice_labels := {}  # スキルの条件のある選択肢のid -> 声の行。DOM-32
 var _minigame_button: Button  # 就いている仕事の1回を、ミニゲームで終える。ADR-0054
 var _story_closed_life := 0  # 戻った記憶の断片やエンディングの画面を閉じた周の番号。DOM-08
+# 第二部の暮らしの操作と、章の目標。DOM-34
+var _rest_button: Button
+var _treat_button: Button
+var _room_button: Button
+var _chapter_label: Label
+var _goals_label: Label
+var _pay_buttons := []  # [{button, goal}]。クレジットを払って満たす目標
 
 
 func _ready() -> void:
@@ -91,7 +98,9 @@ func _build() -> void:
 	_request_buttons.clear()
 	_choice_buttons.clear()
 	_voice_labels.clear()
+	_pay_buttons.clear()
 	_minigame_button = null
+	_rest_button = null
 
 	_content = Control.new()
 	_content.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -361,6 +370,11 @@ func _build_right() -> Control:
 	_body_effects_label = _label(Loc.t("ui.body_effects", {
 		"body": GameData.name_of("bodies", Game.body), "quality": Game.body_quality,
 		"effects": GameData.desc_of("bodies", Game.body)}) + "\n" + tr("body.%s.trait" % Game.body), DIM, UiStyle.SIZE_SMALL)
+	# 第二部の本当の体には種類が無いので、体調の仕組みの説明を体調の行のツールチップに出す（DOM-34）
+	_body_effects_label.visible = Game.part == 1
+	if Game.part == 2:
+		_body_label.tooltip_text = tr("ui.true_body")
+		_body_label.mouse_filter = Control.MOUSE_FILTER_PASS
 	_body_effects_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_body_effects_label)
 	_effect_total_label = _label("", DIM, UiStyle.SIZE_SMALL)
@@ -390,7 +404,55 @@ func _build_right() -> Control:
 	_reputation_label = _label("", DIM, UiStyle.SIZE_SMALL)
 	_reputation_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_reputation_label)
+	if Game.part == 2:
+		_build_part_two(box)
 	return box.get_parent().get_parent()
+
+
+## 第二部の暮らしの操作と、章の目標。依頼と縛りの行は第二部では出ないので、その分の高さを使う。
+## 欄を入れ替えても1280x720に収まるよう、ボタンは1行に並べ、目標は1つの文にまとめる（DOM-34、ADR-0058）
+func _build_part_two(box: VBoxContainer) -> void:
+	var row := HBoxContainer.new()
+	box.add_child(row)
+	_rest_button = _compact_button(tr("ui.rest"), Game.rest)
+	row.add_child(_rest_button)
+	_room_button = _compact_button("", Game.rent_room)
+	_room_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(_room_button)
+	var leave := _compact_button(tr("ui.part_two_leave"), func():
+		_story_closed_life = Game.life_number
+		Game.leave_part_two())
+	leave.disabled = not Game.can_leave_part_two()
+	row.add_child(leave)
+	for button in row.get_children():
+		button.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_room_button.tooltip_text = Loc.t("ui.room_note", {"rent": Game.format_number(Game.ROOM_RENT)})
+	_treat_button = _compact_button("", Game.treat)
+	box.add_child(_treat_button)
+	_chapter_label = _label("", PINK, UiStyle.SIZE_TEXT)
+	_chapter_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_chapter_label.mouse_filter = Control.MOUSE_FILTER_PASS
+	box.add_child(_chapter_label)
+	_goals_label = _label("", UiStyle.TEXT, UiStyle.SIZE_SMALL)
+	_goals_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(_goals_label)
+	# クレジットを払って満たす目標は、払うボタンにする
+	for goal in GameData.chapters.get(Game.chapter_id(), {}).get("goals", []):
+		if goal.has("pay"):
+			var button := _compact_button("", Game.pay_goal.bind(goal))
+			box.add_child(button)
+			_pay_buttons.append({"button": button, "goal": goal})
+
+
+func _compact_button(text: String, pressed: Callable) -> Button:
+	var button := Button.new()
+	button.text = text
+	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	button.theme_type_variation = "CompactButton"
+	button.pressed.connect(pressed)
+	UiStyle.add_hover(button)
+	return button
 
 
 ## インプラントと偽の身元。体の状態の欄に積むと中段が画面の高さを超えるので、3つ目の列に分ける
@@ -501,6 +563,12 @@ func _build_rebirth() -> Control:
 	gained_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	intro.add_child(gained_label)
 	intro.add_child(_label(_fragment_progress(), DIM, UiStyle.SIZE_SMALL))
+	# 本当の体にたどり着いたら、転生の代わりに第二部へ進める（DOM-34）
+	if Game.can_enter_part_two():
+		var enter := _button(tr("ui.part_two_enter"), Game.enter_part_two)
+		enter.add_theme_color_override("font_color", PINK)
+		enter.tooltip_text = tr("ui.part_two_enter_note")
+		intro.add_child(enter)
 
 	# 説明は見出しと同じ行に置き、画面の高さに収める
 	var heading := HBoxContainer.new()
@@ -742,14 +810,17 @@ func _refresh() -> void:
 	if _stats_label == null:
 		return
 	var income := Game.income_per_sec(Game.current_job)
-	_stats_label.text = "%s    %s" % [
-		Loc.t("ui.life", {"n": Game.life_number}),
-		Loc.t("ui.credits", {"n": Game.format_number(Game.credits)}),
-	]
+	var when := Loc.t("ui.life", {"n": Game.life_number})
+	if Game.part == 2:
+		when = "%s %s" % [tr("ui.part_two"), Loc.t("ui.day", {"n": Game.day})]
+	_stats_label.text = "%s    %s" % [when, Loc.t("ui.credits", {"n": Game.format_number(Game.credits)})]
+	# 第二部には記憶ポイントが無いので、代わりに1日の暮らしの代金を出す（DOM-34）
+	var last_stat := Loc.t("ui.living_cost", {"n": Game.format_number(Game.living_cost())}) if Game.part == 2 \
+		else Loc.t("ui.memory_points", {"n": Game.memory_points}) + _points_estimate()
 	_rest_stats_label.text = "    %s    %s" % [
 		Loc.t("ui.income", {"n": "%.1f" % income}),
 		# 体の欄に効果の行を足した分、記憶ポイントは周の状態と並べて上に出す（ADR-0016）
-		Loc.t("ui.memory_points", {"n": Game.memory_points}) + _points_estimate(),
+		last_stat,
 	]
 	for id in _job_buttons:
 		var button: Button = _job_buttons[id]
@@ -761,6 +832,7 @@ func _refresh() -> void:
 			button.text = "%s  %s" % [name, _job_requirement_text(id)]
 			button.disabled = true
 		button.set_pressed_no_signal(id == Game.current_job)
+		button.visible = Game.job_in_part(id)
 		var bar: ProgressBar = _job_bars[id]
 		bar.visible = id == Game.current_job
 		bar.max_value = Game.job_length(id)
@@ -782,11 +854,20 @@ func _refresh() -> void:
 				"effects": _effects_text(GameData.skills[id].get("effects_per_milestone", {}))})
 	_durability_bar.value = Game.durability
 	_durability_bar.modulate = DANGER if Game.durability < Game.LOW_DURABILITY else Color.WHITE
-	_body_label.text = "%s    %s    %s" % [
-		Loc.t("ui.durability", {"now": int(ceil(Game.durability)), "max": int(Game.MAX_DURABILITY)}),
-		Loc.t("ui.age", {"age": Game.format_time(Game.age)}),
-		Loc.t("ui.decay", {"n": "%.2f" % Game.current_decay()}),
-	]
+	if Game.part == 2:
+		_body_label.text = "%s    %s    %s" % [
+			Loc.t("ui.condition", {"now": int(ceil(Game.durability)), "max": int(Game.max_condition())}),
+			Loc.t("ui.injury", {"n": int(ceil(Game.injury))}),
+			Loc.t("ui.drain", {"n": "%.2f" % Game.condition_drain(GameData.jobs[Game.current_job].get("danger", 1.0))})
+				if Game.current_job != "" else Loc.t("ui.rest_rate", {"n": "%.1f" % Game.rest_rate()}),
+		]
+		_refresh_part_two()
+	else:
+		_body_label.text = "%s    %s    %s" % [
+			Loc.t("ui.durability", {"now": int(ceil(Game.durability)), "max": int(Game.MAX_DURABILITY)}),
+			Loc.t("ui.age", {"age": Game.format_time(Game.age)}),
+			Loc.t("ui.decay", {"n": "%.2f" % Game.current_decay()}),
+		]
 	_effect_total_label.text = Loc.t("ui.effect_total", {"effects": _effects_text({
 		"income": Game.effect("income"),
 		"xp": Game.xp_mult() - 1.0,
@@ -807,7 +888,9 @@ func _refresh() -> void:
 	if is_instance_valid(_capacity_label):
 		_capacity_label.text = Loc.t("ui.capacity", {"load": Game.implant_load(), "max": Game.capacity()})
 	if is_instance_valid(_identity_button):
-		_identity_button.text = tr("ui.identity_owned") if Game.identity else Loc.t("ui.identity_buy", {"n": Game.format_number(Game.IDENTITY_COST)})
+		# 第二部には周の終わりが無いので、買った身元はそのまま持ち続ける（DOM-34）
+		var buy_key := "ui.identity_buy" if Game.part == 1 else "ui.identity_buy_kept"
+		_identity_button.text = tr("ui.identity_owned" if Game.part == 1 else "ui.identity_owned_kept") if Game.identity else Loc.t(buy_key, {"n": Game.format_number(Game.IDENTITY_COST)})
 		_identity_button.disabled = Game.identity or not Game.alive or Game.credits < Game.IDENTITY_COST
 	for id in _implant_buttons:
 		var button: Button = _implant_buttons[id]
@@ -824,7 +907,7 @@ func _refresh() -> void:
 			if not Game.implant_fits(id):
 				parts.append(tr("ui.implant_no_room"))
 			button.disabled = not Game.alive or Game.credits < Game.implant_cost(id) or not Game.implant_fits(id)
-		if data.get("persistent", false):
+		if data.get("persistent", false) and Game.part == 1:
 			parts.append(tr("ui.persistent"))
 		button.text = "  ".join(parts)
 	for id in _upgrade_buttons:
@@ -855,6 +938,35 @@ func _refresh() -> void:
 		refund.text = Loc.t("ui.upgrade_refund", {"upgrade": GameData.name_of("upgrades", id), "n": Game.upgrade_spent(id)})
 	if is_instance_valid(_rebirth_points_label):
 		_rebirth_points_label.text = Loc.t("ui.memory_points", {"n": Game.memory_points})
+
+
+func _refresh_part_two() -> void:
+	if not is_instance_valid(_rest_button):
+		return
+	var resting := Game.current_job == ""
+	_rest_button.text = tr("ui.resting") if resting else tr("ui.rest")
+	_rest_button.disabled = resting or not Game.can_leave_part_two()
+	_treat_button.visible = Game.injury > 0.0
+	_treat_button.text = Loc.t("ui.treat", {"n": int(ceil(Game.treat_amount())), "cost": Game.format_number(Game.treat_cost())})
+	_treat_button.disabled = not Game.can_treat()
+	_room_button.text = tr("ui.room_owned") if Game.has_room else Loc.t("ui.room_rent", {"cost": Game.format_number(Game.ROOM_COST)})
+	_room_button.disabled = not Game.can_rent_room()
+	var id := Game.chapter_id()
+	if id == "":
+		_chapter_label.text = tr("ui.chapter_next")
+	else:
+		_chapter_label.text = Loc.t("ui.chapter", {"n": Game.chapter + 1, "name": GameData.name_of("chapters", id)})
+		_chapter_label.tooltip_text = GameData.desc_of("chapters", id)
+	var goals := PackedStringArray()
+	for goal in GameData.chapters.get(id, {}).get("goals", []):
+		goals.append(Loc.t("ui.goal_done" if Game.goal_met(goal) else "ui.goal_open", {"goal": tr("chapter.%s.goal.%s" % [id, goal["id"]])}))
+	_goals_label.text = "  ".join(goals)
+	for row in _pay_buttons:
+		var goal: Dictionary = row["goal"]
+		var button: Button = row["button"]
+		button.visible = not Game.goal_met(goal)
+		button.text = Loc.t("ui.goal_pay", {"goal": tr("chapter.%s.goal.%s" % [id, goal["id"]]), "cost": Game.format_number(float(goal["pay"]))})
+		button.disabled = not Game.can_pay_goal(goal)
 
 
 ## 周の途中に、記憶ポイントの見込みを出す（ADR-0071）

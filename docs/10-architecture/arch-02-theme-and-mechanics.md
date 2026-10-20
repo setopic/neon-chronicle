@@ -37,6 +37,7 @@ related: []
 | 登場人物と人物のイベント | [DOM-10](../20-domain/dom-10-characters.md)・[DOM-13](../20-domain/dom-13-character-events.md) | 体が毎周替わることを、人間関係として感じさせる |
 | クロニクルの物語 | [DOM-07](../20-domain/dom-07-chronicle-story.md) | 使い終えた体の1周を、物語文として残す |
 | エンディング | [DOM-08](../20-domain/dom-08-memory-fragments-and-endings.md)・[DOM-29](../20-domain/dom-29-day-of-waking.md) | 被験体を全員目覚めさせても、企業は残る |
+| 第二部の暮らし | [DOM-34](../20-domain/dom-34-part-two-life.md) | 取り戻した本当の体は、使い捨てにできない。遊ぶ人は、体調が尽きないよう休み、怪我を治しながら暮らす。第一部で体を使い捨ててきた遊び方との違いで、主題を裏から伝える |
 
 次の仕組みは、主題と関わらない。主題に合うかを照らさずに足してよい。
 

@@ -88,5 +88,6 @@ implemented_by:
 - (depends_on) [DOM-13 人物のイベント](./dom-13-character-events.md)
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 - (depends_on) [DOM-20 被験体の出どころ](./dom-20-test-subjects-origin.md)
+- (depends_on) [DOM-34 第二部の暮らし](./dom-34-part-two-life.md)
 
 <!-- graph:auto:end -->

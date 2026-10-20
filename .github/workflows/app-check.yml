@@ -59,6 +59,11 @@ jobs:
         working-directory: game
         run: timeout 300 ~/godot/godot --headless --path . --script res://ci/playthrough.gd
 
+      # エンディング「本当の体」のあと、第二部の章を終えるまで自動で遊び、章の長さが目安の範囲に入るかを見る（DOM-34）。
+      - name: 第二部の章を終えるまで遊んで、長さを確かめる
+        working-directory: game
+        run: timeout 300 ~/godot/godot --headless --path . --script res://ci/part_two.gd
+
       # セーブの時刻をずらしてロードし、閉じていた時間の分だけ進むかを見る（ADR-0007）。
       - name: 閉じていた時間の分だけ進むか確かめる
         working-directory: game

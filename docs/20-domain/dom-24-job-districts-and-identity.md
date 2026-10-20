@@ -78,5 +78,6 @@ implemented_by:
 - (decides) [ADR-0060 主人公は体ごとに口座だけの身元を持つことにする](../50-adr/adr-0060-account-only-identity.md)
 - (decides) [ADR-0066 仕事の区画は仕事を請け負う場所とし、イベントの舞台とは分ける](../50-adr/adr-0066-job-district-is-where-hired.md)
 - (depends_on) [DOM-33 街の噂](./dom-33-city-rumors.md)
+- (depends_on) [DOM-34 第二部の暮らし](./dom-34-part-two-life.md)
 
 <!-- graph:auto:end -->
