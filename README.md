@@ -156,6 +156,7 @@ graph LR
     ADR-0063["ADR-0063<br/>周をまたいで主人公を見分ける決まりを1つにする"]
     ADR-0064["ADR-0064<br/>置いたまま回収していない伏線の扱いを決める"]
     ADR-0065["ADR-0065<br/>用語と名前の揺れを直す"]
+    ADR-0066["ADR-0066<br/>仕事の区画は仕事を請け負う場所とし、イベントの舞台とは分ける"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -308,6 +309,9 @@ graph LR
   ADR-0065 -.->|decides| DOM-17
   ADR-0065 -.->|decides| DOM-23
   ADR-0065 -.->|decides| DOM-25
+  ADR-0066 ==>|supersedes| ADR-0039
+  ADR-0066 -.->|decides| DOM-15
+  ADR-0066 -.->|decides| DOM-24
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
@@ -429,7 +433,7 @@ graph LR
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
-  class ADR-0004,ADR-0005,ADR-0006,ADR-0009,ADR-0010,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0023,ADR-0024,ADR-0033,ADR-0036,ADR-0040,ADR-0044,ADR-0048 deprecated;
+  class ADR-0004,ADR-0005,ADR-0006,ADR-0009,ADR-0010,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0023,ADR-0024,ADR-0033,ADR-0036,ADR-0039,ADR-0040,ADR-0044,ADR-0048 deprecated;
 ```
 
 <!-- graph:diagram:end -->
