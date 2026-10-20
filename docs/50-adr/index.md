@@ -87,6 +87,7 @@ tags: [index]
 - [ADR-0068 人物のイベントは、まだ戻っていない断片の中身を先に明かさない](./adr-0068-reveal-order-of-character-events.md)
 - [ADR-0069 遊ぶ人の側の仕組みを挙げ、街の歴史の穴を埋める](./adr-0069-meta-mechanics-and-city-history-gaps.md)
 - [ADR-0070 本作の主題を「使い捨て」とし、警告として描く](./adr-0070-theme-disposable.md)
+- [ADR-0071 記憶ポイントの見込みと伸びを見せ、閉じていた間の成果をログに出す](./adr-0071-show-rebirth-payoff.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

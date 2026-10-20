@@ -162,6 +162,7 @@ graph LR
     ADR-0068["ADR-0068<br/>人物のイベントは、まだ戻っていない断片の中身を先に明かさない"]
     ADR-0069["ADR-0069<br/>遊ぶ人の側の仕組みを挙げ、街の歴史の穴を埋める"]
     ADR-0070["ADR-0070<br/>本作の主題を「使い捨て」とし、警告として描く"]
+    ADR-0071["ADR-0071<br/>記憶ポイントの見込みと伸びを見せ、閉じていた間の成果をログに出す"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -326,6 +327,7 @@ graph LR
   ADR-0069 -.->|decides| DOM-09
   ADR-0069 -.->|decides| DOM-17
   ADR-0070 -.->|decides| ARCH-02
+  ADR-0071 -.->|decides| DOM-05
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02

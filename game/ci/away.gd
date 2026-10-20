@@ -1,6 +1,6 @@
 extends SceneTree
 
-## 閉じていた時間の分だけ進むかを確かめる。ADR-0007、ADR-0051。
+## 閉じていた時間の分だけ進むかを確かめる。ADR-0007、ADR-0051、ADR-0071。
 ## セーブの時刻を過去にずらしてロードし、1フレーム分だけ進めて結果を見る。
 ## セーブは別のファイルに書くので、手元のセーブは消えない。
 ##
@@ -29,6 +29,12 @@ func _process(_delta: float) -> bool:
 	_expect(absf(_game.credits - pay) < 0.01, "閉じている間に終えた1回の報酬が入る（%.2f / %.2f）" % [_game.credits, pay])
 	_expect(absf(_game.job_progress - 2.0) < 0.3, "途中の1回は続きから進む（%.2f）" % _game.job_progress)
 
+	# 仕事に就いて閉じていたら、稼いだクレジットがログの1行に出る（ADR-0071）
+	_reopen_after(100.0, {"current_job": "courier"})
+	var away: Dictionary = _first_log("log.away_gain")
+	_expect(not away.is_empty(), "閉じていた間の成果がログに残る")
+	_expect(absf(away.get("args", {}).get("earned", 0.0) - _game.life_earned) < 0.01, "ログの稼ぎが、閉じていた間に稼いだクレジットと同じ")
+
 	_reopen_after(30.0 * 24.0 * 3600.0)
 	_expect(not _game.alive, "長く閉じていたら、周が終わる")
 	_expect(_game.chronicle.size() == 1, "終わった周がクロニクルに残る")
@@ -52,6 +58,13 @@ func _reopen_after(seconds: float, changes := {}) -> void:
 	FileAccess.open(SAVE_PATH, FileAccess.WRITE).store_string(JSON.stringify(data))
 	_game.load_game()
 	_game._process(0.016)
+
+
+func _first_log(key: String) -> Dictionary:
+	for entry in _game.logs:
+		if entry.get("key") == key:
+			return entry
+	return {}
 
 
 func _expect(ok: bool, what: String) -> void:
