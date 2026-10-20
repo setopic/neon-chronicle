@@ -58,6 +58,7 @@ var _goals_label: Label
 var _pay_buttons := []  # [{button, goal}]。クレジットを払って満たす目標
 var _ally_buttons := {}  # {仲間のid: Button}。押すたびに、任せる仕事を替える
 var _facility_buttons := {}  # {設備のid: Button}。押すと、設備を次の段にする
+var _stage_button: Button  # 作戦のいまの段階に挑む。作戦の無い章では無い（ADR-0078）
 var _hidden_label: Label
 
 
@@ -472,6 +473,12 @@ func _build_part_two(box: VBoxContainer) -> void:
 			var button := _compact_button("", Game.pay_goal.bind(goal))
 			box.add_child(button)
 			_pay_buttons.append({"button": button, "goal": goal})
+	_stage_button = null
+	if not Game.operation().is_empty():
+		# 作戦は手はずを払ってから挑むので、払うボタンと同時には出ない。行は増えない
+		_stage_button = _compact_button("", Game.attempt_stage)
+		_stage_button.autowrap_mode = TextServer.AUTOWRAP_OFF
+		box.add_child(_stage_button)
 
 
 func _compact_button(text: String, pressed: Callable) -> Button:
@@ -983,7 +990,8 @@ func _refresh_part_two() -> void:
 	_room_button.disabled = not Game.can_rent_room()
 	for ally in _ally_buttons:
 		var job: String = Game.allies.get(ally, "")
-		var args := {"ally": GameData.name_of("allies", ally), "job": GameData.name_of("jobs", job) if job != "" else tr("ui.no_job"), "n": Game.format_number(Game.ally_income(ally)), "share": roundi(Game.ally_share() * 10.0), "pct": roundi(Game.ally_share() * 100.0)}
+		var job_name := tr("ui.ally_operation") if job == Game.OPERATION else GameData.name_of("jobs", job) if job != "" else tr("ui.no_job")
+		var args := {"ally": GameData.name_of("allies", ally), "job": job_name, "n": Game.format_number(Game.ally_income(ally)), "share": roundi(Game.ally_share() * 10.0), "pct": roundi(Game.ally_share() * 100.0)}
 		_ally_buttons[ally].text = Loc.t("ui.ally", args)
 		_ally_buttons[ally].tooltip_text = "%s\n%s" %[GameData.desc_of("allies", ally), Loc.t("ui.ally_note", args)]
 	if _hidden_label != null:
@@ -1009,6 +1017,19 @@ func _refresh_part_two() -> void:
 		button.visible = not Game.goal_met(goal)
 		button.text = Loc.t("ui.goal_pay", {"goal": tr("chapter.%s.goal.%s" % [id, goal["id"]]), "cost": Game.format_number(float(goal["pay"]))})
 		button.disabled = not Game.can_pay_goal(goal)
+	if _stage_button != null:
+		var stage := Game.current_stage()
+		var paid := true
+		for row in _pay_buttons:
+			paid = paid and Game.goal_met(row["goal"])
+		_stage_button.visible = paid and not stage.is_empty()
+		if _stage_button.visible:
+			var args := {"stage": tr("stage.%s.name" % stage["id"]), "skill": GameData.name_of("skills", stage["skill"]), "level": Game.stage_level(stage),
+				"n": int(stage.get("durability", 0)), "ally": GameData.name_of("allies", stage.get("ally", ""))}
+			_stage_button.text = Loc.t("ui.stage", args)
+			_stage_button.tooltip_text = "%s
+%s" % [tr("stage.%s.desc" % stage["id"]), Loc.t("ui.stage_note", args)]
+			_stage_button.disabled = not Game.can_attempt_stage()
 
 
 ## 周の途中に、記憶ポイントの見込みを出す（ADR-0071）

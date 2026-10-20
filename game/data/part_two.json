@@ -47,6 +47,25 @@
         { "event": "p2_runaway", "goal": "beds" },
         { "event": "p2_shelter_end", "goals": true }
       ]
+    },
+    {
+      "id": "copy",
+      "goals": [
+        { "id": "gear", "pay": 1000000 },
+        { "id": "raid", "operation": true }
+      ],
+      "beats": [
+        { "event": "p2_copy_wake" },
+        { "event": "p2_copy_seen", "goal": "gear" },
+        { "event": "p2_inside", "stages": 1 },
+        { "event": "p2_record", "stages": 2 },
+        { "event": "p2_copy_end", "goals": true }
+      ],
+      "operation": [
+        { "id": "infiltrate", "skill": "negotiation", "level": 26, "help": 4, "ally": "saki", "durability": 50 },
+        { "id": "firewall", "skill": "hacking", "level": 28, "help": 4, "ally": "towa", "durability": 55 },
+        { "id": "face", "skill": "combat", "level": 33, "help": 4, "ally": "gou", "durability": 60 }
+      ]
     }
   ],
   "allies": [
@@ -61,6 +80,49 @@
     { "id": "wire", "costs": [5000], "living": 0.0 }
   ],
   "events": [
+    {
+      "id": "p2_copy_wake",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "track" }
+      ]
+    },
+    {
+      "id": "p2_copy_seen",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "watch" },
+        { "id": "follow", "durability": -10, "xp": { "combat": 8 } }
+      ]
+    },
+    {
+      "id": "p2_inside",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "move_on" },
+        { "id": "look_beds", "xp": { "hacking": 6 } }
+      ]
+    },
+    {
+      "id": "p2_record",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "read" },
+        { "id": "copy_out", "requires": { "hacking": 30 }, "xp": { "hacking": 10 } }
+      ]
+    },
+    {
+      "id": "p2_copy_end",
+      "part": 2,
+      "jobs": [],
+      "choices": [
+        { "id": "stay" }
+      ]
+    },
     {
       "id": "p2_union",
       "part": 2,
