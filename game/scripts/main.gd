@@ -487,7 +487,11 @@ func _build_rebirth() -> Control:
 		gained += Loc.t("ui.request_bonus", {"n": Game.last_request_bonus})
 	if Game.last_challenge_bonus > 0:
 		gained += Loc.t("ui.challenge_bonus", {"n": Game.last_challenge_bonus})
-	intro.add_child(_label(gained, PINK, UiStyle.SIZE_STAT))
+	gained += _points_vs_last()
+	# 上乗せと前の周との差が並ぶと列の幅を超えることがあるので、列を広げずに折り返す
+	var gained_label := _label(gained, PINK, UiStyle.SIZE_STAT)
+	gained_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	intro.add_child(gained_label)
 	intro.add_child(_label(_fragment_progress(), DIM, UiStyle.SIZE_SMALL))
 
 	# 説明は見出しと同じ行に置き、画面の高さに収める
@@ -729,7 +733,7 @@ func _refresh() -> void:
 	_rest_stats_label.text = "    %s    %s" % [
 		Loc.t("ui.income", {"n": "%.1f" % income}),
 		# 体の欄に効果の行を足した分、記憶ポイントは周の状態と並べて上に出す（ADR-0016）
-		Loc.t("ui.memory_points", {"n": Game.memory_points}),
+		Loc.t("ui.memory_points", {"n": Game.memory_points}) + _points_estimate(),
 	]
 	for id in _job_buttons:
 		var button: Button = _job_buttons[id]
@@ -826,6 +830,21 @@ func _refresh() -> void:
 		refund.text = Loc.t("ui.upgrade_refund", {"upgrade": GameData.name_of("upgrades", id), "n": Game.upgrade_spent(id)})
 	if is_instance_valid(_rebirth_points_label):
 		_rebirth_points_label.text = Loc.t("ui.memory_points", {"n": Game.memory_points})
+
+
+## 周の途中に、記憶ポイントの見込みを出す（ADR-0071）
+func _points_estimate() -> String:
+	return Loc.t("ui.points_estimate", {"n": Game.points_if_ended_now()}) if Game.alive else ""
+
+
+## 転生の画面で、前の周の記録と比べた差を出す。第1周のあとは比べる周が無い（ADR-0071）
+func _points_vs_last() -> String:
+	if Game.chronicle.size() < 2:
+		return ""
+	var diff: int = Game.last_points_gained - int(Game.chronicle[-2].get("points", 0))
+	if diff == 0:
+		return tr("ui.points_vs_last_same")
+	return Loc.t("ui.points_vs_last_more" if diff > 0 else "ui.points_vs_last_less", {"n": absi(diff)})
 
 
 func _refresh_log() -> void:

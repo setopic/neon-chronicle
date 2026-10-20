@@ -102,24 +102,43 @@ func _process(delta: float) -> void:
 	var now := Time.get_unix_time_from_system()
 	var gap := maxf(delta, now - _last_seen)
 	_last_seen = now
+	var away := {}
 	if gap > AWAY_GAP:
-		_advance_away(minf(gap, MAX_AWAY))
+		away = _advance_away(minf(gap, MAX_AWAY))
 	else:
 		_pending = minf(_pending + delta, MAX_CATCHUP)
 	while _pending >= STEP:
 		_pending -= STEP
 		_tick(STEP)
+	if not away.is_empty():
+		_fill_away_log(away)
 	_save_timer += delta
 	if _save_timer >= SAVE_INTERVAL:
 		_save_timer = 0.0
 		save_game()
 
 
-## 閉じていた時間を、開いているときと同じ刻みで進める。周が終わっても自動で転生はしない（ADR-0007）
-func _advance_away(seconds: float) -> void:
-	if alive and not is_paused() and seconds >= AWAY_LOG:
-		_log("log.away", {"age": seconds})
+## 閉じていた時間を、開いているときと同じ刻みで進める。周が終わっても自動で転生はしない（ADR-0007）。
+## ログに残したときは、その行と進める前の値を返す。閉じていた間の成果は、進め終えてから _fill_away_log で足す（ADR-0071）
+func _advance_away(seconds: float) -> Dictionary:
 	_pending += seconds
+	if not alive or is_paused() or seconds < AWAY_LOG:
+		return {}
+	# 閉じている間に周が終わったときの行より前に出すため、先に行を置いておく
+	_log("log.away", {"age": seconds})
+	return {"entry": logs.back(), "earned": life_earned, "points": points_if_ended_now()}
+
+
+func _fill_away_log(away: Dictionary) -> void:
+	var earned: float = life_earned - away["earned"]
+	var now := last_points_gained if not alive else points_if_ended_now()
+	var points := maxi(0, now - away["points"])
+	if earned <= 0.0 and points == 0:
+		return
+	var entry: Dictionary = away["entry"]
+	entry["key"] = "log.away_gain"
+	entry["args"].merge({"earned": earned, "points": points})
+	log_added.emit()
 
 
 ## 「イベントで止める」の設定で、時間が止まっているか（ADR-0004）
@@ -626,6 +645,27 @@ func points_for_life() -> int:
 	return maxi(1, int((int(sqrt(life_xp / POINTS_XP)) + levels / 3) * (1.0 + effect("points"))))
 
 
+## 記憶ポイントの見込み。いま周が終わったら得る記憶ポイントで、依頼と縛りの上乗せを含む（ADR-0071）
+func points_if_ended_now() -> int:
+	var base := points_for_life()
+	return base + request_bonus_for(base) + challenge_bonus_for(base)
+
+
+func request_bonus_for(base: int) -> int:
+	var bonus: float = GameData.requests.get(request, {}).get("bonus", REQUEST_BONUS)
+	return maxi(1, roundi(base * bonus)) if request_done else 0
+
+
+func challenge_bonus_for(base: int) -> int:
+	var kept := _kept_challenge()
+	return maxi(1, roundi(base * GameData.challenges.get(kept, {}).get("bonus", 0.0))) if kept != "" else 0
+
+
+## まだ破っていない、その周の縛り。無ければ空
+func _kept_challenge() -> String:
+	return challenge if challenge != "" and not challenge_broken else ""
+
+
 # --- 体の質 ---
 
 ## 稼いだクレジットは周ごとに大きく変わるので、2倍ごとに1段階上げる（ADR-0032）
@@ -662,10 +702,9 @@ func _end_life(fatal_event := "", ending := "") -> void:
 	pending_event = ""
 	last_life_choices = life_choices.duplicate()
 	last_points_gained = points_for_life()
-	var bonus: float = GameData.requests.get(request, {}).get("bonus", REQUEST_BONUS)
-	last_request_bonus = maxi(1, roundi(last_points_gained * bonus)) if request_done else 0
-	var kept := challenge if challenge != "" and not challenge_broken else ""
-	last_challenge_bonus = maxi(1, roundi(last_points_gained * GameData.challenges.get(kept, {}).get("bonus", 0.0))) if kept != "" else 0
+	last_request_bonus = request_bonus_for(last_points_gained)
+	var kept := _kept_challenge()
+	last_challenge_bonus = challenge_bonus_for(last_points_gained)
 	last_points_gained += last_request_bonus + last_challenge_bonus
 	memory_points += last_points_gained
 	chronicle.append({
