@@ -152,6 +152,7 @@ graph LR
     ADR-0059["ADR-0059<br/>意識を抜き取るとは、写しを取って体を眠らせることにする"]
     ADR-0060["ADR-0060<br/>主人公は体ごとに口座だけの身元を持つことにする"]
     ADR-0061["ADR-0061<br/>体の元の持ち主から取ったのは神経の型とする"]
+    ADR-0062["ADR-0062<br/>主人公の写しは廃棄した写しとして記録され、ミオは死んだことになっている"]
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
@@ -279,6 +280,9 @@ graph LR
   ADR-0060 -.->|decides| DOM-26
   ADR-0061 ==>|supersedes| ADR-0040
   ADR-0061 -.->|decides| DOM-25
+  ADR-0062 -.->|decides| DOM-09
+  ADR-0062 -.->|decides| DOM-10
+  ADR-0062 -.->|decides| DOM-20
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-02
