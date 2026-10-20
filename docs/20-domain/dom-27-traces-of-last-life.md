@@ -75,5 +75,6 @@ implemented_by:
 - (decides) [ADR-0044 1つ前の周の選択を、次の周の跡のイベントに出す](../50-adr/adr-0044-traces-of-last-life.md)
 - (decides) [ADR-0063 周をまたいで主人公を見分ける決まりを1つにする](../50-adr/adr-0063-recognizing-across-lives.md)
 - (decides) [ADR-0067 1つの周は、世界の中では数日から数週とする](../50-adr/adr-0067-length-of-a-life.md)
+- (depends_on) [DOM-32 スキルの声](./dom-32-skill-voices.md)
 
 <!-- graph:auto:end -->

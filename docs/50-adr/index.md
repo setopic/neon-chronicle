@@ -89,6 +89,7 @@ tags: [index]
 - [ADR-0070 本作の主題を「使い捨て」とし、警告として描く](./adr-0070-theme-disposable.md)
 - [ADR-0071 記憶ポイントの見込みと伸びを見せ、閉じていた間の成果をログに出す](./adr-0071-show-rebirth-payoff.md)
 - [ADR-0072 スキルに節目を置き、下の仕事に戻る理由にする](./adr-0072-skill-milestones.md)
+- [ADR-0073 スキルを、主人公の頭の中の声としてイベントで話させる](./adr-0073-skill-voices.md)
 <!-- graph:children:end -->
 
 ## 追加するとき

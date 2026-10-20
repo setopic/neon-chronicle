@@ -47,6 +47,7 @@ tags: [index]
 - [DOM-29 目覚めの日](./dom-29-day-of-waking.md)
 - [DOM-30 分岐図](./dom-30-branch-chart.md)
 - [DOM-31 話の選び直し](./dom-31-choosing-again.md)
+- [DOM-32 スキルの声](./dom-32-skill-voices.md)
 <!-- graph:children:end -->
 
 ## 追加するとき
@@ -385,5 +386,13 @@ python -m tools.graph new --type domain --id DOM-02 --title "..." --slug some-sl
 | 用語 | 意味 | 旧称 |
 | --- | --- | --- |
 | 選び直す | すでに選んだ話の段から、選択をやり直せるようにすること | |
+
+### [DOM-32 スキルの声](./dom-32-skill-voices.md)
+
+| 用語 | 意味 | 旧称 |
+| --- | --- | --- |
+| スキルの声 | スキルが主人公の頭の中で話す1行の文。スキルの選ぶ条件を持つ選択肢のあるイベントでだけ話す | |
+| 勧める声 | 選ぶ条件を満たしている選択肢について、スキルの声がその選択肢を勧める文 | |
+| からかう声 | 選ぶ条件を満たしていない選択肢について、スキルの声がいまの腕では足りないと言う文 | |
 
 <!-- graph:terms:end -->
