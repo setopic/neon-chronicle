@@ -2,7 +2,7 @@
 id: ADR-0023
 type: adr
 title: 橋に人名を付け、地図を地形の分かる描き方にする
-status: stable
+status: deprecated
 tags: [world]
 decides:
   - DOM-15
@@ -15,7 +15,7 @@ related: []
 # 橋に人名を付け、地図を地形の分かる描き方にする
 
 - 日付: 2026-10-19
-- 状態: stable
+- 状態: deprecated（[ADR-0063](./adr-0063-recognizing-across-lives.md)が置き換えた）
 
 ## 背景
 
@@ -84,5 +84,9 @@ DOM-15に区画や橋が増えたときは、地図の配置が収まるかを�
 
 - [DOM-15 街の場所と勢力](../20-domain/dom-15-city-places-and-powers.md)
 - [DOM-16 街の地図](../20-domain/dom-16-city-map.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0063 周をまたいで主人公を見分ける決まりを1つにする](./adr-0063-recognizing-across-lives.md)
 
 <!-- graph:auto:end -->

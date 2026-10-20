@@ -2,7 +2,7 @@
 id: ADR-0044
 type: adr
 title: 1つ前の周の選択を、次の周の跡のイベントに出す
-status: stable
+status: deprecated
 tags: [loop, story]
 decides:
   - DOM-27
@@ -13,7 +13,7 @@ related: []
 # 1つ前の周の選択を、次の周の跡のイベントに出す
 
 - 日付: 2026-10-20
-- 状態: stable
+- 状態: deprecated（[ADR-0063](./adr-0063-recognizing-across-lives.md)が置き換えた）
 
 ## 背景
 
@@ -69,5 +69,9 @@ DOM-27を新しく起こし、前の周の跡・跡のイベント・跡の条�
 `decides`: この決定が影響を与えるノード（ADR用）
 
 - [DOM-27 前の周の跡](../20-domain/dom-27-traces-of-last-life.md)
+
+このノードを参照しているノード
+
+- (supersedes) [ADR-0063 周をまたいで主人公を見分ける決まりを1つにする](./adr-0063-recognizing-across-lives.md)
 
 <!-- graph:auto:end -->

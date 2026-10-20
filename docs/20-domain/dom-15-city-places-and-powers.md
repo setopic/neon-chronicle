@@ -189,6 +189,7 @@ flowchart TB
 - (decides) [ADR-0028 子どもは親の暮らしの中で育ち、下層街の死者の部品は闇医者が闇市場へ流す](../50-adr/adr-0028-life-course-and-body-parts.md)
 - (decides) [ADR-0029 ザンダー一家をザンダー・ファミリーと呼ぶ](../50-adr/adr-0029-zander-family-name.md)
 - (decides) [ADR-0031 日本のやくざや的屋に寄った語を、欧米の街でも通じる語に改める](../50-adr/adr-0031-western-terms.md)
+- (decides) [ADR-0063 周をまたいで主人公を見分ける決まりを1つにする](../50-adr/adr-0063-recognizing-across-lives.md)
 - (depends_on) [DOM-14 街と人物の資料](./dom-14-city-and-people-profiles.md)
 - (depends_on) [DOM-16 街の地図](./dom-16-city-map.md)
 - (depends_on) [DOM-17 街の歴史](./dom-17-city-history.md)
