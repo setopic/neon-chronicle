@@ -34,14 +34,6 @@
 
 ```mermaid
 graph LR
-  subgraph index["目次"]
-    IDX-ADR["IDX-ADR<br/>決定記録"]
-    IDX-ARCH["IDX-ARCH<br/>アーキテクチャ"]
-    IDX-CON["IDX-CON<br/>契約"]
-    IDX-DOM["IDX-DOM<br/>ドメイン"]
-    IDX-ROOT["IDX-ROOT<br/>ドキュメントグラフのルート"]
-    IDX-UC["IDX-UC<br/>ユースケース"]
-  end
   subgraph meta["メタ / 規約"]
     META-01["META-01<br/>グラフの規約"]
     META-02["META-02<br/>ノード種別と層"]
@@ -50,6 +42,7 @@ graph LR
     META-05["META-05<br/>開発の流れ"]
     META-06["META-06<br/>開発の原則"]
     META-07["META-07<br/>issueとPRの流れ"]
+    META-08["META-08<br/>テンプレートの更新を取り込む"]
   end
   subgraph architecture["アーキテクチャ"]
     ARCH-01["ARCH-01<br/>ゲームの全体構成"]
@@ -176,7 +169,7 @@ graph LR
   end
   ADR-0001 -.->|decides| META-01
   ADR-0001 -.->|decides| ARCH-01
-  ADR-0002 -.->|related| UC-01
+  ADR-0002 -.-|related| UC-01
   ADR-0002 -.->|decides| ARCH-01
   ADR-0003 -.->|decides| DOM-01
   ADR-0003 -.->|decides| DOM-02
@@ -466,22 +459,14 @@ graph LR
   DOM-34 -->|depends_on| DOM-10
   DOM-34 -->|depends_on| DOM-15
   DOM-34 -->|depends_on| DOM-24
-  META-01 -.->|related| META-02
-  META-01 -.->|related| META-03
-  META-01 -.->|related| META-04
-  META-01 -.->|related| META-05
-  META-01 -.->|related| META-07
-  META-02 -.->|related| META-01
-  META-03 -.->|related| META-01
-  META-04 -.->|related| META-01
-  META-04 -.->|related| META-05
-  META-04 -.->|related| META-06
-  META-05 -.->|related| META-01
-  META-05 -.->|related| META-04
-  META-06 -.->|related| META-04
-  META-07 -.->|related| META-01
+  META-01 -.-|related| META-02
+  META-01 -.-|related| META-03
+  META-01 -.-|related| META-07
+  META-01 -.-|related| META-08
+  META-04 -.-|related| META-05
+  META-04 -.-|related| META-06
+  META-07 -.-|related| META-08
   UC-01 -->|depends_on| ARCH-01
-  UC-01 -.->|related| ADR-0002
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
   class UC-01 draft;
