@@ -326,12 +326,6 @@ grillを回したかどうかは、CIからは見えない。回した証跡は�
 
 `related`: 依存はしないが、一緒に読むべきノード
 
-- [META-01 グラフの規約](./graph-rules.md)
 - [META-04 文書と実装を同じリポジトリに置く](./implementation-layout.md)
-
-このノードを参照しているノード
-
-- (related) [META-01 グラフの規約](./graph-rules.md)
-- (related) [META-04 文書と実装を同じリポジトリに置く](./implementation-layout.md)
 
 <!-- graph:auto:end -->
