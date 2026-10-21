@@ -34,20 +34,7 @@
 
 ```mermaid
 graph LR
-  subgraph meta["メタ / 規約"]
-    META-01["META-01<br/>グラフの規約"]
-    META-02["META-02<br/>ノード種別と層"]
-    META-03["META-03<br/>本文のレビュー（AI）"]
-    META-04["META-04<br/>文書と実装を同じリポジトリに置く"]
-    META-05["META-05<br/>開発の流れ"]
-    META-06["META-06<br/>開発の原則"]
-    META-07["META-07<br/>issueとPRの流れ"]
-    META-08["META-08<br/>テンプレートの更新を取り込む"]
-  end
-  subgraph architecture["アーキテクチャ"]
-    ARCH-01["ARCH-01<br/>ゲームの全体構成"]
-    ARCH-02["ARCH-02<br/>主題と仕組みの対応"]
-  end
+  %% ほかのdepends_onを辿れば分かる依存を76本省いた（render --reduce）
   subgraph domain["ドメイン"]
     DOM-01["DOM-01<br/>世界観"]
     DOM-02["DOM-02<br/>周と体"]
@@ -84,393 +71,50 @@ graph LR
     DOM-33["DOM-33<br/>街の噂"]
     DOM-34["DOM-34<br/>第二部の暮らし"]
   end
-  subgraph usecase["ユースケース"]
-    UC-01["UC-01<br/>itch.ioでブラウザ版を公開する"]
-  end
-  subgraph adr["決定記録"]
-    ADR-0001["ADR-0001<br/>設計文書をグラフとして管理する"]
-    ADR-0002["ADR-0002<br/>素材のライセンスの一覧をゲームの中に置く"]
-    ADR-0003["ADR-0003<br/>物語の文書を既定の種別で書く"]
-    ADR-0004["ADR-0004<br/>イベントの起き方と結果を決まった量で表す"]
-    ADR-0005["ADR-0005<br/>クロニクルの物語文を仕事と選択と倒れた理由から組み立てる"]
-    ADR-0006["ADR-0006<br/>記憶の断片を順に戻し、最後の仕事の選択でエンディングを分ける"]
-    ADR-0007["ADR-0007<br/>閉じていた時間を、開いたときにまとめて進める"]
-    ADR-0008["ADR-0008<br/>音楽と効果音をスクリプトで作り、最初の操作から鳴らす"]
-    ADR-0009["ADR-0009<br/>生き直しを闇医者が乗っ取った企業の計画として説明し、4人の人物を置く"]
-    ADR-0010["ADR-0010<br/>ミオの一言を転生の画面に出し、人物を目覚めと断片の文に入れる"]
-    ADR-0011["ADR-0011<br/>倒れた理由の句をイベントごとに書く"]
-    ADR-0012["ADR-0012<br/>転生のときに4種類の体から1つを選ぶ"]
-    ADR-0013["ADR-0013<br/>周の始まりにジンの依頼を1つ示し、果たせば記憶ポイントを上乗せする"]
-    ADR-0014["ADR-0014<br/>人物のイベントを1周に1段ずつ進め、前の段の選択で文と選択肢を変える"]
-    ADR-0015["ADR-0015<br/>街と人物の資料を上のボタンから開き、記憶の断片が戻るまで追記を伏せる"]
-    ADR-0016["ADR-0016<br/>インプラントと体の種類の効果を画面の文に出す"]
-    ADR-0017["ADR-0017<br/>画面の右上のボタンとダイアログの見た目をそろえる"]
-    ADR-0018["ADR-0018<br/>街を複数の企業が分け合い、場所と住人をイベントと資料に出す"]
-    ADR-0019["ADR-0019<br/>衣食住は文だけで書き、食べ物は合成食の企業が握る"]
-    ADR-0020["ADR-0020<br/>街を区画と3本の橋で分け、地図は設計文書の図に残す"]
-    ADR-0021["ADR-0021<br/>電気はヨミ・システムズ、水はリンドホルム食品が握り、街に公共の交通は置かない"]
-    ADR-0022["ADR-0022<br/>街の地図を「街と人物」の画面にタブで出し、中枢サーバーは断片が戻るまで伏せる"]
-    ADR-0023["ADR-0023<br/>橋に人名を付け、地図を地形の分かる描き方にする"]
-    ADR-0024["ADR-0024<br/>下層街に、ギャングのザンダー一家と住人の屋台組合を置く"]
-    ADR-0025["ADR-0025<br/>企業の時代より前の街を市とし、市の財政破綻で企業の時代が始まったことにする"]
-    ADR-0026["ADR-0026<br/>屋台組合が、台帳でみかじめを割り振り、外から来た人に住む場所を割り振る"]
-    ADR-0027["ADR-0027<br/>企業の階級と下層街の稼ぎを決め、身元で橋の行き来を分ける"]
-    ADR-0028["ADR-0028<br/>子どもは親の暮らしの中で育ち、下層街の死者の部品は闇医者が闇市場へ流す"]
-    ADR-0029["ADR-0029<br/>ザンダー一家をザンダー・ファミリーと呼ぶ"]
-    ADR-0030["ADR-0030<br/>被験体は借金の契約で集め、使い捨ての体は闇市場の部品で組み立てる"]
-    ADR-0031["ADR-0031<br/>日本のやくざや的屋に寄った語を、欧米の街でも通じる語に改める"]
-    ADR-0032["ADR-0032<br/>体の質を前の周の稼ぎで決め、記憶ポイントを経験から出す"]
-    ADR-0033["ADR-0033<br/>永続強化を増やし、どちらか一方しか取れない組を作る"]
-    ADR-0034["ADR-0034<br/>ジンの依頼を2つ並べ、受けるものを選ばせる"]
-    ADR-0035["ADR-0035<br/>転生のときに縛りを1つ選び、守り通せば記憶ポイントを上乗せする"]
-    ADR-0036["ADR-0036<br/>橋を架けた技師たちの記録を、イベントと資料の追記で集める"]
-    ADR-0037["ADR-0037<br/>4つの勢力に評判を持たせ、周をまたいで残す"]
-    ADR-0038["ADR-0038<br/>ザンダー・ファミリーと屋台組合の対立を、3段の勢力の話にする"]
-    ADR-0039["ADR-0039<br/>仕事に区画を持たせ、傭兵の仕事には偽の身元を要る"]
-    ADR-0040["ADR-0040<br/>体の種類ごとに元の持ち主を1人決め、その特性を持たせる"]
-    ADR-0041["ADR-0041<br/>体の元の持ち主の記憶を、体ごとの2段の話にする"]
-    ADR-0042["ADR-0042<br/>体の種類ごとに容量を持たせ、インプラントを外せるようにする"]
-    ADR-0043["ADR-0043<br/>ミオにも3段の人物のイベントを持たせる"]
-    ADR-0044["ADR-0044<br/>1つ前の周の選択を、次の周の跡のイベントに出す"]
-    ADR-0045["ADR-0045<br/>イベントの起きやすさに、緊張と耐久で波を付ける"]
-    ADR-0046["ADR-0046<br/>レイとの約束と屋台組合の評判で開く、3つ目のエンディングを足す"]
-    ADR-0047["ADR-0047<br/>話とエンディングの分岐図を、街と人物の画面の3つ目のタブに出す"]
-    ADR-0048["ADR-0048<br/>話の段と永続強化の組を、いつでも選び直せるようにする"]
-    ADR-0049["ADR-0049<br/>転生の画面とメインの画面を1280x720に収める"]
-    ADR-0050["ADR-0050<br/>話の選び直しを、エンディングにたどり着いてから使えるようにする"]
-    ADR-0051["ADR-0051<br/>仕事を、終わったら報酬が入る形にする"]
-    ADR-0052["ADR-0052<br/>画面の見た目の方向と、その土台を決める"]
-    ADR-0053["ADR-0053<br/>仕事の様子を、ログの左に線と点で描く"]
-    ADR-0054["ADR-0054<br/>仕事の1回を、ミニゲームで置き換えて遊べるようにする"]
-    ADR-0055["ADR-0055<br/>ハッカーの仕事のミニゲームを、符号の表を縦横にたどる遊びにする"]
-    ADR-0056["ADR-0056<br/>運び屋の仕事のミニゲームを、追っ手をかわして升目を進む遊びにする"]
-    ADR-0057["ADR-0057<br/>傭兵の仕事のミニゲームを、窓に出る敵を撃つ遊びにする"]
-    ADR-0058["ADR-0058<br/>メインの画面の欄を、2つずつ組にして入れ替えられるようにする"]
-    ADR-0059["ADR-0059<br/>意識を抜き取るとは、写しを取って体を眠らせることにする"]
-    ADR-0060["ADR-0060<br/>主人公は体ごとに口座だけの身元を持つことにする"]
-    ADR-0061["ADR-0061<br/>体の元の持ち主から取ったのは神経の型とする"]
-    ADR-0062["ADR-0062<br/>主人公の写しは廃棄した写しとして記録され、ミオは死んだことになっている"]
-    ADR-0063["ADR-0063<br/>周をまたいで主人公を見分ける決まりを1つにする"]
-    ADR-0064["ADR-0064<br/>置いたまま回収していない伏線の扱いを決める"]
-    ADR-0065["ADR-0065<br/>用語と名前の揺れを直す"]
-    ADR-0066["ADR-0066<br/>仕事の区画は仕事を請け負う場所とし、イベントの舞台とは分ける"]
-    ADR-0067["ADR-0067<br/>1つの周は、世界の中では数日から数週とする"]
-    ADR-0068["ADR-0068<br/>人物のイベントは、まだ戻っていない断片の中身を先に明かさない"]
-    ADR-0069["ADR-0069<br/>遊ぶ人の側の仕組みを挙げ、街の歴史の穴を埋める"]
-    ADR-0070["ADR-0070<br/>本作の主題を「使い捨て」とし、警告として描く"]
-    ADR-0071["ADR-0071<br/>記憶ポイントの見込みと伸びを見せ、閉じていた間の成果をログに出す"]
-    ADR-0072["ADR-0072<br/>スキルに節目を置き、下の仕事に戻る理由にする"]
-    ADR-0073["ADR-0073<br/>スキルを、主人公の頭の中の声としてイベントで話させる"]
-    ADR-0074["ADR-0074<br/>放っておく間のログに、仕事の区画の噂を流す"]
-    ADR-0075["ADR-0075<br/>本当の体のあとに、転生の無い第二部を章で足す"]
-    ADR-0076["ADR-0076<br/>第二部の第2章で、昔の仲間を迎えて仕事を任せる"]
-    ADR-0077["ADR-0077<br/>第二部の第3章で、隠れ家に設備を足し、逃げてきた被験体を匿う"]
-    ADR-0078["ADR-0078<br/>第二部の第4章で、持ち出された写しを止める作戦を遂げ、第二部を終える"]
-  end
-  ADR-0001 -.->|decides| META-01
-  ADR-0001 -.->|decides| ARCH-01
-  ADR-0002 -.-|related| UC-01
-  ADR-0002 -.->|decides| ARCH-01
-  ADR-0003 -.->|decides| DOM-01
-  ADR-0003 -.->|decides| DOM-02
-  ADR-0003 -.->|decides| DOM-03
-  ADR-0003 -.->|decides| DOM-04
-  ADR-0003 -.->|decides| DOM-05
-  ADR-0004 -.->|decides| DOM-06
-  ADR-0004 -.->|decides| ARCH-01
-  ADR-0005 -.->|decides| DOM-07
-  ADR-0005 -.->|decides| ARCH-01
-  ADR-0006 -.->|decides| DOM-08
-  ADR-0006 -.->|decides| DOM-01
-  ADR-0006 -.->|decides| ARCH-01
-  ADR-0007 -.->|decides| DOM-02
-  ADR-0007 -.->|decides| ARCH-01
-  ADR-0008 -.->|decides| ARCH-01
-  ADR-0009 -.->|decides| DOM-09
-  ADR-0009 -.->|decides| DOM-10
-  ADR-0009 -.->|decides| DOM-01
-  ADR-0010 -.->|decides| DOM-10
-  ADR-0011 ==>|supersedes| ADR-0005
-  ADR-0011 -.->|decides| DOM-07
-  ADR-0012 -.->|decides| DOM-11
-  ADR-0013 -.->|decides| DOM-12
-  ADR-0014 -.->|decides| DOM-13
-  ADR-0014 -.->|decides| DOM-10
-  ADR-0015 -.->|decides| DOM-14
-  ADR-0016 -.->|decides| DOM-04
-  ADR-0016 -.->|decides| DOM-11
-  ADR-0017 -.->|decides| ARCH-01
-  ADR-0018 -.->|decides| DOM-01
-  ADR-0018 -.->|decides| DOM-14
-  ADR-0018 -.->|decides| DOM-15
-  ADR-0019 -.->|decides| DOM-14
-  ADR-0019 -.->|decides| DOM-15
-  ADR-0020 -.->|decides| DOM-15
-  ADR-0021 -.->|decides| DOM-14
-  ADR-0021 -.->|decides| DOM-15
-  ADR-0022 ==>|supersedes| ADR-0020
-  ADR-0022 -.->|decides| DOM-16
-  ADR-0023 ==>|supersedes| ADR-0022
-  ADR-0023 -.->|decides| DOM-15
-  ADR-0023 -.->|decides| DOM-16
-  ADR-0024 -.->|decides| DOM-14
-  ADR-0024 -.->|decides| DOM-15
-  ADR-0025 -.->|decides| DOM-14
-  ADR-0025 -.->|decides| DOM-15
-  ADR-0025 -.->|decides| DOM-17
-  ADR-0026 -.->|decides| DOM-15
-  ADR-0027 -.->|decides| DOM-14
-  ADR-0027 -.->|decides| DOM-15
-  ADR-0027 -.->|decides| DOM-18
-  ADR-0028 -.->|decides| DOM-14
-  ADR-0028 -.->|decides| DOM-15
-  ADR-0028 -.->|decides| DOM-19
-  ADR-0029 ==>|supersedes| ADR-0024
-  ADR-0029 -.->|decides| DOM-14
-  ADR-0029 -.->|decides| DOM-15
-  ADR-0029 -.->|decides| DOM-18
-  ADR-0029 -.->|decides| DOM-19
-  ADR-0030 -.->|decides| DOM-14
-  ADR-0030 -.->|decides| DOM-20
-  ADR-0031 -.->|decides| DOM-14
-  ADR-0031 -.->|decides| DOM-15
-  ADR-0031 -.->|decides| DOM-19
-  ADR-0032 ==>|supersedes| ADR-0012
-  ADR-0032 -.->|decides| DOM-05
-  ADR-0032 -.->|decides| DOM-09
-  ADR-0032 -.->|decides| DOM-11
-  ADR-0033 -.->|decides| DOM-05
-  ADR-0033 -.->|decides| DOM-09
-  ADR-0034 ==>|supersedes| ADR-0013
-  ADR-0034 -.->|decides| DOM-12
-  ADR-0035 -.->|decides| DOM-21
-  ADR-0036 -.->|decides| DOM-14
-  ADR-0037 -.->|decides| DOM-22
-  ADR-0038 -.->|decides| DOM-23
-  ADR-0038 -.->|decides| DOM-14
-  ADR-0039 -.->|decides| DOM-24
-  ADR-0040 -.->|decides| DOM-25
-  ADR-0041 -.->|decides| DOM-25
-  ADR-0041 -.->|decides| DOM-14
-  ADR-0042 -.->|decides| DOM-26
-  ADR-0043 ==>|supersedes| ADR-0014
-  ADR-0043 -.->|decides| DOM-13
-  ADR-0043 -.->|decides| DOM-10
-  ADR-0043 -.->|decides| DOM-14
-  ADR-0044 -.->|decides| DOM-27
-  ADR-0045 ==>|supersedes| ADR-0004
-  ADR-0045 -.->|decides| DOM-28
-  ADR-0045 -.->|decides| DOM-06
-  ADR-0046 ==>|supersedes| ADR-0006
-  ADR-0046 -.->|decides| DOM-29
-  ADR-0046 -.->|decides| DOM-08
-  ADR-0047 -.->|decides| DOM-30
-  ADR-0048 ==>|supersedes| ADR-0033
-  ADR-0048 -.->|decides| DOM-31
-  ADR-0048 -.->|decides| DOM-05
-  ADR-0049 -.->|decides| ARCH-01
-  ADR-0050 ==>|supersedes| ADR-0048
-  ADR-0050 -.->|decides| DOM-31
-  ADR-0050 -.->|decides| DOM-05
-  ADR-0051 -.->|decides| DOM-03
-  ADR-0052 -.->|decides| ARCH-01
-  ADR-0053 -.->|decides| ARCH-01
-  ADR-0054 -.->|decides| DOM-03
-  ADR-0055 -.->|decides| DOM-03
-  ADR-0056 -.->|decides| DOM-03
-  ADR-0057 -.->|decides| DOM-03
-  ADR-0058 -.->|decides| ARCH-01
-  ADR-0059 -.->|decides| DOM-08
-  ADR-0059 -.->|decides| DOM-09
-  ADR-0059 -.->|decides| DOM-20
-  ADR-0060 ==>|supersedes| ADR-0010
-  ADR-0060 -.->|decides| DOM-09
-  ADR-0060 -.->|decides| DOM-10
-  ADR-0060 -.->|decides| DOM-11
-  ADR-0060 -.->|decides| DOM-18
-  ADR-0060 -.->|decides| DOM-19
-  ADR-0060 -.->|decides| DOM-24
-  ADR-0060 -.->|decides| DOM-26
-  ADR-0061 ==>|supersedes| ADR-0040
-  ADR-0061 -.->|decides| DOM-25
-  ADR-0062 -.->|decides| DOM-09
-  ADR-0062 -.->|decides| DOM-10
-  ADR-0062 -.->|decides| DOM-20
-  ADR-0063 ==>|supersedes| ADR-0023
-  ADR-0063 ==>|supersedes| ADR-0044
-  ADR-0063 -.->|decides| DOM-09
-  ADR-0063 -.->|decides| DOM-10
-  ADR-0063 -.->|decides| DOM-15
-  ADR-0063 -.->|decides| DOM-16
-  ADR-0063 -.->|decides| DOM-22
-  ADR-0063 -.->|decides| DOM-27
-  ADR-0064 ==>|supersedes| ADR-0009
-  ADR-0064 ==>|supersedes| ADR-0036
-  ADR-0064 -.->|decides| DOM-10
-  ADR-0064 -.->|decides| DOM-13
-  ADR-0064 -.->|decides| DOM-14
-  ADR-0064 -.->|decides| DOM-17
-  ADR-0064 -.->|decides| DOM-29
-  ADR-0065 -.->|decides| DOM-03
-  ADR-0065 -.->|decides| DOM-04
-  ADR-0065 -.->|decides| DOM-10
-  ADR-0065 -.->|decides| DOM-15
-  ADR-0065 -.->|decides| DOM-17
-  ADR-0065 -.->|decides| DOM-23
-  ADR-0065 -.->|decides| DOM-25
-  ADR-0066 ==>|supersedes| ADR-0039
-  ADR-0066 -.->|decides| DOM-15
-  ADR-0066 -.->|decides| DOM-24
-  ADR-0067 -.->|decides| DOM-02
-  ADR-0067 -.->|decides| DOM-27
-  ADR-0068 ==>|supersedes| ADR-0043
-  ADR-0068 -.->|decides| DOM-13
-  ADR-0068 -.->|decides| DOM-10
-  ADR-0068 -.->|decides| DOM-14
-  ADR-0069 -.->|decides| DOM-09
-  ADR-0069 -.->|decides| DOM-17
-  ADR-0070 -.->|decides| ARCH-02
-  ADR-0071 -.->|decides| DOM-05
-  ADR-0072 -.->|decides| DOM-03
-  ADR-0073 -.->|decides| DOM-32
-  ADR-0074 -.->|decides| DOM-33
-  ADR-0075 -.->|decides| DOM-34
-  ADR-0075 -.->|decides| DOM-08
-  ADR-0076 -.->|decides| DOM-34
-  ADR-0076 -.->|decides| DOM-10
-  ADR-0077 -.->|decides| DOM-34
-  ADR-0078 -.->|decides| DOM-34
-  ADR-0078 -.->|decides| DOM-09
   DOM-02 -->|depends_on| DOM-01
   DOM-03 -->|depends_on| DOM-02
-  DOM-04 -->|depends_on| DOM-02
   DOM-04 -->|depends_on| DOM-03
-  DOM-05 -->|depends_on| DOM-02
-  DOM-05 -->|depends_on| DOM-03
   DOM-05 -->|depends_on| DOM-04
-  DOM-06 -->|depends_on| DOM-01
-  DOM-06 -->|depends_on| DOM-02
   DOM-06 -->|depends_on| DOM-03
-  DOM-07 -->|depends_on| DOM-02
-  DOM-07 -->|depends_on| DOM-03
   DOM-07 -->|depends_on| DOM-05
   DOM-07 -->|depends_on| DOM-06
-  DOM-08 -->|depends_on| DOM-01
-  DOM-08 -->|depends_on| DOM-02
-  DOM-08 -->|depends_on| DOM-03
-  DOM-08 -->|depends_on| DOM-05
-  DOM-08 -->|depends_on| DOM-06
   DOM-08 -->|depends_on| DOM-07
-  DOM-09 -->|depends_on| DOM-01
-  DOM-09 -->|depends_on| DOM-02
-  DOM-09 -->|depends_on| DOM-03
-  DOM-09 -->|depends_on| DOM-04
-  DOM-09 -->|depends_on| DOM-05
   DOM-09 -->|depends_on| DOM-08
-  DOM-10 -->|depends_on| DOM-01
-  DOM-10 -->|depends_on| DOM-06
-  DOM-10 -->|depends_on| DOM-08
   DOM-10 -->|depends_on| DOM-09
-  DOM-11 -->|depends_on| DOM-02
-  DOM-11 -->|depends_on| DOM-03
-  DOM-11 -->|depends_on| DOM-05
-  DOM-11 -->|depends_on| DOM-09
   DOM-11 -->|depends_on| DOM-10
-  DOM-12 -->|depends_on| DOM-03
-  DOM-12 -->|depends_on| DOM-05
-  DOM-12 -->|depends_on| DOM-09
   DOM-12 -->|depends_on| DOM-10
-  DOM-13 -->|depends_on| DOM-05
-  DOM-13 -->|depends_on| DOM-06
-  DOM-13 -->|depends_on| DOM-08
   DOM-13 -->|depends_on| DOM-10
-  DOM-14 -->|depends_on| DOM-01
-  DOM-14 -->|depends_on| DOM-08
-  DOM-14 -->|depends_on| DOM-09
-  DOM-14 -->|depends_on| DOM-10
   DOM-14 -->|depends_on| DOM-13
-  DOM-14 -->|depends_on| DOM-15
-  DOM-14 -->|depends_on| DOM-17
-  DOM-14 -->|depends_on| DOM-18
-  DOM-14 -->|depends_on| DOM-19
   DOM-14 -->|depends_on| DOM-20
-  DOM-15 -->|depends_on| DOM-01
-  DOM-15 -->|depends_on| DOM-06
-  DOM-15 -->|depends_on| DOM-08
   DOM-15 -->|depends_on| DOM-09
-  DOM-16 -->|depends_on| DOM-08
   DOM-16 -->|depends_on| DOM-14
-  DOM-16 -->|depends_on| DOM-15
-  DOM-17 -->|depends_on| DOM-01
   DOM-17 -->|depends_on| DOM-15
-  DOM-18 -->|depends_on| DOM-09
-  DOM-18 -->|depends_on| DOM-15
   DOM-18 -->|depends_on| DOM-17
-  DOM-19 -->|depends_on| DOM-04
-  DOM-19 -->|depends_on| DOM-15
   DOM-19 -->|depends_on| DOM-18
-  DOM-20 -->|depends_on| DOM-08
-  DOM-20 -->|depends_on| DOM-09
-  DOM-20 -->|depends_on| DOM-10
   DOM-20 -->|depends_on| DOM-11
-  DOM-20 -->|depends_on| DOM-15
-  DOM-20 -->|depends_on| DOM-18
   DOM-20 -->|depends_on| DOM-19
-  DOM-21 -->|depends_on| DOM-04
-  DOM-21 -->|depends_on| DOM-05
-  DOM-21 -->|depends_on| DOM-06
   DOM-21 -->|depends_on| DOM-07
-  DOM-22 -->|depends_on| DOM-05
-  DOM-22 -->|depends_on| DOM-06
   DOM-22 -->|depends_on| DOM-15
   DOM-23 -->|depends_on| DOM-13
   DOM-23 -->|depends_on| DOM-22
   DOM-24 -->|depends_on| DOM-16
-  DOM-24 -->|depends_on| DOM-18
-  DOM-25 -->|depends_on| DOM-11
   DOM-25 -->|depends_on| DOM-20
   DOM-25 -->|depends_on| DOM-23
-  DOM-26 -->|depends_on| DOM-04
   DOM-26 -->|depends_on| DOM-11
-  DOM-27 -->|depends_on| DOM-07
   DOM-27 -->|depends_on| DOM-09
   DOM-28 -->|depends_on| DOM-06
-  DOM-29 -->|depends_on| DOM-08
   DOM-29 -->|depends_on| DOM-13
-  DOM-29 -->|depends_on| DOM-17
   DOM-29 -->|depends_on| DOM-20
   DOM-29 -->|depends_on| DOM-22
-  DOM-30 -->|depends_on| DOM-23
   DOM-30 -->|depends_on| DOM-25
   DOM-30 -->|depends_on| DOM-29
   DOM-31 -->|depends_on| DOM-30
   DOM-32 -->|depends_on| DOM-27
-  DOM-33 -->|depends_on| DOM-14
   DOM-33 -->|depends_on| DOM-22
   DOM-33 -->|depends_on| DOM-24
-  DOM-34 -->|depends_on| DOM-01
-  DOM-34 -->|depends_on| DOM-02
-  DOM-34 -->|depends_on| DOM-03
-  DOM-34 -->|depends_on| DOM-04
-  DOM-34 -->|depends_on| DOM-05
-  DOM-34 -->|depends_on| DOM-06
-  DOM-34 -->|depends_on| DOM-08
-  DOM-34 -->|depends_on| DOM-09
-  DOM-34 -->|depends_on| DOM-10
-  DOM-34 -->|depends_on| DOM-15
   DOM-34 -->|depends_on| DOM-24
-  META-01 -.-|related| META-02
-  META-01 -.-|related| META-03
-  META-01 -.-|related| META-07
-  META-01 -.-|related| META-08
-  META-04 -.-|related| META-05
-  META-04 -.-|related| META-06
-  META-07 -.-|related| META-08
-  UC-01 -->|depends_on| ARCH-01
   classDef draft stroke-dasharray: 4\,3;
   classDef deprecated opacity:0.5;
-  class UC-01 draft;
-  class ADR-0004,ADR-0005,ADR-0006,ADR-0009,ADR-0010,ADR-0012,ADR-0013,ADR-0014,ADR-0020,ADR-0022,ADR-0023,ADR-0024,ADR-0033,ADR-0036,ADR-0039,ADR-0040,ADR-0043,ADR-0044,ADR-0048 deprecated;
 ```
 
 <!-- graph:diagram:end -->
