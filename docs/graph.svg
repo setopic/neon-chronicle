@@ -1,0 +1,433 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 2786" width="680" height="2786" class="graph" role="img" aria-label="設計文書のグラフ">
+<desc>ほかのdepends_onを辿れば分かる依存を76本省いた（render --reduce）</desc>
+<title>設計文書のグラフ</title>
+<style><![CDATA[
+/* graph-doc-templateの既定のテーマ（render --format svg）。
+   自分のテーマにするときは、このファイルを写して書き換え、graph.tomlの[render]のthemeで指す。
+   renderは配置とクラス名だけを出す。色・フォント・線の太さ・動きの見た目は、ここで決める。 */
+
+.graph {
+  --bg: #ffffff;
+  --lane: #f7f7f5;
+  --muted: #77756f;
+  --ink: #2b2a27;
+  --edge: #6f6d67;
+  --flow: #c8743a;
+  font-family: "Hiragino Sans", "Yu Gothic UI", "Meiryo", "Noto Sans JP", sans-serif;
+}
+
+.bg { fill: var(--bg); }
+.lane-bg { fill: var(--lane); rx: 10px; }
+.lane-label, .band-label { fill: var(--muted); font-size: 13px; font-weight: 600; }
+
+/* 箱。層の種別ごとに色と枠を分ける */
+.box { fill: #f3f3f1; stroke: #8a8a84; stroke-width: 1.6px; rx: 9px; }
+.t-contract .box { fill: #fdf2e9; stroke: #c8743a; }
+.t-usecase .box { fill: #eaf4ec; stroke: #3f8a52; }
+.t-domain .box { fill: #e9f0fb; stroke: #3b6db3; }
+.t-architecture .box { fill: #f1ecf9; stroke: #7652b0; }
+.t-adr .box { fill: #fbf6df; stroke: #a8891c; }
+.t-meta .box, .t-index .box { fill: #f3f3f1; stroke: #8a8a84; }
+.group .box { stroke-width: 2.4px; }
+.node-id { fill: var(--ink); font-size: 12px; font-weight: 700; }
+.node-title { fill: var(--ink); font-size: 12.5px; }
+
+/* status */
+.s-draft .box { stroke-dasharray: 5 3; }
+.s-deprecated { opacity: 0.5; }
+.focus .box { stroke-width: 3.2px; }
+
+/* 線 */
+.edge { fill: none; stroke: var(--edge); stroke-width: 1.6px; }
+.edge.k-related, .edge.k-decides, .edge.k-mentions { stroke-dasharray: 5 4; }
+.edge.k-supersedes { stroke-width: 2.6px; }
+.arrow-head { fill: var(--edge); }
+.edge-label {
+  fill: var(--muted);
+  font-size: 10.5px;
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 3px;
+}
+/* depends_onとrelatedは数が多いので、名前を書かない。まとめた線の本数は書く */
+.edge-label.k-depends_on:not(.counted), .edge-label.k-related:not(.counted) { display: none; }
+
+/* 動き。点の色と、行き着いた先の箱の光り方 */
+.flow-dot { fill: var(--flow); }
+.glow { fill: none; stroke: var(--flow); stroke-width: 3px; stroke-opacity: 0.55; rx: 11px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .flow { display: none; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .graph {
+    --bg: #1c1c1a;
+    --lane: #262624;
+    --muted: #a9a79f;
+    --ink: #ecebe6;
+    --edge: #a9a79f;
+    --flow: #e8955a;
+  }
+  .box { fill: #2c2c2a; stroke: #8a8a84; }
+  .t-contract .box { fill: #3a2a1e; stroke: #e0905a; }
+  .t-usecase .box { fill: #1f3324; stroke: #6cbf80; }
+  .t-domain .box { fill: #1d2a3d; stroke: #6f9ee0; }
+  .t-architecture .box { fill: #2b2340; stroke: #a688db; }
+  .t-adr .box { fill: #36301a; stroke: #d2b44a; }
+  .t-meta .box, .t-index .box { fill: #2c2c2a; stroke: #8a8a84; }
+}
+]]></style>
+<defs>
+<marker id="arrow-depends_on" class="arrow k-depends_on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow-head k-depends_on" d="M0,0 L10,5 L0,10 z"/></marker>
+</defs>
+<rect class="bg" width="680" height="2786"/>
+<g class="lanes">
+<g class="lane t-domain"><rect class="lane-bg" x="48" y="20" width="252" height="2746"/><text class="lane-label" x="60" y="42">20 ドメイン</text></g>
+</g>
+<g class="edges">
+<path id="e0" class="edge k-depends_on" d="M174,131 L174,115" marker-end="url(#arrow-depends_on)" data-src="DOM-02" data-dst="DOM-01"/>
+<path id="e1" class="edge k-depends_on" d="M174,211 L174,195" marker-end="url(#arrow-depends_on)" data-src="DOM-03" data-dst="DOM-02"/>
+<path id="e2" class="edge k-depends_on" d="M174,291 L174,275" marker-end="url(#arrow-depends_on)" data-src="DOM-04" data-dst="DOM-03"/>
+<path id="e3" class="edge k-depends_on" d="M174,371 L174,355" marker-end="url(#arrow-depends_on)" data-src="DOM-05" data-dst="DOM-04"/>
+<path id="e4" class="edge k-depends_on" d="M289,483 C331,483 331,243 289,243" marker-end="url(#arrow-depends_on)" data-src="DOM-06" data-dst="DOM-03"/>
+<path id="e5" class="edge k-depends_on" d="M289,563 C323,563 323,403 289,403" marker-end="url(#arrow-depends_on)" data-src="DOM-07" data-dst="DOM-05"/>
+<path id="e6" class="edge k-depends_on" d="M174,531 L174,515" marker-end="url(#arrow-depends_on)" data-src="DOM-07" data-dst="DOM-06"/>
+<path id="e7" class="edge k-depends_on" d="M174,611 L174,595" marker-end="url(#arrow-depends_on)" data-src="DOM-08" data-dst="DOM-07"/>
+<path id="e8" class="edge k-depends_on" d="M174,691 L174,675" marker-end="url(#arrow-depends_on)" data-src="DOM-09" data-dst="DOM-08"/>
+<path id="e9" class="edge k-depends_on" d="M174,771 L174,755" marker-end="url(#arrow-depends_on)" data-src="DOM-10" data-dst="DOM-09"/>
+<path id="e10" class="edge k-depends_on" d="M174,851 L174,835" marker-end="url(#arrow-depends_on)" data-src="DOM-11" data-dst="DOM-10"/>
+<path id="e11" class="edge k-depends_on" d="M289,963 C323,963 323,803 289,803" marker-end="url(#arrow-depends_on)" data-src="DOM-12" data-dst="DOM-10"/>
+<path id="e12" class="edge k-depends_on" d="M289,1043 C331,1043 331,803 289,803" marker-end="url(#arrow-depends_on)" data-src="DOM-13" data-dst="DOM-10"/>
+<path id="e13" class="edge k-depends_on" d="M174,1091 L174,1075" marker-end="url(#arrow-depends_on)" data-src="DOM-14" data-dst="DOM-13"/>
+<path id="e14" class="edge k-depends_on" d="M289,1123 C339,1123 339,1603 289,1603" marker-end="url(#arrow-depends_on)" data-src="DOM-14" data-dst="DOM-20"/>
+<path id="e15" class="edge k-depends_on" d="M289,1203 C339,1203 339,723 289,723" marker-end="url(#arrow-depends_on)" data-src="DOM-15" data-dst="DOM-09"/>
+<path id="e16" class="edge k-depends_on" d="M289,1283 C323,1283 323,1123 289,1123" marker-end="url(#arrow-depends_on)" data-src="DOM-16" data-dst="DOM-14"/>
+<path id="e17" class="edge k-depends_on" d="M289,1363 C323,1363 323,1203 289,1203" marker-end="url(#arrow-depends_on)" data-src="DOM-17" data-dst="DOM-15"/>
+<path id="e18" class="edge k-depends_on" d="M174,1411 L174,1395" marker-end="url(#arrow-depends_on)" data-src="DOM-18" data-dst="DOM-17"/>
+<path id="e19" class="edge k-depends_on" d="M174,1491 L174,1475" marker-end="url(#arrow-depends_on)" data-src="DOM-19" data-dst="DOM-18"/>
+<path id="e20" class="edge k-depends_on" d="M289,1603 C339,1603 339,883 289,883" marker-end="url(#arrow-depends_on)" data-src="DOM-20" data-dst="DOM-11"/>
+<path id="e21" class="edge k-depends_on" d="M174,1571 L174,1555" marker-end="url(#arrow-depends_on)" data-src="DOM-20" data-dst="DOM-19"/>
+<path id="e22" class="edge k-depends_on" d="M289,1683 C339,1683 339,563 289,563" marker-end="url(#arrow-depends_on)" data-src="DOM-21" data-dst="DOM-07"/>
+<path id="e23" class="edge k-depends_on" d="M289,1763 C339,1763 339,1203 289,1203" marker-end="url(#arrow-depends_on)" data-src="DOM-22" data-dst="DOM-15"/>
+<path id="e24" class="edge k-depends_on" d="M289,1843 C339,1843 339,1043 289,1043" marker-end="url(#arrow-depends_on)" data-src="DOM-23" data-dst="DOM-13"/>
+<path id="e25" class="edge k-depends_on" d="M174,1811 L174,1795" marker-end="url(#arrow-depends_on)" data-src="DOM-23" data-dst="DOM-22"/>
+<path id="e26" class="edge k-depends_on" d="M289,1923 C339,1923 339,1283 289,1283" marker-end="url(#arrow-depends_on)" data-src="DOM-24" data-dst="DOM-16"/>
+<path id="e27" class="edge k-depends_on" d="M289,2003 C339,2003 339,1603 289,1603" marker-end="url(#arrow-depends_on)" data-src="DOM-25" data-dst="DOM-20"/>
+<path id="e28" class="edge k-depends_on" d="M289,2003 C323,2003 323,1843 289,1843" marker-end="url(#arrow-depends_on)" data-src="DOM-25" data-dst="DOM-23"/>
+<path id="e29" class="edge k-depends_on" d="M289,2083 C339,2083 339,883 289,883" marker-end="url(#arrow-depends_on)" data-src="DOM-26" data-dst="DOM-11"/>
+<path id="e30" class="edge k-depends_on" d="M289,2163 C339,2163 339,723 289,723" marker-end="url(#arrow-depends_on)" data-src="DOM-27" data-dst="DOM-09"/>
+<path id="e31" class="edge k-depends_on" d="M289,2243 C339,2243 339,483 289,483" marker-end="url(#arrow-depends_on)" data-src="DOM-28" data-dst="DOM-06"/>
+<path id="e32" class="edge k-depends_on" d="M289,2323 C339,2323 339,1043 289,1043" marker-end="url(#arrow-depends_on)" data-src="DOM-29" data-dst="DOM-13"/>
+<path id="e33" class="edge k-depends_on" d="M289,2323 C339,2323 339,1603 289,1603" marker-end="url(#arrow-depends_on)" data-src="DOM-29" data-dst="DOM-20"/>
+<path id="e34" class="edge k-depends_on" d="M289,2323 C339,2323 339,1763 289,1763" marker-end="url(#arrow-depends_on)" data-src="DOM-29" data-dst="DOM-22"/>
+<path id="e35" class="edge k-depends_on" d="M289,2403 C339,2403 339,2003 289,2003" marker-end="url(#arrow-depends_on)" data-src="DOM-30" data-dst="DOM-25"/>
+<path id="e36" class="edge k-depends_on" d="M174,2371 L174,2355" marker-end="url(#arrow-depends_on)" data-src="DOM-30" data-dst="DOM-29"/>
+<path id="e37" class="edge k-depends_on" d="M174,2451 L174,2435" marker-end="url(#arrow-depends_on)" data-src="DOM-31" data-dst="DOM-30"/>
+<path id="e38" class="edge k-depends_on" d="M289,2563 C339,2563 339,2163 289,2163" marker-end="url(#arrow-depends_on)" data-src="DOM-32" data-dst="DOM-27"/>
+<path id="e39" class="edge k-depends_on" d="M289,2643 C339,2643 339,1763 289,1763" marker-end="url(#arrow-depends_on)" data-src="DOM-33" data-dst="DOM-22"/>
+<path id="e40" class="edge k-depends_on" d="M289,2643 C339,2643 339,1923 289,1923" marker-end="url(#arrow-depends_on)" data-src="DOM-33" data-dst="DOM-24"/>
+<path id="e41" class="edge k-depends_on" d="M289,2723 C339,2723 339,1923 289,1923" marker-end="url(#arrow-depends_on)" data-src="DOM-34" data-dst="DOM-24"/>
+</g>
+<g class="edge-labels">
+<text class="edge-label k-depends_on" x="182" y="127" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="207" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="287" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="367" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="324.5" y="359" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="318.5" y="479" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="527" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="607" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="687" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="767" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="847" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="318.5" y="879" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="324.5" y="919" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="1087" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="1359" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="959" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="318.5" y="1199" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="318.5" y="1279" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="1407" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="1487" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="1239" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="1567" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="1119" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="1479" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="1439" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="1807" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="1599" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="1799" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="318.5" y="1919" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="1479" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="1439" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="1359" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="1679" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="1959" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="2039" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="2199" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="2367" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="182" y="2447" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="2359" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="2199" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="2279" text-anchor="start">depends_on</text>
+<text class="edge-label k-depends_on" x="330.5" y="2319" text-anchor="start">depends_on</text>
+</g>
+<g class="flow">
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e0"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="0s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.42s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e1"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.84s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e2"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-1.26s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e3"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e4"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="0s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.42s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e5"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.84s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e6"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-1.26s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e7"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e8"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="0s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.42s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e9"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.84s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e10"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-1.26s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e11"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e12"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="0s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.42s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e13"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.84s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e14"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-1.26s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e15"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e16"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="0s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.42s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e17"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.84s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e18"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-1.26s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e19"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e20"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="0s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.42s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e21"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.84s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e22"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-1.26s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e23"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e24"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="0s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.42s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e25"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.84s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e26"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-1.26s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e27"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e28"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="0s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.42s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e29"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.84s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e30"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-1.26s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e31"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e32"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="0s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.42s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e33"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.84s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e34"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-1.26s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e35"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e36"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="0s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.42s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e37"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.84s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e38"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-1.26s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e39"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e40"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="0s" repeatCount="indefinite"/></circle>
+<circle class="flow-dot k-depends_on" r="4" opacity="0"><animateMotion dur="6s" begin="-0.42s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#e41"/></animateMotion><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.64;0.7;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></circle>
+<rect class="glow" x="59" y="51" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="0s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="131" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="211" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="291" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="211" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="0s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="371" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="451" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="531" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="611" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="0s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="691" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="771" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="771" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="771" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="0s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1011" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1571" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="691" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1091" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="0s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1171" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1331" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1411" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="851" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="0s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1491" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="531" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1171" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1011" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="0s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1731" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1251" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1571" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1811" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="0s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="851" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="691" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="451" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1571" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1731" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1971" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="2291" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="0s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="2371" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="2131" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.84s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1731" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-1.26s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1891" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="0s" repeatCount="indefinite"/></rect>
+<rect class="glow" x="59" y="1891" width="230" height="64" opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.66;0.74;0.92;1" dur="6s" begin="-0.42s" repeatCount="indefinite"/></rect>
+</g>
+<g class="nodes">
+<g class="node t-domain s-stable" data-id="DOM-01">
+<rect class="box" x="62" y="54" width="224" height="58"/>
+<text class="node-id" x="74" y="76">DOM-01</text>
+<text class="node-title"><tspan x="74" y="95">世界観</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-02">
+<rect class="box" x="62" y="134" width="224" height="58"/>
+<text class="node-id" x="74" y="156">DOM-02</text>
+<text class="node-title"><tspan x="74" y="175">周と体</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-03">
+<rect class="box" x="62" y="214" width="224" height="58"/>
+<text class="node-id" x="74" y="236">DOM-03</text>
+<text class="node-title"><tspan x="74" y="255">仕事とスキル</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-04">
+<rect class="box" x="62" y="294" width="224" height="58"/>
+<text class="node-id" x="74" y="316">DOM-04</text>
+<text class="node-title"><tspan x="74" y="335">インプラント</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-05">
+<rect class="box" x="62" y="374" width="224" height="58"/>
+<text class="node-id" x="74" y="396">DOM-05</text>
+<text class="node-title"><tspan x="74" y="415">転生と永続強化</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-06">
+<rect class="box" x="62" y="454" width="224" height="58"/>
+<text class="node-id" x="74" y="476">DOM-06</text>
+<text class="node-title"><tspan x="74" y="495">イベントと選択肢</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-07">
+<rect class="box" x="62" y="534" width="224" height="58"/>
+<text class="node-id" x="74" y="556">DOM-07</text>
+<text class="node-title"><tspan x="74" y="575">クロニクルの物語</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-08">
+<rect class="box" x="62" y="614" width="224" height="58"/>
+<text class="node-id" x="74" y="636">DOM-08</text>
+<text class="node-title"><tspan x="74" y="655">記憶の断片とエンディング</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-09">
+<rect class="box" x="62" y="694" width="224" height="58"/>
+<text class="node-id" x="74" y="716">DOM-09</text>
+<text class="node-title"><tspan x="74" y="735">意識の写しと目覚め</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-10">
+<rect class="box" x="62" y="774" width="224" height="58"/>
+<text class="node-id" x="74" y="796">DOM-10</text>
+<text class="node-title"><tspan x="74" y="815">登場人物</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-11">
+<rect class="box" x="62" y="854" width="224" height="58"/>
+<text class="node-id" x="74" y="876">DOM-11</text>
+<text class="node-title"><tspan x="74" y="895">体の種類</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-12">
+<rect class="box" x="62" y="934" width="224" height="58"/>
+<text class="node-id" x="74" y="956">DOM-12</text>
+<text class="node-title"><tspan x="74" y="975">ジンの依頼</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-13">
+<rect class="box" x="62" y="1014" width="224" height="58"/>
+<text class="node-id" x="74" y="1036">DOM-13</text>
+<text class="node-title"><tspan x="74" y="1055">人物のイベント</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-14">
+<rect class="box" x="62" y="1094" width="224" height="58"/>
+<text class="node-id" x="74" y="1116">DOM-14</text>
+<text class="node-title"><tspan x="74" y="1135">街と人物の資料</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-15">
+<rect class="box" x="62" y="1174" width="224" height="58"/>
+<text class="node-id" x="74" y="1196">DOM-15</text>
+<text class="node-title"><tspan x="74" y="1215">街の場所と勢力</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-16">
+<rect class="box" x="62" y="1254" width="224" height="58"/>
+<text class="node-id" x="74" y="1276">DOM-16</text>
+<text class="node-title"><tspan x="74" y="1295">街の地図</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-17">
+<rect class="box" x="62" y="1334" width="224" height="58"/>
+<text class="node-id" x="74" y="1356">DOM-17</text>
+<text class="node-title"><tspan x="74" y="1375">街の歴史</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-18">
+<rect class="box" x="62" y="1414" width="224" height="58"/>
+<text class="node-id" x="74" y="1436">DOM-18</text>
+<text class="node-title"><tspan x="74" y="1455">住民の階級と暮らし</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-19">
+<rect class="box" x="62" y="1494" width="224" height="58"/>
+<text class="node-id" x="74" y="1516">DOM-19</text>
+<text class="node-title"><tspan x="74" y="1535">住民の生まれから死まで</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-20">
+<rect class="box" x="62" y="1574" width="224" height="58"/>
+<text class="node-id" x="74" y="1596">DOM-20</text>
+<text class="node-title"><tspan x="74" y="1615">被験体の出どころ</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-21">
+<rect class="box" x="62" y="1654" width="224" height="58"/>
+<text class="node-id" x="74" y="1676">DOM-21</text>
+<text class="node-title"><tspan x="74" y="1695">縛りの周</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-22">
+<rect class="box" x="62" y="1734" width="224" height="58"/>
+<text class="node-id" x="74" y="1756">DOM-22</text>
+<text class="node-title"><tspan x="74" y="1775">勢力の評判</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-23">
+<rect class="box" x="62" y="1814" width="224" height="58"/>
+<text class="node-id" x="74" y="1836">DOM-23</text>
+<text class="node-title"><tspan x="74" y="1855">屋台通りの対立</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-24">
+<rect class="box" x="62" y="1894" width="224" height="58"/>
+<text class="node-id" x="74" y="1916">DOM-24</text>
+<text class="node-title"><tspan x="74" y="1935">仕事の区画と身元</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-25">
+<rect class="box" x="62" y="1974" width="224" height="58"/>
+<text class="node-id" x="74" y="1996">DOM-25</text>
+<text class="node-title"><tspan x="74" y="2015">体の元の持ち主と特性</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-26">
+<rect class="box" x="62" y="2054" width="224" height="58"/>
+<text class="node-id" x="74" y="2076">DOM-26</text>
+<text class="node-title"><tspan x="74" y="2095">体の容量とインプラントの取り外し</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-27">
+<rect class="box" x="62" y="2134" width="224" height="58"/>
+<text class="node-id" x="74" y="2156">DOM-27</text>
+<text class="node-title"><tspan x="74" y="2175">前の周の跡</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-28">
+<rect class="box" x="62" y="2214" width="224" height="58"/>
+<text class="node-id" x="74" y="2236">DOM-28</text>
+<text class="node-title"><tspan x="74" y="2255">イベントの波</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-29">
+<rect class="box" x="62" y="2294" width="224" height="58"/>
+<text class="node-id" x="74" y="2316">DOM-29</text>
+<text class="node-title"><tspan x="74" y="2335">目覚めの日</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-30">
+<rect class="box" x="62" y="2374" width="224" height="58"/>
+<text class="node-id" x="74" y="2396">DOM-30</text>
+<text class="node-title"><tspan x="74" y="2415">分岐図</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-31">
+<rect class="box" x="62" y="2454" width="224" height="58"/>
+<text class="node-id" x="74" y="2476">DOM-31</text>
+<text class="node-title"><tspan x="74" y="2495">話の選び直し</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-32">
+<rect class="box" x="62" y="2534" width="224" height="58"/>
+<text class="node-id" x="74" y="2556">DOM-32</text>
+<text class="node-title"><tspan x="74" y="2575">スキルの声</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-33">
+<rect class="box" x="62" y="2614" width="224" height="58"/>
+<text class="node-id" x="74" y="2636">DOM-33</text>
+<text class="node-title"><tspan x="74" y="2655">街の噂</tspan></text>
+</g>
+<g class="node t-domain s-stable" data-id="DOM-34">
+<rect class="box" x="62" y="2694" width="224" height="58"/>
+<text class="node-id" x="74" y="2716">DOM-34</text>
+<text class="node-title"><tspan x="74" y="2735">第二部の暮らし</tspan></text>
+</g>
+</g>
+</svg>
